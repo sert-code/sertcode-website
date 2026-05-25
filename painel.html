@@ -1,0 +1,1364 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel do Gestor — SertCode</title>
+  <link rel="icon" type="image/png" href="assets/logo-symbol.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/portal.css">
+  <style>
+    .admin-badge {
+      font-size: 9px; font-weight: 800;
+      background: rgba(255,106,0,0.12);
+      color: var(--orange);
+      border: 1px solid rgba(255,106,0,0.22);
+      padding: 3px 10px; border-radius: 99px;
+      text-transform: uppercase; letter-spacing: .09em;
+    }
+    .filter-tabs {
+      display: flex; border-bottom: 1px solid var(--border); gap: 0;
+    }
+    .filter-tab {
+      padding: 8px 16px; font-size: 12.5px; font-weight: 600;
+      color: var(--text-dim); cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px; transition: var(--tr); white-space: nowrap;
+    }
+    .filter-tab.active { color: var(--orange); border-bottom-color: var(--orange); }
+    .filter-tab:hover:not(.active) { color: var(--text); }
+
+    .proj-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .proj-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 20px;
+    }
+    .proj-card-top { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 14px; }
+    .proj-initials {
+      width: 38px; height: 38px; border-radius: 10px;
+      background: linear-gradient(135deg, #FF8A00, #D94A00);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 800; color: #fff; flex-shrink: 0;
+    }
+    .proj-client { font-size: 11px; color: var(--text-dim); margin-bottom: 2px; }
+    .proj-name   { font-size: 14px; font-weight: 700; color: var(--text); }
+    .proj-actions { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+
+    .testimonial-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 20px 22px; margin-bottom: 12px;
+      transition: var(--tr);
+    }
+    .testimonial-stars   { color: var(--orange); font-size: 16px; margin-bottom: 6px; }
+    .testimonial-quote   { font-size: 13.5px; color: var(--text); line-height: 1.65; margin-bottom: 10px; font-style: italic; }
+    .testimonial-author  { font-size: 11.5px; color: var(--text-dim); margin-bottom: 14px; }
+    .testimonial-actions { display: flex; gap: 8px; }
+
+    .feedback-item {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 16px 20px; margin-bottom: 10px;
+      display: flex; gap: 14px; align-items: flex-start;
+      transition: var(--tr);
+    }
+    .feedback-item:hover { border-color: rgba(255,255,255,0.1); }
+    .feedback-avatar {
+      width: 34px; height: 34px; border-radius: 8px;
+      background: linear-gradient(135deg,rgba(255,106,0,.25),rgba(217,74,0,.25));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 700; color: var(--orange); flex-shrink: 0;
+    }
+    .feedback-stars    { color: var(--orange); font-size: 13px; margin-bottom: 2px; }
+    .feedback-category { font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--text-dim); letter-spacing: .06em; margin-bottom: 4px; }
+    .feedback-text     { font-size: 13px; color: var(--text); line-height: 1.55; }
+    .feedback-meta     { font-size: 11px; color: var(--text-dim); margin-top: 5px; }
+
+    .upload-area {
+      border: 2px dashed var(--border); border-radius: 12px;
+      padding: 36px 20px; text-align: center; cursor: pointer;
+      transition: var(--tr); margin-bottom: 16px;
+    }
+    .upload-area:hover { border-color: rgba(255,106,0,.35); background: rgba(255,106,0,.02); }
+
+    .range-wrap { display: flex; align-items: center; gap: 12px; margin-top: 6px; }
+    input[type="range"] {
+      flex: 1; accent-color: var(--orange);
+      background: rgba(255,255,255,.08); border-radius: 99px;
+      outline: none; cursor: pointer; height: 6px;
+    }
+    .range-val { font-size: 22px; font-weight: 800; color: var(--orange); min-width: 54px; text-align: right; }
+
+    .client-selector {
+      background: var(--surface-2); border: 1px solid var(--border);
+      border-radius: 8px; padding: 9px 13px; color: var(--text);
+      font-family: var(--font); font-size: 13.5px; outline: none; min-width: 240px;
+    }
+    .client-selector:focus { border-color: rgba(255,106,0,.4); }
+
+    .ticket-info-box {
+      background: rgba(255,255,255,.03); border: 1px solid var(--border);
+      border-radius: 8px; padding: 12px 14px; margin-bottom: 16px; font-size: 12.5px;
+    }
+
+    @media (max-width: 900px) { .proj-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+
+<div class="portal-layout">
+
+  <!-- ══ SIDEBAR ══ -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <a href="index.html" class="sidebar-logo">
+        <img src="assets/logo-symbol.png" alt="SertCode">
+        <span class="sidebar-logo-text">Sert<em>Code</em></span>
+      </a>
+    </div>
+
+    <div class="sidebar-project">
+      <div class="sidebar-project-label">Modo de acesso</div>
+      <div class="sidebar-project-name" style="display:flex;align-items:center;gap:7px">
+        Painel do Gestor <span class="admin-badge">Admin</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="#" class="active" data-tab="dashboard">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+        Dashboard
+      </a>
+      <a href="#" data-tab="clientes">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+        Clientes
+      </a>
+      <a href="#" data-tab="projetos">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
+        Projetos
+      </a>
+      <a href="#" data-tab="chamados">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        Chamados
+        <span class="sidebar-badge">2</span>
+      </a>
+      <a href="#" data-tab="arquivos">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
+        Arquivos
+      </a>
+      <a href="#" data-tab="financeiro">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+        Financeiro
+      </a>
+      <a href="#" data-tab="depoimentos">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        Depoimentos
+        <span class="sidebar-badge" style="background:var(--green)">2</span>
+      </a>
+      <a href="#" data-tab="feedbacks">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
+        Feedbacks
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="sidebar-avatar" style="background:linear-gradient(135deg,#1a1a1a,#0a0a0a);border:1px solid rgba(255,106,0,.3)">G</div>
+      <div>
+        <div class="sidebar-user-name">Gestor SertCode</div>
+        <div class="sidebar-user-role" style="color:var(--orange);font-size:10px;font-weight:700">ADMINISTRADOR</div>
+      </div>
+      <a href="gestor.html" class="sidebar-logout" title="Sair">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      </a>
+    </div>
+  </aside>
+
+  <!-- ══ MAIN ══ -->
+  <main class="portal-main">
+
+    <header class="portal-header">
+      <div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="portal-header-title" id="header-title">Dashboard</div>
+          <span class="admin-badge">Gestor</span>
+        </div>
+        <div class="portal-header-sub">Painel administrativo — SertCode</div>
+      </div>
+      <div class="portal-header-right">
+        <div class="notif-btn" title="Notificações">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+          <div class="notif-dot"></div>
+        </div>
+        <div class="header-avatar" style="background:linear-gradient(135deg,#1a1a1a,#0a0a0a);border:1px solid rgba(255,106,0,.2)">G</div>
+      </div>
+    </header>
+
+    <div class="portal-content">
+
+      <!-- ════════════ DASHBOARD ════════════ -->
+      <section class="tab-section active" id="tab-dashboard">
+        <div class="section-title">Visão geral</div>
+        <div class="section-sub">Resumo de todos os clientes, projetos e receitas</div>
+
+        <div class="stat-row">
+          <div class="stat-card">
+            <div class="stat-card-top">
+              <span class="stat-card-label">Clientes ativos</span>
+              <div class="stat-icon blue">
+                <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/></svg>
+              </div>
+            </div>
+            <div class="stat-value">3</div>
+            <div class="stat-hint">2 em desenvolvimento · 1 entregue</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-top">
+              <span class="stat-card-label">Projetos em andamento</span>
+              <div class="stat-icon orange">
+                <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+              </div>
+            </div>
+            <div class="stat-value">2</div>
+            <div class="stat-hint">+1 entregue este mês</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-top">
+              <span class="stat-card-label">Chamados abertos</span>
+              <div class="stat-icon purple">
+                <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+              </div>
+            </div>
+            <div class="stat-value">2</div>
+            <div class="stat-hint">1 alta prioridade</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-top">
+              <span class="stat-card-label">Receita recebida</span>
+              <div class="stat-icon green">
+                <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+              </div>
+            </div>
+            <div class="stat-value" style="font-size:20px">R$ 31.200</div>
+            <div class="stat-hint">R$ 12.600 a receber</div>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title">Chamados aguardando resposta</div>
+            <div class="card-sub">Tickets que precisam de ação imediata</div>
+            <div class="activity-list">
+              <div class="activity-item">
+                <div class="activity-dot" style="background:var(--red)"></div>
+                <div class="activity-text">
+                  <strong>#SC-003</strong> — Clínica Vida Plena<br>
+                  <span style="font-size:12px;color:var(--text-dim)">Erro ao salvar agendamento · <strong style="color:var(--red)">Alta prioridade</strong></span>
+                </div>
+                <span class="status status-dev" style="flex-shrink:0;white-space:nowrap">Aberto</span>
+              </div>
+              <div class="activity-item">
+                <div class="activity-dot blue"></div>
+                <div class="activity-text">
+                  <strong>#SC-001</strong> — Empresa ABC<br>
+                  <span style="font-size:12px;color:var(--text-dim)">Dashboard lento ao carregar · Média prioridade</span>
+                </div>
+                <span class="status status-analysis" style="flex-shrink:0;white-space:nowrap">Em análise</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">Progresso dos projetos</div>
+            <div class="card-sub">Atualizado em tempo real</div>
+            <div style="display:flex;flex-direction:column;gap:16px">
+              <div>
+                <div style="display:flex;justify-content:space-between;margin-bottom:5px;font-size:13px">
+                  <span>ERP Comercial <span style="color:var(--text-dim);font-size:11px">· Empresa ABC</span></span>
+                  <span style="font-weight:700;color:var(--orange)" id="dash-prog-abc">72%</span>
+                </div>
+                <div class="progress-bar-track"><div class="progress-bar-fill" id="dash-bar-abc" style="width:72%"></div></div>
+              </div>
+              <div>
+                <div style="display:flex;justify-content:space-between;margin-bottom:5px;font-size:13px">
+                  <span>Portal Agendamentos <span style="color:var(--text-dim);font-size:11px">· Clínica Vida Plena</span></span>
+                  <span style="font-weight:700;color:var(--orange)" id="dash-prog-vpl">45%</span>
+                </div>
+                <div class="progress-bar-track"><div class="progress-bar-fill" id="dash-bar-vpl" style="width:45%"></div></div>
+              </div>
+              <div>
+                <div style="display:flex;justify-content:space-between;margin-bottom:5px;font-size:13px">
+                  <span>App Logística <span style="color:var(--text-dim);font-size:11px">· NordLog</span></span>
+                  <span style="font-weight:700;color:var(--green)">100%</span>
+                </div>
+                <div class="progress-bar-track"><div class="progress-bar-fill" style="width:100%;background:var(--green)"></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ════════════ CLIENTES ════════════ -->
+      <section class="tab-section" id="tab-clientes">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:14px;margin-bottom:24px">
+          <div>
+            <div class="section-title">Clientes</div>
+            <div class="section-sub" style="margin-bottom:0">Gerenciamento de acesso, projetos e credenciais</div>
+          </div>
+          <button class="btn btn-primary" onclick="alert('Em produção: cadastro de novo cliente com geração automática de credenciais e envio por e-mail.')">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Novo cliente
+          </button>
+        </div>
+
+        <div class="card">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Cliente</th>
+                <th>Empresa</th>
+                <th>Projeto</th>
+                <th>Progresso</th>
+                <th>Último acesso</th>
+                <th>Status</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <div style="display:flex;align-items:center;gap:10px">
+                    <div style="width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#FF8A00,#D94A00);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff;flex-shrink:0">CA</div>
+                    <div><div style="font-weight:600">Carlos Almeida</div><div style="font-size:11px;color:var(--text-dim)">carlos@empresaabc.com</div></div>
+                  </div>
+                </td>
+                <td style="color:var(--text-dim)">Empresa ABC Ltda</td>
+                <td>ERP Comercial</td>
+                <td>
+                  <div style="display:flex;align-items:center;gap:8px">
+                    <div class="progress-bar-track" style="width:60px"><div class="progress-bar-fill" style="width:72%"></div></div>
+                    <span style="font-size:12px;font-weight:700;color:var(--orange)">72%</span>
+                  </div>
+                </td>
+                <td style="color:var(--text-dim);font-size:12px">Hoje 09:14</td>
+                <td><span class="status status-dev">Ativo</span></td>
+                <td>
+                  <div style="display:flex;gap:6px">
+                    <a href="portal.html" class="btn btn-outline" style="padding:5px 10px;font-size:11px" target="_blank">Portal</a>
+                    <button class="btn btn-outline" style="padding:5px 10px;font-size:11px" onclick="showCredentials('Carlos Almeida','carlos@empresaabc.com','cliente#ABC01')">Credenciais</button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <div style="display:flex;align-items:center;gap:10px">
+                    <div style="width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#8B5CF6,#6D28D9);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff;flex-shrink:0">MS</div>
+                    <div><div style="font-weight:600">Mariana Santos</div><div style="font-size:11px;color:var(--text-dim)">mariana@vidaplena.com</div></div>
+                  </div>
+                </td>
+                <td style="color:var(--text-dim)">Clínica Vida Plena</td>
+                <td>Portal Agendamentos</td>
+                <td>
+                  <div style="display:flex;align-items:center;gap:8px">
+                    <div class="progress-bar-track" style="width:60px"><div class="progress-bar-fill" style="width:45%"></div></div>
+                    <span style="font-size:12px;font-weight:700;color:var(--orange)">45%</span>
+                  </div>
+                </td>
+                <td style="color:var(--text-dim);font-size:12px">Ontem 16:30</td>
+                <td><span class="status status-dev">Ativo</span></td>
+                <td>
+                  <div style="display:flex;gap:6px">
+                    <a href="portal.html" class="btn btn-outline" style="padding:5px 10px;font-size:11px" target="_blank">Portal</a>
+                    <button class="btn btn-outline" style="padding:5px 10px;font-size:11px" onclick="showCredentials('Mariana Santos','mariana@vidaplena.com','cliente#VPL02')">Credenciais</button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <div style="display:flex;align-items:center;gap:10px">
+                    <div style="width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#22C55E,#16A34A);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff;flex-shrink:0">RL</div>
+                    <div><div style="font-weight:600">Roberto Lima</div><div style="font-size:11px;color:var(--text-dim)">roberto@nordlog.com</div></div>
+                  </div>
+                </td>
+                <td style="color:var(--text-dim)">Distribuidora NordLog</td>
+                <td>App Logística</td>
+                <td>
+                  <div style="display:flex;align-items:center;gap:8px">
+                    <div class="progress-bar-track" style="width:60px"><div class="progress-bar-fill" style="width:100%;background:var(--green)"></div></div>
+                    <span style="font-size:12px;font-weight:700;color:var(--green)">100%</span>
+                  </div>
+                </td>
+                <td style="color:var(--text-dim);font-size:12px">3 dias atrás</td>
+                <td><span class="status status-done">Entregue</span></td>
+                <td>
+                  <div style="display:flex;gap:6px">
+                    <a href="portal.html" class="btn btn-outline" style="padding:5px 10px;font-size:11px" target="_blank">Portal</a>
+                    <button class="btn btn-outline" style="padding:5px 10px;font-size:11px" onclick="showCredentials('Roberto Lima','roberto@nordlog.com','cliente#NLD03')">Credenciais</button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ════════════ PROJETOS ════════════ -->
+      <section class="tab-section" id="tab-projetos">
+        <div class="section-title">Projetos</div>
+        <div class="section-sub">Gerencie progresso, fases e atividades de cada projeto</div>
+
+        <div class="proj-grid">
+
+          <div class="proj-card">
+            <div class="proj-card-top">
+              <div class="proj-initials">ABC</div>
+              <div style="flex:1;min-width:0">
+                <div class="proj-client">Empresa ABC Ltda</div>
+                <div class="proj-name">Sistema ERP Comercial</div>
+              </div>
+              <span class="status status-dev">Em dev</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px">
+              <span style="color:var(--text-dim)">Progresso</span>
+              <span style="font-weight:700;color:var(--orange)" id="prog-abc-val">72%</span>
+            </div>
+            <div class="progress-bar-track" style="height:8px">
+              <div class="progress-bar-fill" id="prog-abc-bar" style="width:72%"></div>
+            </div>
+            <div style="font-size:11px;color:var(--text-dim);margin-top:7px">Fase: Desenvolvimento · Entrega: 10 Jul 2026</div>
+            <div class="proj-actions">
+              <button class="btn btn-primary" style="font-size:12px;padding:7px 12px" onclick="openProgressModal('abc','Sistema ERP Comercial',72)">
+                <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                Atualizar progresso
+              </button>
+              <button class="btn btn-outline" style="font-size:12px;padding:7px 12px" onclick="openActivityModal('Sistema ERP Comercial')">
+                <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Adicionar atividade
+              </button>
+            </div>
+          </div>
+
+          <div class="proj-card">
+            <div class="proj-card-top">
+              <div class="proj-initials" style="background:linear-gradient(135deg,#8B5CF6,#6D28D9)">VPL</div>
+              <div style="flex:1;min-width:0">
+                <div class="proj-client">Clínica Vida Plena</div>
+                <div class="proj-name">Portal de Agendamentos</div>
+              </div>
+              <span class="status status-dev">Em dev</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px">
+              <span style="color:var(--text-dim)">Progresso</span>
+              <span style="font-weight:700;color:var(--orange)" id="prog-vpl-val">45%</span>
+            </div>
+            <div class="progress-bar-track" style="height:8px">
+              <div class="progress-bar-fill" id="prog-vpl-bar" style="width:45%"></div>
+            </div>
+            <div style="font-size:11px;color:var(--text-dim);margin-top:7px">Fase: Desenvolvimento · Entrega: 20 Ago 2026</div>
+            <div class="proj-actions">
+              <button class="btn btn-primary" style="font-size:12px;padding:7px 12px" onclick="openProgressModal('vpl','Portal de Agendamentos',45)">
+                <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                Atualizar progresso
+              </button>
+              <button class="btn btn-outline" style="font-size:12px;padding:7px 12px" onclick="openActivityModal('Portal de Agendamentos')">
+                <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Adicionar atividade
+              </button>
+            </div>
+          </div>
+
+          <div class="proj-card" style="border-color:rgba(34,197,94,.15)">
+            <div class="proj-card-top">
+              <div class="proj-initials" style="background:linear-gradient(135deg,#22C55E,#16A34A)">NLD</div>
+              <div style="flex:1;min-width:0">
+                <div class="proj-client">Distribuidora NordLog</div>
+                <div class="proj-name">App de Logística</div>
+              </div>
+              <span class="status status-done">Entregue</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px">
+              <span style="color:var(--text-dim)">Progresso</span>
+              <span style="font-weight:700;color:var(--green)">100%</span>
+            </div>
+            <div class="progress-bar-track" style="height:8px">
+              <div class="progress-bar-fill" style="width:100%;background:var(--green)"></div>
+            </div>
+            <div style="font-size:11px;color:var(--text-dim);margin-top:7px">Entregue em 01 Mai 2026 · Suporte ativo</div>
+            <div class="proj-actions">
+              <button class="btn btn-outline" style="font-size:12px;padding:7px 12px" onclick="openActivityModal('App de Logística')">
+                <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Registrar atividade
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ════════════ CHAMADOS ════════════ -->
+      <section class="tab-section" id="tab-chamados">
+        <div class="section-title">Chamados</div>
+        <div class="section-sub">Central de suporte — todos os clientes</div>
+
+        <div class="filter-tabs" style="margin-bottom:16px">
+          <div class="filter-tab active" data-filter="all">Todos <span style="opacity:.5">(4)</span></div>
+          <div class="filter-tab" data-filter="open">Abertos <span style="opacity:.5">(1)</span></div>
+          <div class="filter-tab" data-filter="analysis">Em análise <span style="opacity:.5">(1)</span></div>
+          <div class="filter-tab" data-filter="done">Concluídos <span style="opacity:.5">(2)</span></div>
+        </div>
+
+        <div class="card">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>ID</th><th>Cliente</th><th>Assunto</th><th>Prioridade</th><th>Abertura</th><th>Status</th><th>Ação</th>
+              </tr>
+            </thead>
+            <tbody id="tickets-body">
+              <tr data-status="open">
+                <td><span class="ticket-id">#SC-003</span></td>
+                <td style="font-weight:600">Clínica Vida Plena</td>
+                <td>Erro ao salvar agendamento de paciente</td>
+                <td><span class="status" style="background:rgba(239,68,68,.1);color:var(--red)">Alta</span></td>
+                <td style="color:var(--text-dim);font-size:12px">22 Mai 2026</td>
+                <td><span class="status status-dev" id="st-003">Aberto</span></td>
+                <td><button class="btn btn-primary" style="padding:5px 12px;font-size:12px" onclick="openResponseModal('003','Erro ao salvar agendamento de paciente','Clínica Vida Plena','open')">Responder</button></td>
+              </tr>
+              <tr data-status="analysis">
+                <td><span class="ticket-id">#SC-001</span></td>
+                <td style="font-weight:600">Empresa ABC</td>
+                <td>Dashboard apresenta lentidão ao carregar</td>
+                <td><span class="status" style="background:rgba(245,158,11,.1);color:#F59E0B">Média</span></td>
+                <td style="color:var(--text-dim);font-size:12px">21 Mai 2026</td>
+                <td><span class="status status-analysis" id="st-001">Em análise</span></td>
+                <td><button class="btn btn-outline" style="padding:5px 12px;font-size:12px" onclick="openResponseModal('001','Dashboard apresenta lentidão ao carregar','Empresa ABC','analysis')">Responder</button></td>
+              </tr>
+              <tr data-status="done">
+                <td><span class="ticket-id">#SC-004</span></td>
+                <td style="font-weight:600">NordLog</td>
+                <td>Como integrar a API com sistema legado?</td>
+                <td><span class="status status-pending">Baixa</span></td>
+                <td style="color:var(--text-dim);font-size:12px">10 Mai 2026</td>
+                <td><span class="status status-done">Concluído</span></td>
+                <td><button class="btn btn-outline" style="padding:5px 12px;font-size:12px;opacity:.45;pointer-events:none">Ver</button></td>
+              </tr>
+              <tr data-status="done">
+                <td><span class="ticket-id">#SC-002</span></td>
+                <td style="font-weight:600">Empresa ABC</td>
+                <td>Solicitação: exportar relatório em PDF</td>
+                <td><span class="status status-pending">Baixa</span></td>
+                <td style="color:var(--text-dim);font-size:12px">15 Mai 2026</td>
+                <td><span class="status status-done">Concluído</span></td>
+                <td><button class="btn btn-outline" style="padding:5px 12px;font-size:12px;opacity:.45;pointer-events:none">Ver</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ════════════ ARQUIVOS ════════════ -->
+      <section class="tab-section" id="tab-arquivos">
+        <div class="section-title">Arquivos</div>
+        <div class="section-sub">Envie e gerencie arquivos por cliente</div>
+
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap">
+          <label style="font-size:11px;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:.06em">Cliente:</label>
+          <select class="client-selector" id="file-client-select" onchange="window.switchFileClient(this.value)">
+            <option value="">Carregando clientes...</option>
+          </select>
+        </div>
+
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+            <div>
+              <div class="card-title" id="file-card-title">Arquivos — Empresa ABC Ltda</div>
+              <div class="card-sub" style="margin-bottom:0">5 arquivos · 15.7 MB total</div>
+            </div>
+            <button class="btn btn-primary" style="font-size:12px;padding:7px 13px" onclick="document.getElementById('upload-zone').style.display='block';this.style.display='none'">
+              <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0018 9h-1.26A8 8 0 103 16.3"/></svg>
+              Enviar arquivo
+            </button>
+          </div>
+
+          <div id="upload-zone" style="display:none">
+            <div class="upload-area" onclick="simulateUpload()">
+              <div style="font-size:32px;margin-bottom:8px">📎</div>
+              <div style="font-size:13px;color:var(--text-dim)">Clique para selecionar ou arraste o arquivo aqui</div>
+              <div style="font-size:11px;color:var(--text-dim);margin-top:4px">PDF, DOC, ZIP, FIG — máx. 50 MB</div>
+            </div>
+          </div>
+
+          <div class="file-row"><div class="file-icon pdf">PDF</div><div><div class="file-name">Proposta Comercial SertCode.pdf</div><div class="file-meta">245 KB · 02 Mai 2026</div></div><a href="#" class="file-dl" onclick="event.preventDefault()"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Baixar</a></div>
+          <div class="file-row"><div class="file-icon pdf">PDF</div><div><div class="file-name">Contrato de Desenvolvimento.pdf</div><div class="file-meta">180 KB · 03 Mai 2026</div></div><a href="#" class="file-dl" onclick="event.preventDefault()"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Baixar</a></div>
+          <div class="file-row"><div class="file-icon fig">FIG</div><div><div class="file-name">Protótipo UI/UX — Figma.fig</div><div class="file-meta">2.4 MB · 18 Mai 2026</div></div><a href="#" class="file-dl" onclick="event.preventDefault()"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Baixar</a></div>
+          <div class="file-row"><div class="file-icon doc">PDF</div><div><div class="file-name">Manual do Usuário v1.0.pdf</div><div class="file-meta">890 KB · 20 Mai 2026</div></div><a href="#" class="file-dl" onclick="event.preventDefault()"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Baixar</a></div>
+          <div class="file-row"><div class="file-icon zip">ZIP</div><div><div class="file-name">Logo e Identidade Visual.zip</div><div class="file-meta">12 MB · 19 Mai 2026</div></div><a href="#" class="file-dl" onclick="event.preventDefault()"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Baixar</a></div>
+        </div>
+      </section>
+
+      <!-- ════════════ FINANCEIRO ════════════ -->
+      <section class="tab-section" id="tab-financeiro">
+        <div class="section-title">Financeiro</div>
+        <div class="section-sub">Controle de parcelas e recebimentos de todos os clientes</div>
+
+        <div class="stat-row" style="grid-template-columns:repeat(3,1fr);margin-bottom:20px">
+          <div class="stat-card">
+            <div class="stat-card-top"><span class="stat-card-label">Total contratos</span><div class="stat-icon blue"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div></div>
+            <div class="stat-value" style="font-size:20px">R$ 43.800</div>
+            <div class="stat-hint">3 contratos ativos</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-top"><span class="stat-card-label">Recebido</span><div class="stat-icon green"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div></div>
+            <div class="stat-value" style="font-size:20px;color:var(--green)">R$ 31.200</div>
+            <div class="stat-hint">71% do total</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-top"><span class="stat-card-label">A receber</span><div class="stat-icon orange"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div></div>
+            <div class="stat-value" style="font-size:20px">R$ 12.600</div>
+            <div class="stat-hint">4 parcelas pendentes</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <table class="data-table">
+            <thead>
+              <tr><th>Cliente</th><th>Descrição</th><th>Valor</th><th>Vencimento</th><th>Status</th><th>Ação</th></tr>
+            </thead>
+            <tbody>
+              <tr><td style="font-weight:600">Empresa ABC</td><td style="color:var(--text-dim)">Parcela 1 de 3</td><td style="font-weight:700">R$ 4.200,00</td><td style="color:var(--text-dim);font-size:12px">03 Mai 2026</td><td><span class="status status-paid">Pago</span></td><td style="color:var(--text-dim);font-size:12px">—</td></tr>
+              <tr><td style="font-weight:600">Empresa ABC</td><td style="color:var(--text-dim)">Parcela 2 de 3</td><td style="font-weight:700">R$ 4.200,00</td><td style="color:var(--text-dim);font-size:12px">03 Jun 2026</td><td id="fin-1"><span class="status status-pending">Pendente</span></td><td><button class="btn btn-outline" style="font-size:11px;padding:4px 10px" onclick="markPaid(this,'fin-1')">Marcar pago</button></td></tr>
+              <tr><td style="font-weight:600">Empresa ABC</td><td style="color:var(--text-dim)">Parcela 3 de 3 · Entrega</td><td style="font-weight:700">R$ 4.200,00</td><td style="color:var(--text-dim);font-size:12px">10 Jul 2026</td><td id="fin-2"><span class="status status-pending">Pendente</span></td><td><button class="btn btn-outline" style="font-size:11px;padding:4px 10px" onclick="markPaid(this,'fin-2')">Marcar pago</button></td></tr>
+              <tr><td style="font-weight:600">Clínica Vida Plena</td><td style="color:var(--text-dim)">Parcela 1 de 2</td><td style="font-weight:700">R$ 6.000,00</td><td style="color:var(--text-dim);font-size:12px">02 Mai 2026</td><td><span class="status status-paid">Pago</span></td><td style="color:var(--text-dim);font-size:12px">—</td></tr>
+              <tr><td style="font-weight:600">Clínica Vida Plena</td><td style="color:var(--text-dim)">Parcela 2 de 2 · Entrega</td><td style="font-weight:700">R$ 6.000,00</td><td style="color:var(--text-dim);font-size:12px">02 Jun 2026</td><td id="fin-3"><span class="status status-pending">Pendente</span></td><td><button class="btn btn-outline" style="font-size:11px;padding:4px 10px" onclick="markPaid(this,'fin-3')">Marcar pago</button></td></tr>
+              <tr><td style="font-weight:600">NordLog</td><td style="color:var(--text-dim)">Projeto completo · Único</td><td style="font-weight:700">R$ 15.000,00</td><td style="color:var(--text-dim);font-size:12px">01 Mai 2026</td><td><span class="status status-paid">Pago</span></td><td style="color:var(--text-dim);font-size:12px">—</td></tr>
+              <tr><td style="font-weight:600">NordLog</td><td style="color:var(--text-dim)">Suporte mensal Mai/Jun</td><td style="font-weight:700">R$ 4.200,00</td><td style="color:var(--text-dim);font-size:12px">01 Jun 2026</td><td id="fin-4"><span class="status status-pending">Pendente</span></td><td><button class="btn btn-outline" style="font-size:11px;padding:4px 10px" onclick="markPaid(this,'fin-4')">Marcar pago</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ════════════ DEPOIMENTOS ════════════ -->
+      <section class="tab-section" id="tab-depoimentos">
+        <div class="section-title">Depoimentos</div>
+        <div class="section-sub">Aprove avaliações de clientes para publicar no site público</div>
+
+        <div id="testi-list">
+
+          <div class="testimonial-card" id="testi-1">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+              <div style="width:34px;height:34px;border-radius:8px;background:linear-gradient(135deg,#FF8A00,#D94A00);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0">CA</div>
+              <div>
+                <div style="font-size:13px;font-weight:700">Carlos Almeida</div>
+                <div style="font-size:11px;color:var(--text-dim)">Empresa ABC Ltda · Diretor de Operações</div>
+              </div>
+              <div class="testimonial-stars" style="margin-left:auto">★★★★★</div>
+            </div>
+            <div class="testimonial-quote">"A SertCode entregou muito além do que esperávamos. O sistema transformou nossa operação e a equipe foi extremamente atenciosa em todo o processo."</div>
+            <div class="testimonial-author">Enviado em 20 Mai 2026 · Sistema ERP Comercial</div>
+            <div class="testimonial-actions">
+              <button class="btn btn-primary" style="font-size:12px;padding:7px 14px" onclick="approveTestimonial('testi-1',this)">
+                <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                Aprovar para o site
+              </button>
+              <button class="btn btn-outline" style="font-size:12px;padding:7px 14px" onclick="rejectTestimonial('testi-1')">Rejeitar</button>
+            </div>
+          </div>
+
+          <div class="testimonial-card" id="testi-2">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+              <div style="width:34px;height:34px;border-radius:8px;background:linear-gradient(135deg,#8B5CF6,#6D28D9);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0">MS</div>
+              <div>
+                <div style="font-size:13px;font-weight:700">Mariana Santos</div>
+                <div style="font-size:11px;color:var(--text-dim)">Clínica Vida Plena · Diretora Clínica</div>
+              </div>
+              <div class="testimonial-stars" style="margin-left:auto">★★★★☆</div>
+            </div>
+            <div class="testimonial-quote">"Ótima experiência com a equipe SertCode. O portal ficou exatamente como precisávamos. Recomendo a quem busca organização e profissionalismo."</div>
+            <div class="testimonial-author">Enviado em 22 Mai 2026 · Portal de Agendamentos</div>
+            <div class="testimonial-actions">
+              <button class="btn btn-primary" style="font-size:12px;padding:7px 14px" onclick="approveTestimonial('testi-2',this)">
+                <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                Aprovar para o site
+              </button>
+              <button class="btn btn-outline" style="font-size:12px;padding:7px 14px" onclick="rejectTestimonial('testi-2')">Rejeitar</button>
+            </div>
+          </div>
+
+          <div id="testi-empty" style="display:none;text-align:center;padding:48px 20px;color:var(--text-dim);font-size:13px">
+            Nenhum depoimento pendente de aprovação.
+          </div>
+        </div>
+      </section>
+
+      <!-- ════════════ FEEDBACKS ════════════ -->
+      <section class="tab-section" id="tab-feedbacks">
+        <div class="section-title">Feedbacks</div>
+        <div class="section-sub">Avaliações enviadas pelos clientes através do portal</div>
+
+        <div class="feedback-item">
+          <div class="feedback-avatar">CA</div>
+          <div style="flex:1">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px">
+              <span style="font-size:13px;font-weight:700">Carlos Almeida</span>
+              <span style="font-size:11px;color:var(--text-dim)">· Empresa ABC Ltda</span>
+            </div>
+            <div class="feedback-category">Qualidade do desenvolvimento</div>
+            <div class="feedback-stars">★★★★★</div>
+            <div class="feedback-text">"A SertCode entregou muito além do que esperávamos. O sistema transformou nossa operação completamente."</div>
+            <div class="feedback-meta">20 Mai 2026 às 10:34</div>
+          </div>
+        </div>
+
+        <div class="feedback-item">
+          <div class="feedback-avatar" style="background:linear-gradient(135deg,rgba(139,92,246,.25),rgba(109,40,217,.25));color:var(--purple)">MS</div>
+          <div style="flex:1">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px">
+              <span style="font-size:13px;font-weight:700">Mariana Santos</span>
+              <span style="font-size:11px;color:var(--text-dim)">· Clínica Vida Plena</span>
+            </div>
+            <div class="feedback-category">Comunicação da equipe</div>
+            <div class="feedback-stars" style="color:var(--orange)">★★★★☆</div>
+            <div class="feedback-text">"Ótima experiência. A comunicação poderia ser um pouco mais frequente durante o desenvolvimento, mas no geral estou muito satisfeita."</div>
+            <div class="feedback-meta">22 Mai 2026 às 14:11</div>
+          </div>
+        </div>
+
+        <div class="feedback-item">
+          <div class="feedback-avatar" style="background:linear-gradient(135deg,rgba(34,197,94,.2),rgba(22,163,74,.2));color:var(--green)">RL</div>
+          <div style="flex:1">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px">
+              <span style="font-size:13px;font-weight:700">Roberto Lima</span>
+              <span style="font-size:11px;color:var(--text-dim)">· Distribuidora NordLog</span>
+            </div>
+            <div class="feedback-category">Experiência geral</div>
+            <div class="feedback-stars">★★★★★</div>
+            <div class="feedback-text">"O app de logística superou as expectativas. Nossa operação hoje é muito mais eficiente. O suporte pós-entrega também é excelente."</div>
+            <div class="feedback-meta">05 Mai 2026 às 09:20</div>
+          </div>
+        </div>
+
+      </section>
+
+    </div><!-- /portal-content -->
+  </main>
+</div><!-- /portal-layout -->
+
+<!-- ══ MODAL: Atualizar Progresso ══ -->
+<div class="modal-overlay" id="modal-progress">
+  <div class="modal-box" style="max-width:400px">
+    <button class="modal-close" onclick="closeModal('modal-progress')">&times;</button>
+    <div class="modal-title">Atualizar progresso</div>
+    <div class="modal-sub" id="prog-modal-name">Projeto</div>
+    <input type="hidden" id="prog-id">
+    <div class="form-group">
+      <label>Percentual de conclusão</label>
+      <div class="range-wrap">
+        <input type="range" id="prog-slider" min="0" max="100" value="72" oninput="document.getElementById('prog-display').textContent=this.value+'%'">
+        <div class="range-val" id="prog-display">72%</div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Fase atual</label>
+      <select id="prog-phase">
+        <option>Diagnóstico</option><option>Planejamento</option>
+        <option>Design & UX</option><option selected>Desenvolvimento</option>
+        <option>Testes & QA</option><option>Entregue</option>
+      </select>
+    </div>
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-primary" style="flex:1;justify-content:center" onclick="saveProgress()">Salvar</button>
+      <button class="btn btn-outline" onclick="closeModal('modal-progress')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: Adicionar Atividade ══ -->
+<div class="modal-overlay" id="modal-activity">
+  <div class="modal-box" style="max-width:440px">
+    <button class="modal-close" onclick="closeModal('modal-activity')">&times;</button>
+    <div class="modal-title">Adicionar atividade</div>
+    <div class="modal-sub" id="act-modal-name">Registre uma atualização visível ao cliente</div>
+    <div class="form-group">
+      <label>Descrição da atividade</label>
+      <input type="text" id="act-text" placeholder="Ex: Módulo de relatórios financeiros concluído">
+    </div>
+    <div class="form-group">
+      <label>Tipo</label>
+      <select id="act-type">
+        <option value="orange">Entrega / Conclusão</option>
+        <option value="green">Aprovação</option>
+        <option value="blue">Início de etapa</option>
+        <option value="purple">Testes / QA</option>
+      </select>
+    </div>
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-primary" style="flex:1;justify-content:center" onclick="saveActivity()">Publicar atividade</button>
+      <button class="btn btn-outline" onclick="closeModal('modal-activity')">Cancelar</button>
+    </div>
+    <div id="act-success" style="display:none;margin-top:12px;padding:10px 14px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:8px;font-size:12.5px;color:var(--green)">
+      ✓ Atividade publicada com sucesso no portal do cliente!
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: Responder Chamado ══ -->
+<div class="modal-overlay" id="modal-response">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('modal-response')">&times;</button>
+    <div class="modal-title">Responder chamado</div>
+    <div class="modal-sub">Sua resposta será visível ao cliente no portal</div>
+    <div class="ticket-info-box" id="resp-info"></div>
+    <div class="form-group">
+      <label>Resposta</label>
+      <textarea id="resp-text" placeholder="Digite sua resposta aqui..."></textarea>
+    </div>
+    <div class="form-group">
+      <label>Atualizar status para</label>
+      <select id="resp-status">
+        <option value="open">Aberto</option>
+        <option value="analysis">Em análise</option>
+        <option value="dev">Em desenvolvimento</option>
+        <option value="done">Concluído</option>
+      </select>
+    </div>
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-primary" id="resp-btn" style="flex:1;justify-content:center" onclick="sendResponse()">
+        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        Enviar resposta
+      </button>
+      <button class="btn btn-outline" onclick="closeModal('modal-response')">Cancelar</button>
+    </div>
+    <div id="resp-success" style="display:none;margin-top:12px;padding:10px 14px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:8px;font-size:12.5px;color:var(--green)">
+      ✓ Resposta enviada! O cliente será notificado pelo portal.
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: Credenciais ══ -->
+<div class="modal-overlay" id="modal-cred">
+  <div class="modal-box" style="max-width:370px">
+    <button class="modal-close" onclick="closeModal('modal-cred')">&times;</button>
+    <div class="modal-title">Credenciais de acesso</div>
+    <div class="modal-sub">Dados de login do cliente no portal</div>
+    <div id="cred-info" style="background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px;padding:16px 18px;margin-bottom:14px"></div>
+    <div style="font-size:11.5px;color:var(--text-dim);padding:10px 14px;background:rgba(255,106,0,.05);border:1px solid rgba(255,106,0,.12);border-radius:8px">
+      🔒 Nunca compartilhe credenciais por canais públicos. Envie via WhatsApp ou e-mail diretamente ao cliente.
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { supabase } from './js/supabase.js'
+
+/* ── VERIFICAR SESSÃO E PAPEL ── */
+const { data: { session } } = await supabase.auth.getSession();
+if (!session) { window.location.href = 'gestor.html'; }
+
+const { data: myProfile } = await supabase
+  .from('profiles').select('role, name').eq('id', session.user.id).single();
+if (myProfile?.role !== 'gestor') { await supabase.auth.signOut(); window.location.href = 'gestor.html'; }
+
+// Nome do gestor na sidebar
+document.querySelector('.sidebar-user-name').textContent = myProfile?.name || 'Gestor SertCode';
+
+/* ── CARREGAR DADOS ── */
+let allClients = [], allProjects = [], allTickets = [], allInvoices = [], allTestimonials = [], allFeedbacks = [];
+let clientMap = {}; // id → profile
+
+async function loadAll() {
+  const [c, p, t, i, te, f] = await Promise.all([
+    supabase.from('profiles').select('*').eq('role','client'),
+    supabase.from('projects').select('*').order('created_at'),
+    supabase.from('tickets').select('*').order('created_at', {ascending:false}),
+    supabase.from('invoices').select('*').order('due_date'),
+    supabase.from('testimonials').select('*').eq('status','pending').order('created_at',{ascending:false}),
+    supabase.from('feedbacks').select('*').order('created_at',{ascending:false}),
+  ]);
+  allClients      = c.data || [];
+  allProjects     = p.data || [];
+  allTickets      = t.data || [];
+  allInvoices     = i.data || [];
+  allTestimonials = te.data || [];
+  allFeedbacks    = f.data || [];
+  allClients.forEach(cl => clientMap[cl.id] = cl);
+  renderDashboard();
+  renderClientes();
+  renderProjetos();
+  renderChamados();
+  renderFinanceiro();
+  renderDepoimentos();
+  renderFeedbacks();
+}
+
+/* ── HELPERS ── */
+function ini(name) { return (name||'?').split(' ').map(n=>n[0]).slice(0,2).join('').toUpperCase(); }
+function fmtDate(d) { return d ? new Date(d).toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric'}) : '—'; }
+function fmtMoney(v) { return 'R$ ' + Number(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2}); }
+function statusCls(s) { return {open:'status-dev',analysis:'status-analysis',done:'status-done',dev:'status-dev',testing:'status-analysis'}[s]||''; }
+function statusLabel(s) { return {open:'Aberto',analysis:'Em análise',done:'Concluído',dev:'Em dev',testing:'Testes'}[s]||s; }
+function projStatusCls(s) { return {analysis:'status-analysis',dev:'status-dev',testing:'status-analysis',done:'status-done'}[s]||'status-dev'; }
+function projStatusLabel(s) { return {analysis:'Em análise',dev:'Em dev',testing:'Testes',done:'Entregue'}[s]||s; }
+
+/* ── DASHBOARD ── */
+function renderDashboard() {
+  const openTickets = allTickets.filter(t => t.status !== 'done').length;
+  const received = allInvoices.filter(i => i.status === 'paid').reduce((s,i) => s+Number(i.amount),0);
+  const pending  = allInvoices.filter(i => i.status !== 'paid').reduce((s,i) => s+Number(i.amount),0);
+  const inDev    = allProjects.filter(p => p.status !== 'done').length;
+  const done     = allProjects.filter(p => p.status === 'done').length;
+
+  const vals = document.querySelectorAll('#tab-dashboard .stat-value');
+  if (vals[0]) vals[0].textContent = allClients.length;
+  if (vals[1]) { vals[1].textContent = inDev; vals[1].closest('.stat-card').querySelector('.stat-hint').textContent = '+'+done+' entregue(s)'; }
+  if (vals[2]) vals[2].textContent = openTickets;
+  if (vals[3]) { vals[3].textContent = fmtMoney(received); vals[3].closest('.stat-card').querySelector('.stat-hint').textContent = fmtMoney(pending)+' a receber'; }
+
+  // Chamados urgentes no dashboard
+  const urgTickets = allTickets.filter(t => t.status !== 'done').slice(0,3);
+  const actList = document.querySelector('#tab-dashboard .activity-list');
+  if (actList) actList.innerHTML = urgTickets.length ? urgTickets.map(t => {
+    const cl = clientMap[t.client_id];
+    return `<div class="activity-item">
+      <div class="activity-dot" style="background:var(--${t.type==='urgent'?'red':'blue'})"></div>
+      <div class="activity-text"><strong>#SC-${t.id.slice(-4).toUpperCase()}</strong> — ${cl?.company||cl?.name||'—'}<br>
+        <span style="font-size:12px;color:var(--text-dim)">${t.subject}</span></div>
+      <span class="status ${statusCls(t.status)}" style="flex-shrink:0;white-space:nowrap">${statusLabel(t.status)}</span>
+    </div>`;
+  }).join('') : '<div style="color:var(--text-dim);font-size:13px;padding:8px 0">Nenhum chamado aberto.</div>';
+
+  // Progresso no dashboard
+  const progCard = document.querySelectorAll('#tab-dashboard .card')[1];
+  if (progCard) {
+    const progContainer = progCard.querySelector('div[style*="flex-direction:column"]');
+    if (progContainer) progContainer.innerHTML = allProjects.slice(0,4).map(p => {
+      const cl = clientMap[p.client_id];
+      const color = p.progress === 100 ? 'var(--green)' : 'var(--orange)';
+      return `<div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:5px;font-size:13px">
+          <span>${p.name} <span style="color:var(--text-dim);font-size:11px">· ${cl?.company||cl?.name||''}</span></span>
+          <span style="font-weight:700;color:${color}">${p.progress}%</span>
+        </div>
+        <div class="progress-bar-track"><div class="progress-bar-fill" style="width:${p.progress}%;background:${color}"></div></div>
+      </div>`;
+    }).join('');
+  }
+}
+
+/* ── CLIENTES ── */
+function renderClientes() {
+  const tbody = document.querySelector('#tab-clientes .data-table tbody');
+  if (!tbody) return;
+  tbody.innerHTML = allClients.map(cl => {
+    const proj = allProjects.find(p => p.client_id === cl.id);
+    return `<tr>
+      <td>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#FF8A00,#D94A00);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff;flex-shrink:0">${ini(cl.name)}</div>
+          <div><div style="font-weight:600">${cl.name||'—'}</div><div style="font-size:11px;color:var(--text-dim)">${session.user.email}</div></div>
+        </div>
+      </td>
+      <td style="color:var(--text-dim)">${cl.company||'—'}</td>
+      <td>${proj?.name||'—'}</td>
+      <td>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="progress-bar-track" style="width:60px"><div class="progress-bar-fill" style="width:${proj?.progress||0}%"></div></div>
+          <span style="font-size:12px;font-weight:700;color:var(--orange)">${proj?.progress||0}%</span>
+        </div>
+      </td>
+      <td style="color:var(--text-dim);font-size:12px">—</td>
+      <td><span class="status ${proj?.status==='done'?'status-done':'status-dev'}">${proj?.status==='done'?'Entregue':'Ativo'}</span></td>
+      <td>
+        <div style="display:flex;gap:6px">
+          <a href="portal.html" class="btn btn-outline" style="padding:5px 10px;font-size:11px" target="_blank">Portal</a>
+          <button class="btn btn-outline" style="padding:5px 10px;font-size:11px" onclick="window._showCred('${cl.name||''}','${cl.id}')">Credenciais</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('') || '<tr><td colspan="7" style="text-align:center;color:var(--text-dim)">Nenhum cliente cadastrado.</td></tr>';
+}
+
+/* ── PROJETOS ── */
+function renderProjetos() {
+  const grid = document.querySelector('.proj-grid');
+  if (!grid) return;
+  grid.innerHTML = allProjects.map(p => {
+    const cl = clientMap[p.client_id];
+    const isDone = p.status === 'done';
+    const color  = isDone ? 'var(--green)' : 'var(--orange)';
+    return `<div class="proj-card" ${isDone?'style="border-color:rgba(34,197,94,.15)"':''}>
+      <div class="proj-card-top">
+        <div class="proj-initials">${ini(cl?.company||cl?.name||'?')}</div>
+        <div style="flex:1;min-width:0">
+          <div class="proj-client">${cl?.company||cl?.name||'—'}</div>
+          <div class="proj-name">${p.name}</div>
+        </div>
+        <span class="status ${projStatusCls(p.status)}">${projStatusLabel(p.status)}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px">
+        <span style="color:var(--text-dim)">Progresso</span>
+        <span style="font-weight:700;color:${color}" id="prog-val-${p.id}">${p.progress}%</span>
+      </div>
+      <div class="progress-bar-track" style="height:8px">
+        <div class="progress-bar-fill" id="prog-bar-${p.id}" style="width:${p.progress}%;background:${color}"></div>
+      </div>
+      <div style="font-size:11px;color:var(--text-dim);margin-top:7px">Fase: ${p.current_phase||'—'} · Entrega: ${fmtDate(p.end_date)}</div>
+      <div class="proj-actions">
+        ${!isDone ? `<button class="btn btn-primary" style="font-size:12px;padding:7px 12px" onclick="window._openProgress('${p.id}','${p.name.replace(/'/g,"\\'")}',${p.progress})">
+          <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          Atualizar progresso
+        </button>` : ''}
+        <button class="btn btn-outline" style="font-size:12px;padding:7px 12px" onclick="window._openActivity('${p.id}','${p.name.replace(/'/g,"\\'")}')">
+          <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          ${isDone?'Registrar atividade':'Adicionar atividade'}
+        </button>
+      </div>
+    </div>`;
+  }).join('') || '<p style="color:var(--text-dim)">Nenhum projeto cadastrado.</p>';
+}
+
+/* ── CHAMADOS ── */
+function renderChamados() {
+  const tbody = document.getElementById('tickets-body');
+  if (!tbody) return;
+  tbody.innerHTML = allTickets.map(t => {
+    const cl = clientMap[t.client_id];
+    const isDone = t.status === 'done';
+    return `<tr data-status="${t.status}">
+      <td><span class="ticket-id">#SC-${t.id.slice(-4).toUpperCase()}</span></td>
+      <td style="font-weight:600">${cl?.company||cl?.name||'—'}</td>
+      <td>${t.subject}</td>
+      <td><span class="status ${t.type==='urgent'?'':'status-pending'}" style="${t.type==='urgent'?'background:rgba(239,68,68,.1);color:var(--red)':''}">${{urgent:'Alta',bug:'Média',feature:'Baixa',doubt:'Baixa'}[t.type]||'Média'}</span></td>
+      <td style="color:var(--text-dim);font-size:12px">${fmtDate(t.created_at)}</td>
+      <td><span class="status ${statusCls(t.status)}" id="st-${t.id}">${statusLabel(t.status)}</span></td>
+      <td><button class="btn ${isDone?'btn-outline':'btn-primary'}" style="padding:5px 12px;font-size:12px${isDone?';opacity:.45;pointer-events:none':''}"
+        onclick="window._openResponse('${t.id}','${t.subject.replace(/'/g,"\\'")}','${cl?.company||cl?.name||''}','${t.status}')">
+        ${isDone?'Ver':'Responder'}
+      </button></td>
+    </tr>`;
+  }).join('') || '<tr><td colspan="7" style="text-align:center;color:var(--text-dim)">Nenhum chamado.</td></tr>';
+
+  // Contagens nos filtros
+  const all  = allTickets.length;
+  const open = allTickets.filter(t=>t.status==='open').length;
+  const ana  = allTickets.filter(t=>t.status==='analysis').length;
+  const done = allTickets.filter(t=>t.status==='done').length;
+  document.querySelectorAll('.filter-tab').forEach(tab => {
+    const cnt = {all,open,analysis:ana,done}[tab.dataset.filter];
+    tab.innerHTML = tab.textContent.split('(')[0] + `<span style="opacity:.5">(${cnt})</span>`;
+  });
+
+  // Badge sidebar
+  const badge = document.querySelector('.sidebar-nav a[data-tab="chamados"] .sidebar-badge');
+  if (badge) { badge.textContent = open+ana || ''; if(!(open+ana)) badge.style.display='none'; }
+}
+
+/* ── FINANCEIRO ── */
+function renderFinanceiro() {
+  const received = allInvoices.filter(i=>i.status==='paid').reduce((s,i)=>s+Number(i.amount),0);
+  const total    = allInvoices.reduce((s,i)=>s+Number(i.amount),0);
+  const pendAmt  = total - received;
+
+  const stVals = document.querySelectorAll('#tab-financeiro .stat-value');
+  if (stVals[0]) stVals[0].textContent = fmtMoney(total);
+  if (stVals[1]) stVals[1].textContent = fmtMoney(received);
+  if (stVals[2]) stVals[2].textContent = fmtMoney(pendAmt);
+
+  const tbody = document.querySelector('#tab-financeiro .data-table tbody');
+  if (!tbody) return;
+  tbody.innerHTML = allInvoices.map((inv,idx) => {
+    const cl = clientMap[inv.client_id];
+    const isPaid = inv.status === 'paid';
+    return `<tr>
+      <td style="font-weight:600">${cl?.company||cl?.name||'—'}</td>
+      <td style="color:var(--text-dim)">${inv.description||'Parcela '+(idx+1)}</td>
+      <td style="font-weight:700">${fmtMoney(inv.amount)}</td>
+      <td style="color:var(--text-dim);font-size:12px">${fmtDate(inv.due_date)}</td>
+      <td id="fin-${inv.id}"><span class="status ${isPaid?'status-paid':'status-pending'}">${isPaid?'Pago':'Pendente'}</span></td>
+      <td>${isPaid
+        ? '<span style="font-size:12px;color:var(--text-dim)">—</span>'
+        : `<button class="btn btn-outline" style="font-size:11px;padding:4px 10px" onclick="window._markPaid('${inv.id}',this)">Marcar pago</button>`
+      }</td>
+    </tr>`;
+  }).join('') || '<tr><td colspan="6" style="text-align:center;color:var(--text-dim)">Nenhuma fatura.</td></tr>';
+}
+
+/* ── DEPOIMENTOS ── */
+function renderDepoimentos() {
+  const list = document.getElementById('testi-list');
+  if (!list) return;
+  list.innerHTML = allTestimonials.length
+    ? allTestimonials.map(t => `
+      <div class="testimonial-card" id="testi-${t.id}">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+          <div style="width:34px;height:34px;border-radius:8px;background:linear-gradient(135deg,#FF8A00,#D94A00);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff">${ini(t.client_name)}</div>
+          <div>
+            <div style="font-size:13px;font-weight:700">${t.client_name||'—'}</div>
+            <div style="font-size:11px;color:var(--text-dim)">${t.company||''}</div>
+          </div>
+          <div class="testimonial-stars" style="margin-left:auto">${'★'.repeat(t.rating||5)}${'☆'.repeat(5-(t.rating||5))}</div>
+        </div>
+        <div class="testimonial-quote">"${t.content||''}"</div>
+        <div class="testimonial-author">Enviado em ${fmtDate(t.created_at)}</div>
+        <div class="testimonial-actions">
+          <button class="btn btn-primary" style="font-size:12px;padding:7px 14px" onclick="window._approveTesti('${t.id}',this)">
+            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            Aprovar para o site
+          </button>
+          <button class="btn btn-outline" style="font-size:12px;padding:7px 14px" onclick="window._rejectTesti('${t.id}')">Rejeitar</button>
+        </div>
+      </div>`).join('')
+    : '<div id="testi-empty" style="text-align:center;padding:48px 20px;color:var(--text-dim);font-size:13px">Nenhum depoimento pendente de aprovação.</div>';
+
+  const badge = document.querySelector('.sidebar-nav a[data-tab="depoimentos"] .sidebar-badge');
+  if (badge) { badge.textContent = allTestimonials.length||''; if(!allTestimonials.length) badge.style.display='none'; }
+}
+
+/* ── FEEDBACKS ── */
+function renderFeedbacks() {
+  const container = document.querySelector('#tab-feedbacks');
+  if (!container) return;
+  const existing = container.querySelectorAll('.feedback-item');
+  existing.forEach(el => el.remove());
+  const title = container.querySelector('.section-sub');
+  const items = allFeedbacks.map(f => `
+    <div class="feedback-item">
+      <div class="feedback-avatar">${ini(f.client_name)}</div>
+      <div style="flex:1">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px">
+          <span style="font-size:13px;font-weight:700">${f.client_name||'—'}</span>
+        </div>
+        <div class="feedback-stars">${'★'.repeat(f.rating||5)}${'☆'.repeat(5-(f.rating||5))}</div>
+        <div class="feedback-text">"${f.message||''}"</div>
+        <div class="feedback-meta">${fmtDate(f.created_at)}</div>
+      </div>
+    </div>`).join('');
+  (title || container.querySelector('.section-sub'))?.insertAdjacentHTML('afterend', items || '<p style="color:var(--text-dim)">Nenhum feedback recebido.</p>');
+}
+
+/* ── GLOBAL HANDLERS (chamados pelo onclick no HTML renderizado) ── */
+let _currentProjId = '', _currentTicketId = '';
+
+window._openProgress = (id, name, val) => {
+  _currentProjId = id;
+  document.getElementById('prog-modal-name').textContent = name;
+  document.getElementById('prog-slider').value = val;
+  document.getElementById('prog-display').textContent = val + '%';
+  document.getElementById('modal-progress').classList.add('open');
+};
+
+window._openActivity = (projId, name) => {
+  _currentProjId = projId;
+  document.getElementById('act-modal-name').textContent = name;
+  document.getElementById('act-text').value = '';
+  document.getElementById('act-success').style.display = 'none';
+  document.getElementById('modal-activity').classList.add('open');
+};
+
+window._openResponse = (id, subject, client, status) => {
+  _currentTicketId = id;
+  document.getElementById('resp-info').innerHTML =
+    `<strong style="color:var(--text)">#SC-${id.slice(-4).toUpperCase()}</strong> &mdash; ${client}<br>
+     <span style="color:var(--text-dim)">${subject}</span>`;
+  document.getElementById('resp-status').value = status === 'open' ? 'analysis' : 'done';
+  document.getElementById('resp-text').value = '';
+  document.getElementById('resp-success').style.display = 'none';
+  document.getElementById('modal-response').classList.add('open');
+};
+
+window._showCred = async (name, clientId) => {
+  document.getElementById('cred-info').innerHTML =
+    rowBox('Cliente', name) + rowBox('ID Supabase', clientId) +
+    rowOrangeBox('Login', 'Via e-mail cadastrado no Supabase Auth');
+  document.getElementById('modal-cred').classList.add('open');
+};
+
+window._markPaid = async (invoiceId, btn) => {
+  btn.textContent = '...'; btn.disabled = true;
+  await supabase.from('invoices').update({ status:'paid', paid_at: new Date().toISOString() }).eq('id', invoiceId);
+  document.getElementById('fin-'+invoiceId).innerHTML = '<span class="status status-paid">Pago</span>';
+  btn.parentElement.innerHTML = '<span style="font-size:12px;color:var(--green);font-weight:600">✓ Confirmado</span>';
+  renderFinanceiro(); renderDashboard();
+};
+
+window._approveTesti = async (id, btn) => {
+  btn.textContent = 'Aprovando...'; btn.disabled = true;
+  await supabase.from('testimonials').update({ status:'approved' }).eq('id', id);
+  const card = document.getElementById('testi-'+id);
+  if (card) {
+    card.querySelector('.testimonial-actions').innerHTML = '<span style="font-size:13px;color:var(--green);font-weight:700">✓ Publicado no site</span>';
+    card.style.borderColor = 'rgba(34,197,94,.2)';
+  }
+};
+
+window._rejectTesti = async (id) => {
+  await supabase.from('testimonials').update({ status:'rejected' }).eq('id', id);
+  const card = document.getElementById('testi-'+id);
+  if (card) {
+    card.style.transition = 'opacity .35s'; card.style.opacity = '0';
+    setTimeout(() => { card.style.display='none'; renderDepoimentos(); }, 380);
+  }
+};
+
+/* ── SAVE PROGRESS ── */
+window.saveProgress = async () => {
+  const val   = +document.getElementById('prog-slider').value;
+  const phase = document.getElementById('prog-phase').value;
+  const status = val === 100 ? 'done' : val >= 50 ? 'dev' : 'analysis';
+  await supabase.from('projects').update({ progress:val, current_phase:phase, status }).eq('id', _currentProjId);
+  const bar = document.getElementById('prog-bar-'+_currentProjId);
+  const lbl = document.getElementById('prog-val-'+_currentProjId);
+  if (bar) bar.style.width = val+'%';
+  if (lbl) lbl.textContent = val+'%';
+  closeModal('modal-progress');
+  renderDashboard();
+};
+
+/* ── SAVE ACTIVITY (kanban_items) ── */
+window.saveActivity = async () => {
+  const t = document.getElementById('act-text').value.trim();
+  if (!t) { document.getElementById('act-text').focus(); return; }
+  await supabase.from('kanban_items').insert({ project_id: _currentProjId, title: t, status: 'done' });
+  const msg = document.getElementById('act-success');
+  msg.style.display = 'block';
+  setTimeout(() => { closeModal('modal-activity'); msg.style.display='none'; }, 2000);
+};
+
+/* ── SEND RESPONSE ── */
+const stMap = { open:['status-dev','Aberto'], analysis:['status-analysis','Em análise'], dev:['status-dev','Em dev'], done:['status-done','Concluído'] };
+window.sendResponse = async () => {
+  const btn  = document.getElementById('resp-btn');
+  const orig = btn.innerHTML;
+  btn.textContent = 'Enviando...'; btn.disabled = true;
+  const newSt = document.getElementById('resp-status').value;
+  const resp  = document.getElementById('resp-text').value;
+  await supabase.from('tickets').update({ status:newSt, response:resp, updated_at:new Date().toISOString() }).eq('id', _currentTicketId);
+  const badge = document.getElementById('st-'+_currentTicketId);
+  if (badge) {
+    const [cls, label] = stMap[newSt]||['',''];
+    badge.className = 'status '+cls; badge.textContent = label;
+    const row = badge.closest('tr'); if (row) row.dataset.status = newSt;
+  }
+  document.getElementById('resp-success').style.display = 'block';
+  btn.innerHTML = orig; btn.disabled = false;
+  setTimeout(() => closeModal('modal-response'), 2200);
+};
+
+/* ── MODALS / TABS ── */
+window.closeModal = id => document.getElementById(id).classList.remove('open');
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', e => { if (e.target===m) m.classList.remove('open'); });
+});
+document.addEventListener('keydown', e => {
+  if (e.key==='Escape') document.querySelectorAll('.modal-overlay.open').forEach(m=>m.classList.remove('open'));
+});
+document.getElementById('prog-slider').addEventListener('input', function() {
+  document.getElementById('prog-display').textContent = this.value+'%';
+});
+
+const tabTitles = {dashboard:'Dashboard',clientes:'Clientes',projetos:'Projetos',chamados:'Chamados',arquivos:'Arquivos',financeiro:'Financeiro',depoimentos:'Depoimentos',feedbacks:'Feedbacks'};
+document.querySelectorAll('.sidebar-nav a[data-tab]').forEach(link => {
+  link.addEventListener('click', e => {
+    e.preventDefault();
+    const tab = link.dataset.tab;
+    document.querySelectorAll('.sidebar-nav a').forEach(l=>l.classList.remove('active'));
+    link.classList.add('active');
+    document.querySelectorAll('.tab-section').forEach(t=>t.classList.remove('active'));
+    document.getElementById('tab-'+tab).classList.add('active');
+    document.getElementById('header-title').textContent = tabTitles[tab];
+  });
+});
+
+document.querySelectorAll('.filter-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.filter-tab').forEach(t=>t.classList.remove('active'));
+    tab.classList.add('active');
+    const f = tab.dataset.filter;
+    document.querySelectorAll('#tickets-body tr').forEach(row => {
+      row.style.display = (f==='all'||row.dataset.status===f)?'':'none';
+    });
+  });
+});
+
+/* ── FILE CLIENT SWITCH (mantém funcional) ── */
+window.switchFileClient = async (clientId) => {
+  const cl = clientMap[clientId];
+  document.getElementById('file-card-title').textContent = 'Arquivos — ' + (cl?.company||cl?.name||'—');
+  document.getElementById('upload-zone').style.display = 'none';
+  const card = document.querySelector('#tab-arquivos .card');
+  const rows = card.querySelectorAll('.file-row');
+  rows.forEach(r=>r.remove());
+  const { data: files } = await supabase.from('files').select('*').eq('client_id',clientId);
+  if (files?.length) {
+    files.forEach(f => {
+      const ext = (f.type||f.name.split('.').pop()).toUpperCase();
+      const iconCls = ['PDF','DOC'].includes(ext)?'pdf':ext==='FIG'?'fig':ext==='ZIP'?'zip':'doc';
+      const div = document.createElement('div'); div.className='file-row';
+      div.innerHTML = `<div class="file-icon ${iconCls}">${ext}</div>
+        <div><div class="file-name">${f.name}</div><div class="file-meta">${f.size_kb||'?'} KB · ${fmtDate(f.created_at)}</div></div>
+        <a href="#" class="file-dl" data-path="${f.storage_path||''}">
+          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Baixar</a>`;
+      div.querySelector('.file-dl').addEventListener('click', async ev => {
+        ev.preventDefault();
+        const path = ev.currentTarget.dataset.path; if(!path) return;
+        const {data} = await supabase.storage.from('project-files').createSignedUrl(path,3600);
+        if(data?.signedUrl) window.open(data.signedUrl,'_blank');
+      });
+      card.appendChild(div);
+    });
+  }
+};
+
+/* ── UPLOAD REAL ── */
+window.simulateUpload = async () => {
+  const input = document.createElement('input');
+  input.type = 'file'; input.accept = '.pdf,.doc,.docx,.zip,.fig';
+  input.onchange = async () => {
+    const file = input.files[0]; if(!file) return;
+    const clientId = document.getElementById('file-client-select').value;
+    if(!clientId) { alert('Selecione um cliente primeiro.'); return; }
+    const path = `${clientId}/${Date.now()}_${file.name}`;
+    const { error } = await supabase.storage.from('project-files').upload(path, file);
+    if (!error) {
+      await supabase.from('files').insert({ client_id:clientId, name:file.name, type:file.name.split('.').pop(), size_kb:Math.round(file.size/1024), storage_path:path, uploaded_by:'gestor' });
+      alert('Arquivo enviado com sucesso!');
+      window.switchFileClient(clientId);
+    } else { alert('Erro: '+error.message); }
+  };
+  input.click();
+};
+
+/* ── LOGOUT ── */
+document.querySelector('.sidebar-logout').addEventListener('click', async e => {
+  e.preventDefault();
+  await supabase.auth.signOut();
+  window.location.href = 'gestor.html';
+});
+
+/* ── CREDENTIAL HELPERS ── */
+function rowBox(label, val) {
+  return `<div style="margin-bottom:12px"><div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.07em;font-weight:700;margin-bottom:3px">${label}</div>
+    <div style="font-size:13px;font-family:monospace;background:rgba(255,255,255,.04);padding:7px 10px;border-radius:6px;color:var(--text)">${val}</div></div>`;
+}
+function rowOrangeBox(label, val) {
+  return `<div><div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.07em;font-weight:700;margin-bottom:3px">${label}</div>
+    <div style="font-size:13px;font-family:monospace;background:rgba(255,106,0,.06);border:1px solid rgba(255,106,0,.18);padding:7px 10px;border-radius:6px;color:var(--orange)">${val}</div></div>`;
+}
+
+/* ── INICIALIZAR ── */
+async function init() {
+  await loadAll();
+  // Popular select de clientes na aba Arquivos
+  const sel = document.getElementById('file-client-select');
+  if (sel && allClients.length) {
+    sel.innerHTML = allClients.map(cl =>
+      `<option value="${cl.id}">${cl.company||cl.name||cl.id}</option>`
+    ).join('');
+    // Carregar arquivos do primeiro cliente automaticamente
+    window.switchFileClient(allClients[0].id);
+  }
+}
+
+init();
+</script>
+
+</body>
+</html>

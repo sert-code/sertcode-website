@@ -1,0 +1,25 @@
+:root {
+  --bg:           #050505;
+  --surface:      #0B0B0B;
+  --surface-2:    #111111;
+  --border:       rgba(255,106,0,0.12);
+  --border-hover: rgba(255,106,0,0.35);
+  --text:         #F2F2F2;
+  --text-muted:   #8A8A8A;
+  --text-dim:     #555555;
+  --orange:       #FF6A00;
+  --orange-dark:  #D94A00;
+  --glow:         #FF8A00;
+  --gradient:     linear-gradient(180deg,#FF8A00 0%,#FF6A00 45%,#F25C05 75%,#D94A00 100%);
+  --gradient-h:   linear-gradient(90deg,#FF8A00 0%,#D94A00 100%);
+  --shadow-glow:  0 0 24px rgba(255,106,0,0.25), 0 0 60px rgba(255,106,0,0.08);
+  --shadow-card:  0 4px 32px rgba(0,0,0,0.6);
+  --radius:       12px;
+  --radius-sm:    8px;
+  --radius-lg:    20px;
+  --font-body:    'Inter', system-ui, sans-serif;
+  --font-head:    'Space Grotesk', 'Inter', system-ui, sans-serif;
+  --transition:   0.3s cubic-bezier(0.4,0,0.2,1);
+  --max-w:        1200px;
+  --section-gap:  120px;
+}

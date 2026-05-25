@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portal do Cliente — SertCode</title>
+  <link rel="icon" type="image/png" href="assets/logo-symbol.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/portal.css">
+</head>
+<body>
+
+
+<div class="portal-layout">
+
+  <!-- ══ SIDEBAR ══ -->
+  <aside class="sidebar">
+
+    <div class="sidebar-brand">
+      <a href="index.html" class="sidebar-logo">
+        <img src="assets/logo-symbol.png" alt="SertCode">
+        <span class="sidebar-logo-text">Sert<em>Code</em></span>
+      </a>
+    </div>
+
+    <div class="sidebar-project">
+      <div class="sidebar-project-label">Projeto ativo</div>
+      <div class="sidebar-project-name">Sistema ERP Comercial</div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="#" class="active" data-tab="dashboard">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+        Dashboard
+      </a>
+      <a href="#" data-tab="projeto">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+        Meu Projeto
+      </a>
+      <a href="#" data-tab="suporte">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        Suporte / SLA
+        <span class="sidebar-badge">1</span>
+      </a>
+      <a href="#" data-tab="arquivos">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
+        Arquivos
+      </a>
+      <a href="#" data-tab="financeiro">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+        Financeiro
+      </a>
+      <a href="#" data-tab="feedback">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        Feedback
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="sidebar-avatar">CA</div>
+      <div>
+        <div class="sidebar-user-name">Carlos Almeida</div>
+        <div class="sidebar-user-role">Empresa ABC Ltda</div>
+      </div>
+      <a href="cliente.html" class="sidebar-logout" title="Sair" aria-label="Sair">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      </a>
+    </div>
+
+  </aside>
+
+  <!-- ══ MAIN ══ -->
+  <main class="portal-main">
+
+    <!-- Header -->
+    <header class="portal-header">
+      <div>
+        <div class="portal-header-title" id="header-title">Dashboard</div>
+        <div class="portal-header-sub">Bem-vindo de volta, Carlos</div>
+      </div>
+      <div class="portal-header-right">
+        <div class="notif-btn" title="Notificações">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+          <div class="notif-dot"></div>
+        </div>
+        <div class="header-avatar" title="Carlos Almeida">CA</div>
+      </div>
+    </header>
+
+    <!-- Content -->
+    <div class="portal-content">
+
+      <!-- ════════════════════════
+           TAB: DASHBOARD
+      ════════════════════════ -->
+      <section class="tab-section active" id="tab-dashboard">
+
+        <div class="section-title">Visão geral</div>
+        <div class="section-sub">Atualizado em 24 mai 2026 às 14:32</div>
+
+        <!-- Stats -->
+        <div class="stat-row">
+          <div class="stat-card">
+            <div class="stat-card-top">
+              <span class="stat-card-label">Status</span>
+              <div class="stat-icon orange">
+                <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              </div>
+            </div>
+            <div class="stat-value" style="font-size:16px;color:var(--orange);line-height:1.3">Em<br>desenvolvimento</div>
+            <div class="stat-hint" style="margin-top:6px">Fase 4 de 6</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-card-top">
+              <span class="stat-card-label">Progresso</span>
+              <div class="stat-icon green">
+                <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+              </div>
+            </div>
+            <div class="stat-value">72%</div>
+            <div class="progress-wrap">
+              <div class="progress-bar-track">
+                <div class="progress-bar-fill" style="width:72%"></div>
+              </div>
+            </div>
+            <div class="stat-hint">+8% esta semana</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-card-top">
+              <span class="stat-card-label">Chamados abertos</span>
+              <div class="stat-icon blue">
+                <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+              </div>
+            </div>
+            <div class="stat-value">1</div>
+            <div class="stat-hint">1 em análise</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-card-top">
+              <span class="stat-card-label">Próximo prazo</span>
+              <div class="stat-icon purple">
+                <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              </div>
+            </div>
+            <div class="stat-value" style="font-size:20px">15 Jun</div>
+            <div class="stat-hint">Fim do desenvolvimento</div>
+          </div>
+        </div>
+
+        <!-- Grid: Fases + Atividade -->
+        <div class="grid-2">
+
+          <div class="card">
+            <div class="card-title">Fases do projeto</div>
+            <div class="card-sub">Sistema ERP Comercial</div>
+            <div class="phase-list">
+              <div class="phase-item">
+                <div class="phase-dot done">✓</div>
+                <div style="flex:1">
+                  <div class="phase-name">Diagnóstico</div>
+                  <div class="phase-date">Concluído em 02 Mai</div>
+                </div>
+                <span class="phase-badge done">Concluído</span>
+              </div>
+              <div class="phase-item">
+                <div class="phase-dot done">✓</div>
+                <div style="flex:1">
+                  <div class="phase-name">Planejamento</div>
+                  <div class="phase-date">Concluído em 08 Mai</div>
+                </div>
+                <span class="phase-badge done">Concluído</span>
+              </div>
+              <div class="phase-item">
+                <div class="phase-dot done">✓</div>
+                <div style="flex:1">
+                  <div class="phase-name">Design & UX</div>
+                  <div class="phase-date">Concluído em 18 Mai</div>
+                </div>
+                <span class="phase-badge done">Concluído</span>
+              </div>
+              <div class="phase-item">
+                <div class="phase-dot active">⟳</div>
+                <div style="flex:1">
+                  <div class="phase-name">Desenvolvimento</div>
+                  <div class="phase-date">Estimativa: 15 Jun</div>
+                </div>
+                <span class="phase-badge active">Em andamento</span>
+              </div>
+              <div class="phase-item">
+                <div class="phase-dot pend">○</div>
+                <div style="flex:1">
+                  <div class="phase-name pend">Testes & QA</div>
+                  <div class="phase-date">Estimativa: 28 Jun</div>
+                </div>
+                <span class="phase-badge pend">Aguardando</span>
+              </div>
+              <div class="phase-item">
+                <div class="phase-dot pend">○</div>
+                <div style="flex:1">
+                  <div class="phase-name pend">Entrega e Treinamento</div>
+                  <div class="phase-date">Estimativa: 10 Jul</div>
+                </div>
+                <span class="phase-badge pend">Aguardando</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">Atualizações recentes</div>
+            <div class="card-sub">Últimas atividades registradas</div>
+            <div class="activity-list">
+              <div class="activity-item">
+                <div class="activity-dot orange"></div>
+                <div class="activity-text">Módulo de relatórios financeiros <strong>concluído</strong></div>
+                <div class="activity-time">Hoje 14:32</div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-dot green"></div>
+                <div class="activity-text">Design das telas de configuração <strong>aprovado</strong></div>
+                <div class="activity-time">Ontem 11:15</div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-dot blue"></div>
+                <div class="activity-text">Integração com API de pagamento <strong>iniciada</strong></div>
+                <div class="activity-time">20 Mai 09:40</div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-dot green"></div>
+                <div class="activity-text">Módulo de usuários e permissões <strong>entregue</strong></div>
+                <div class="activity-time">18 Mai 16:00</div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-dot orange"></div>
+                <div class="activity-text">Dashboard financeiro <strong>em desenvolvimento</strong></div>
+                <div class="activity-time">17 Mai 10:22</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Status servidor -->
+        <div class="card">
+          <div class="card-title">Status da infraestrutura</div>
+          <div class="card-sub">Serviços em tempo real</div>
+          <div class="status-row">
+            <div class="status-dot ok"></div>
+            <span class="status-label">Servidor principal</span>
+            <span class="status-val" style="color:var(--green)">ONLINE</span>
+          </div>
+          <div class="status-row">
+            <div class="status-dot ok"></div>
+            <span class="status-label">Banco de dados</span>
+            <span class="status-val" style="color:var(--green)">OPERACIONAL</span>
+          </div>
+          <div class="status-row">
+            <div class="status-dot ok"></div>
+            <span class="status-label">API</span>
+            <span class="status-val" style="color:var(--green)">OPERACIONAL</span>
+          </div>
+          <div class="status-row">
+            <div class="status-dot ok"></div>
+            <span class="status-label">Último backup automático</span>
+            <span class="status-val">Hoje 02:14</span>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ════════════════════════
+           TAB: MEU PROJETO
+      ════════════════════════ -->
+      <section class="tab-section" id="tab-projeto">
+
+        <div class="section-title">Meu Projeto</div>
+        <div class="section-sub">Sistema ERP Comercial — Acompanhamento detalhado em tempo real</div>
+
+        <div class="card" style="margin-bottom:16px">
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px">
+            <div>
+              <div class="card-title">Progresso geral</div>
+              <div class="card-sub" style="margin-bottom:0">72% concluído · Entrega estimada: 10 Jul 2026</div>
+            </div>
+            <span class="status status-dev">Em desenvolvimento</span>
+          </div>
+          <div class="progress-bar-track" style="height:10px">
+            <div class="progress-bar-fill" style="width:72%"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-top:7px;font-size:11px;color:var(--text-dim)">
+            <span>Início</span><span style="color:var(--orange);font-weight:700">72% concluído</span><span>Entrega</span>
+          </div>
+        </div>
+
+        <div class="card-title" style="margin-bottom:10px">Quadro de funcionalidades</div>
+
+        <div class="kanban">
+          <div class="kanban-col">
+            <div class="kanban-col-title">Fila <span>2</span></div>
+            <div class="kanban-card">
+              <div class="kanban-card-tag">Integração</div>
+              Integração com marketplace externo
+            </div>
+            <div class="kanban-card">
+              <div class="kanban-card-tag">Relatório</div>
+              Auditoria de acessos por usuário
+            </div>
+          </div>
+          <div class="kanban-col">
+            <div class="kanban-col-title" style="color:var(--blue)">Em desenvolvimento <span>2</span></div>
+            <div class="kanban-card">
+              <div class="kanban-card-tag">Pagamentos</div>
+              API de pagamento via PIX
+            </div>
+            <div class="kanban-card">
+              <div class="kanban-card-tag">Dashboard</div>
+              Dashboard financeiro
+            </div>
+          </div>
+          <div class="kanban-col">
+            <div class="kanban-col-title" style="color:var(--purple)">Testes <span>1</span></div>
+            <div class="kanban-card">
+              <div class="kanban-card-tag">Usuários</div>
+              Módulo de usuários e permissões
+            </div>
+          </div>
+          <div class="kanban-col">
+            <div class="kanban-col-title" style="color:var(--green)">Concluído <span>3</span></div>
+            <div class="kanban-card">
+              <div class="kanban-card-tag">Auth</div>
+              Login e autenticação
+            </div>
+            <div class="kanban-card">
+              <div class="kanban-card-tag">Produtos</div>
+              Cadastro de produtos
+            </div>
+            <div class="kanban-card">
+              <div class="kanban-card-tag">Pedidos</div>
+              Sistema de pedidos
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ════════════════════════
+           TAB: SUPORTE / SLA
+      ════════════════════════ -->
+      <section class="tab-section" id="tab-suporte">
+
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:14px;margin-bottom:24px">
+          <div>
+            <div class="section-title">Suporte / SLA</div>
+            <div class="section-sub" style="margin-bottom:0">Central de chamados e abertura de tickets</div>
+          </div>
+          <button class="btn btn-primary" onclick="document.getElementById('modal-ticket').classList.add('open')">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Abrir chamado
+          </button>
+        </div>
+
+        <div class="card">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Assunto</th>
+                <th>Categoria</th>
+                <th>Aberto em</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="ticket-id">#SC-001</span></td>
+                <td>Dashboard apresenta lentidão ao carregar</td>
+                <td style="color:var(--text-dim)">Performance</td>
+                <td style="color:var(--text-dim)">21 Mai 2026</td>
+                <td><span class="status status-analysis">Em análise</span></td>
+              </tr>
+              <tr>
+                <td><span class="ticket-id">#SC-002</span></td>
+                <td>Solicitação: exportar relatório em PDF</td>
+                <td style="color:var(--text-dim)">Melhoria</td>
+                <td style="color:var(--text-dim)">15 Mai 2026</td>
+                <td><span class="status status-done">Concluído</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="card" style="margin-top:16px">
+          <div class="card-title">SLA de atendimento</div>
+          <div class="card-sub">Tempos de resposta garantidos por prioridade</div>
+          <div class="status-row">
+            <div class="status-dot ok"></div>
+            <span class="status-label">🔴 Crítico — sistema fora do ar</span>
+            <span class="status-val">Até 2 horas</span>
+          </div>
+          <div class="status-row">
+            <div class="status-dot ok"></div>
+            <span class="status-label">🟠 Alta — bug grave / bloqueio de operação</span>
+            <span class="status-val">Até 4 horas</span>
+          </div>
+          <div class="status-row">
+            <div class="status-dot ok"></div>
+            <span class="status-label">🟡 Média — erro funcional / inconveniência</span>
+            <span class="status-val">Até 1 dia útil</span>
+          </div>
+          <div class="status-row">
+            <div class="status-dot ok"></div>
+            <span class="status-label">🟢 Baixa — melhoria / sugestão</span>
+            <span class="status-val">Até 3 dias úteis</span>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ════════════════════════
+           TAB: ARQUIVOS
+      ════════════════════════ -->
+      <section class="tab-section" id="tab-arquivos">
+
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:14px;margin-bottom:24px">
+          <div>
+            <div class="section-title">Arquivos</div>
+            <div class="section-sub" style="margin-bottom:0">Documentos, contratos, layouts e exportações do projeto</div>
+          </div>
+          <button class="btn btn-outline" onclick="alert('Em breve: solicitação de arquivos diretamente pelo portal.')">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Solicitar arquivo
+          </button>
+        </div>
+
+        <div class="card">
+          <div class="file-row">
+            <div class="file-icon pdf">PDF</div>
+            <div>
+              <div class="file-name">Proposta Comercial SertCode.pdf</div>
+              <div class="file-meta">245 KB &middot; Enviado em 02 Mai 2026</div>
+            </div>
+            <a href="#" class="file-dl" onclick="event.preventDefault()">
+              <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Baixar
+            </a>
+          </div>
+          <div class="file-row">
+            <div class="file-icon pdf">PDF</div>
+            <div>
+              <div class="file-name">Contrato de Desenvolvimento.pdf</div>
+              <div class="file-meta">180 KB &middot; Enviado em 03 Mai 2026</div>
+            </div>
+            <a href="#" class="file-dl" onclick="event.preventDefault()">
+              <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Baixar
+            </a>
+          </div>
+          <div class="file-row">
+            <div class="file-icon fig">FIG</div>
+            <div>
+              <div class="file-name">Protótipo UI/UX — Figma.fig</div>
+              <div class="file-meta">2.4 MB &middot; Enviado em 18 Mai 2026</div>
+            </div>
+            <a href="#" class="file-dl" onclick="event.preventDefault()">
+              <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Baixar
+            </a>
+          </div>
+          <div class="file-row">
+            <div class="file-icon doc">PDF</div>
+            <div>
+              <div class="file-name">Manual do Usuário v1.0.pdf</div>
+              <div class="file-meta">890 KB &middot; Enviado em 20 Mai 2026</div>
+            </div>
+            <a href="#" class="file-dl" onclick="event.preventDefault()">
+              <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Baixar
+            </a>
+          </div>
+          <div class="file-row">
+            <div class="file-icon zip">ZIP</div>
+            <div>
+              <div class="file-name">Logo e Identidade Visual.zip</div>
+              <div class="file-meta">12 MB &middot; Enviado em 19 Mai 2026</div>
+            </div>
+            <a href="#" class="file-dl" onclick="event.preventDefault()">
+              <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Baixar
+            </a>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ════════════════════════
+           TAB: FINANCEIRO
+      ════════════════════════ -->
+      <section class="tab-section" id="tab-financeiro">
+
+        <div class="section-title">Financeiro</div>
+        <div class="section-sub">Parcelas, pagamentos e histórico de contratos</div>
+
+        <div class="grid-2" style="margin-bottom:20px">
+          <div class="stat-card">
+            <div class="stat-card-top">
+              <span class="stat-card-label">Total pago</span>
+              <div class="stat-icon green">
+                <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+            </div>
+            <div class="stat-value" style="color:var(--green)">R$ 4.200</div>
+            <div class="stat-hint">1 de 3 parcelas</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-top">
+              <span class="stat-card-label">A pagar</span>
+              <div class="stat-icon orange">
+                <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              </div>
+            </div>
+            <div class="stat-value">R$ 8.400</div>
+            <div class="stat-hint">2 parcelas pendentes</div>
+          </div>
+        </div>
+
+        <div class="invoice-list">
+
+          <div class="invoice-card">
+            <div class="invoice-icon">
+              <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            </div>
+            <div style="flex:1;min-width:0">
+              <div class="invoice-title">Parcela 1 de 3</div>
+              <div class="invoice-desc">Sistema ERP Comercial · Venc. 03 Mai 2026</div>
+            </div>
+            <div class="invoice-amount">
+              <div class="invoice-value">R$ 4.200,00</div>
+              <div style="margin-top:5px"><span class="status status-paid">Pago</span></div>
+            </div>
+          </div>
+
+          <div class="invoice-card">
+            <div class="invoice-icon">
+              <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            </div>
+            <div style="flex:1;min-width:0">
+              <div class="invoice-title">Parcela 2 de 3</div>
+              <div class="invoice-desc">Sistema ERP Comercial · Venc. 03 Jun 2026</div>
+            </div>
+            <div class="invoice-amount">
+              <div class="invoice-value">R$ 4.200,00</div>
+              <div style="margin-top:5px"><span class="status status-pending">Pendente</span></div>
+            </div>
+          </div>
+
+          <div class="invoice-card">
+            <div class="invoice-icon">
+              <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            </div>
+            <div style="flex:1;min-width:0">
+              <div class="invoice-title">Parcela 3 de 3 — Entrega final</div>
+              <div class="invoice-desc">Sistema ERP Comercial · Venc. 10 Jul 2026</div>
+            </div>
+            <div class="invoice-amount">
+              <div class="invoice-value">R$ 4.200,00</div>
+              <div style="margin-top:5px"><span class="status status-pending">Pendente</span></div>
+            </div>
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- ════════════════════════
+           TAB: FEEDBACK
+      ════════════════════════ -->
+      <section class="tab-section" id="tab-feedback">
+
+        <div class="section-title">Feedback</div>
+        <div class="section-sub">Sua opinião é essencial para continuarmos evoluindo</div>
+
+        <div class="card" style="max-width:520px">
+          <div class="card-title">Avalie sua experiência</div>
+          <div class="card-sub">Como está sendo o andamento do projeto?</div>
+
+          <div class="star-rating" id="star-row">
+            <button class="star-btn" data-v="1" title="1 estrela">★</button>
+            <button class="star-btn" data-v="2" title="2 estrelas">★</button>
+            <button class="star-btn" data-v="3" title="3 estrelas">★</button>
+            <button class="star-btn" data-v="4" title="4 estrelas">★</button>
+            <button class="star-btn" data-v="5" title="5 estrelas">★</button>
+          </div>
+
+          <div class="form-group">
+            <label>Categoria</label>
+            <select>
+              <option>Comunicação da equipe</option>
+              <option>Qualidade do desenvolvimento</option>
+              <option>Cumprimento de prazos</option>
+              <option>Atendimento / suporte</option>
+              <option>Experiência geral</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Comentário</label>
+            <textarea placeholder="Descreva sua experiência, sugestões ou pontos de melhoria..."></textarea>
+          </div>
+
+          <button class="btn btn-primary" id="feedback-btn">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            Enviar feedback
+          </button>
+
+          <div id="feedback-msg" style="display:none;margin-top:14px;padding:12px 14px;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);border-radius:8px;font-size:13px;color:var(--green)">
+            ✓ Feedback enviado com sucesso! Obrigado pela sua avaliação.
+          </div>
+        </div>
+
+      </section>
+
+    </div><!-- /portal-content -->
+  </main>
+</div><!-- /portal-layout -->
+
+<!-- ══ MODAL: Abrir Chamado ══ -->
+<div class="modal-overlay" id="modal-ticket">
+  <div class="modal-box">
+    <button class="modal-close" id="modal-close-btn" aria-label="Fechar">&times;</button>
+    <div class="modal-title">Abrir novo chamado</div>
+    <div class="modal-sub">Descreva o problema ou solicitação em detalhes para agilizarmos o atendimento.</div>
+
+    <div class="form-group">
+      <label>Assunto</label>
+      <input type="text" placeholder="Ex: Erro ao salvar cadastro de clientes">
+    </div>
+    <div class="form-group">
+      <label>Categoria</label>
+      <select>
+        <option>Bug / Erro</option>
+        <option>Performance</option>
+        <option>Melhoria / Nova funcionalidade</option>
+        <option>Dúvida de uso</option>
+        <option>Outro</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Prioridade</label>
+      <select>
+        <option>Média — erro funcional</option>
+        <option>Alta — bug grave</option>
+        <option>Crítica — sistema fora do ar</option>
+        <option>Baixa — sugestão</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Descrição</label>
+      <textarea placeholder="Descreva o que aconteceu, como reproduzir o problema e qual era o comportamento esperado..."></textarea>
+    </div>
+
+    <div style="display:flex;gap:10px;margin-top:4px">
+      <button class="btn btn-primary" id="ticket-submit" style="flex:1;justify-content:center">
+        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        Enviar chamado
+      </button>
+      <button class="btn btn-outline" onclick="document.getElementById('modal-ticket').classList.remove('open')">Cancelar</button>
+    </div>
+
+    <div id="ticket-success" style="display:none;margin-top:12px;padding:10px 14px;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);border-radius:8px;font-size:12.5px;color:var(--green)">
+      ✓ Chamado aberto com sucesso! Você receberá uma resposta conforme o SLA definido.
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { supabase } from './js/supabase.js'
+
+/* ── VERIFICAR SESSÃO ── */
+const { data: { session } } = await supabase.auth.getSession();
+if (!session) { window.location.href = 'cliente.html'; }
+
+const userId = session.user.id;
+
+/* ── CARREGAR DADOS DO CLIENTE ── */
+async function loadPortalData() {
+  // Perfil
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('name, company')
+    .eq('id', userId)
+    .single();
+
+  if (profile) {
+    const initials = (profile.name || 'CL').split(' ').map(n => n[0]).slice(0,2).join('').toUpperCase();
+    document.querySelectorAll('.sidebar-avatar, .header-avatar').forEach(el => el.textContent = initials);
+    document.querySelector('.sidebar-user-name').textContent = profile.name || 'Cliente';
+    document.querySelector('.sidebar-user-role').textContent = profile.company || '';
+    document.querySelector('.portal-header-sub').textContent = 'Bem-vindo de volta, ' + (profile.name?.split(' ')[0] || '');
+  }
+
+  // Projeto
+  const { data: project } = await supabase
+    .from('projects')
+    .select('*')
+    .eq('client_id', userId)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .single();
+
+  if (project) {
+    // Sidebar
+    document.querySelector('.sidebar-project-name').textContent = project.name;
+    // Dashboard stats
+    document.querySelector('#tab-dashboard .stat-value[style*="orange"]') && (
+      document.querySelector('#tab-dashboard .stat-value[style*="orange"]').textContent = labelStatus(project.status)
+    );
+    const progEls = document.querySelectorAll('.progress-bar-fill');
+    progEls.forEach(el => el.style.width = project.progress + '%');
+    document.querySelectorAll('.stat-value').forEach(el => {
+      if (el.textContent === '72%') el.textContent = project.progress + '%';
+    });
+    // Aba Projeto
+    document.querySelector('#tab-projeto .card-sub').textContent =
+      project.name + ' — ' + project.progress + '% concluído · Entrega estimada: ' + formatDate(project.end_date);
+    document.querySelector('#tab-projeto .progress-bar-fill').style.width = project.progress + '%';
+    document.querySelector('#tab-projeto [style*="72%"]') &&
+      (document.querySelector('#tab-projeto [style*="72%"]').textContent = project.progress + '%');
+    document.querySelector('.section-sub').textContent =
+      project.name + ' — Acompanhamento detalhado em tempo real';
+  }
+
+  // Tickets
+  const { data: tickets } = await supabase
+    .from('tickets')
+    .select('*')
+    .eq('client_id', userId)
+    .order('created_at', { ascending: false });
+
+  if (tickets?.length) {
+    const tbody = document.querySelector('#tab-suporte .data-table tbody');
+    tbody.innerHTML = tickets.map((t, i) => `
+      <tr>
+        <td><span class="ticket-id">#SC-${String(i+1).padStart(3,'0')}</span></td>
+        <td>${t.subject}</td>
+        <td style="color:var(--text-dim)">${labelType(t.type)}</td>
+        <td style="color:var(--text-dim)">${formatDate(t.created_at)}</td>
+        <td><span class="status ${statusClass(t.status)}">${labelStatus2(t.status)}</span></td>
+      </tr>
+    `).join('');
+
+    const open = tickets.filter(t => t.status !== 'done').length;
+    const badge = document.querySelector('.sidebar-nav a[data-tab="suporte"] .sidebar-badge');
+    if (badge) badge.textContent = open || '';
+    if (badge && !open) badge.style.display = 'none';
+  }
+
+  // Financeiro
+  const { data: invoices } = await supabase
+    .from('invoices')
+    .select('*')
+    .eq('client_id', userId)
+    .order('due_date');
+
+  if (invoices?.length) {
+    const paid = invoices.filter(i => i.status === 'paid').reduce((s, i) => s + Number(i.amount), 0);
+    const pending = invoices.filter(i => i.status !== 'paid').reduce((s, i) => s + Number(i.amount), 0);
+    const paidCount = invoices.filter(i => i.status === 'paid').length;
+    const pendCount = invoices.filter(i => i.status !== 'paid').length;
+
+    const statCards = document.querySelectorAll('#tab-financeiro .stat-card');
+    if (statCards[0]) {
+      statCards[0].querySelector('.stat-value').textContent = 'R$ ' + paid.toLocaleString('pt-BR');
+      statCards[0].querySelector('.stat-hint').textContent = paidCount + ' de ' + invoices.length + ' parcelas';
+    }
+    if (statCards[1]) {
+      statCards[1].querySelector('.stat-value').textContent = 'R$ ' + pending.toLocaleString('pt-BR');
+      statCards[1].querySelector('.stat-hint').textContent = pendCount + ' parcelas pendentes';
+    }
+
+    const list = document.querySelector('.invoice-list');
+    list.innerHTML = invoices.map((inv, i) => `
+      <div class="invoice-card">
+        <div class="invoice-icon">
+          <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        </div>
+        <div style="flex:1;min-width:0">
+          <div class="invoice-title">${inv.description || 'Parcela ' + (i+1)}</div>
+          <div class="invoice-desc">${project?.name || ''} · Venc. ${formatDate(inv.due_date)}</div>
+        </div>
+        <div class="invoice-amount">
+          <div class="invoice-value">R$ ${Number(inv.amount).toLocaleString('pt-BR', {minimumFractionDigits:2})}</div>
+          <div style="margin-top:5px"><span class="status ${inv.status === 'paid' ? 'status-paid' : 'status-pending'}">${inv.status === 'paid' ? 'Pago' : 'Pendente'}</span></div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // Arquivos
+  const { data: files } = await supabase
+    .from('files')
+    .select('*')
+    .eq('client_id', userId)
+    .order('created_at', { ascending: false });
+
+  if (files?.length) {
+    const card = document.querySelector('#tab-arquivos .card');
+    const header = card.querySelector('div[style*="justify-content:space-between"]');
+    card.innerHTML = '';
+    card.appendChild(header);
+    files.forEach(f => {
+      const ext = (f.type || f.name.split('.').pop()).toUpperCase();
+      const iconClass = ['PDF','DOC'].includes(ext) ? 'pdf' : ext === 'FIG' ? 'fig' : ext === 'ZIP' ? 'zip' : 'doc';
+      const div = document.createElement('div');
+      div.className = 'file-row';
+      div.innerHTML = `
+        <div class="file-icon ${iconClass}">${ext}</div>
+        <div>
+          <div class="file-name">${f.name}</div>
+          <div class="file-meta">${f.size_kb ? f.size_kb + ' KB' : ''} · ${formatDate(f.created_at)}</div>
+        </div>
+        <a href="#" class="file-dl" data-path="${f.storage_path || ''}">
+          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Baixar
+        </a>`;
+      card.appendChild(div);
+    });
+
+    // Download via Supabase Storage
+    card.querySelectorAll('.file-dl').forEach(a => {
+      a.addEventListener('click', async e => {
+        e.preventDefault();
+        const path = a.dataset.path;
+        if (!path) return;
+        const { data } = await supabase.storage.from('project-files').createSignedUrl(path, 3600);
+        if (data?.signedUrl) window.open(data.signedUrl, '_blank');
+      });
+    });
+  }
+}
+
+/* ── HELPERS ── */
+function labelStatus(s) {
+  return { analysis:'Em análise', dev:'Em desenvolvimento', testing:'Em testes', done:'Entregue' }[s] || s;
+}
+function labelStatus2(s) {
+  return { open:'Aberto', analysis:'Em análise', done:'Concluído' }[s] || s;
+}
+function statusClass(s) {
+  return { open:'status-dev', analysis:'status-analysis', done:'status-done' }[s] || '';
+}
+function labelType(t) {
+  return { bug:'Bug / Erro', feature:'Melhoria', doubt:'Dúvida', urgent:'Urgente' }[t] || t;
+}
+function formatDate(d) {
+  if (!d) return '—';
+  return new Date(d).toLocaleDateString('pt-BR', { day:'2-digit', month:'short', year:'numeric' });
+}
+
+loadPortalData();
+
+/* ── LOGOUT ── */
+document.querySelector('.sidebar-logout').addEventListener('click', async e => {
+  e.preventDefault();
+  await supabase.auth.signOut();
+  window.location.href = 'cliente.html';
+});
+
+/* ── TAB NAVIGATION ── */
+const tabTitles = {
+  dashboard:'Dashboard', projeto:'Meu Projeto',
+  suporte:'Suporte / SLA', arquivos:'Arquivos',
+  financeiro:'Financeiro', feedback:'Feedback'
+};
+document.querySelectorAll('.sidebar-nav a[data-tab]').forEach(link => {
+  link.addEventListener('click', e => {
+    e.preventDefault();
+    const tab = link.dataset.tab;
+    document.querySelectorAll('.sidebar-nav a').forEach(l => l.classList.remove('active'));
+    link.classList.add('active');
+    document.querySelectorAll('.tab-section').forEach(t => t.classList.remove('active'));
+    document.getElementById('tab-' + tab).classList.add('active');
+    document.getElementById('header-title').textContent = tabTitles[tab];
+  });
+});
+
+/* ── STAR RATING ── */
+let rating = 0;
+const stars = document.querySelectorAll('.star-btn');
+stars.forEach(star => {
+  star.addEventListener('click', () => { rating = +star.dataset.v; updateStars(rating); });
+  star.addEventListener('mouseenter', () => updateStars(+star.dataset.v));
+});
+document.getElementById('star-row').addEventListener('mouseleave', () => updateStars(rating));
+function updateStars(val) {
+  stars.forEach((s, i) => s.classList.toggle('active', i < val));
+}
+
+/* ── FEEDBACK SUBMIT ── */
+document.getElementById('feedback-btn').addEventListener('click', async () => {
+  const btn = document.getElementById('feedback-btn');
+  const msg = document.getElementById('feedback-msg');
+  const textarea = document.querySelector('#tab-feedback textarea');
+  const category = document.querySelector('#tab-feedback select');
+  const orig = btn.innerHTML;
+
+  if (!rating) { alert('Selecione uma avaliação em estrelas.'); return; }
+
+  btn.textContent = 'Enviando...';
+  btn.disabled = true;
+
+  const { data: profile } = await supabase.from('profiles').select('name, company').eq('id', userId).single();
+
+  await supabase.from('feedbacks').insert({
+    client_id:   userId,
+    client_name: profile?.name || '',
+    rating,
+    message:     textarea?.value || '',
+  });
+
+  msg.style.display = 'block';
+  btn.style.display = 'none';
+  if (textarea) textarea.value = '';
+  rating = 0;
+  updateStars(0);
+
+  setTimeout(() => {
+    msg.style.display = 'none';
+    btn.innerHTML = orig;
+    btn.disabled = false;
+    btn.style.display = '';
+  }, 5000);
+});
+
+/* ── TICKET SUBMIT (com Supabase) ── */
+document.getElementById('ticket-submit').addEventListener('click', async () => {
+  const btn     = document.getElementById('ticket-submit');
+  const msg     = document.getElementById('ticket-success');
+  const subject = document.querySelector('#modal-ticket input[type="text"]');
+  const cat     = document.querySelector('#modal-ticket select:nth-of-type(1)');
+  const orig    = btn.innerHTML;
+
+  if (!subject?.value.trim()) { subject?.focus(); return; }
+
+  btn.textContent = 'Enviando...';
+  btn.disabled = true;
+
+  const typeMap = { 'Bug / Erro':'bug', 'Performance':'bug', 'Melhoria / Nova funcionalidade':'feature', 'Dúvida de uso':'doubt', 'Outro':'doubt' };
+
+  await supabase.from('tickets').insert({
+    client_id:   userId,
+    subject:     subject.value.trim(),
+    type:        typeMap[cat?.value] || 'doubt',
+    status:      'open',
+    description: document.querySelector('#modal-ticket textarea')?.value || ''
+  });
+
+  msg.style.display = 'block';
+  btn.innerHTML = orig;
+  btn.disabled = false;
+
+  setTimeout(async () => {
+    document.getElementById('modal-ticket').classList.remove('open');
+    msg.style.display = 'none';
+    if (subject) subject.value = '';
+    await loadPortalData(); // atualiza lista de tickets
+  }, 2500);
+});
+
+/* ── MODAL ── */
+document.getElementById('modal-close-btn').addEventListener('click', () => {
+  document.getElementById('modal-ticket').classList.remove('open');
+});
+document.getElementById('modal-ticket').addEventListener('click', e => {
+  if (e.target.id === 'modal-ticket') e.target.classList.remove('open');
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') document.getElementById('modal-ticket').classList.remove('open');
+});
+</script>
+
+</body>
+</html>

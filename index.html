@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SertCode — Sistemas sob medida e automações para empresas</title>
+  <meta name="description" content="A SertCode desenvolve sistemas web, automações e soluções digitais sob medida para empresas que buscam eficiência, escala e resultado. Tecnologia com identidade, força e visão de futuro.">
+  <meta name="keywords" content="sistemas sob medida, automação empresarial, desenvolvimento de software, dashboard, painel administrativo, sertcode">
+  <meta name="author" content="SertCode">
+  <meta name="robots" content="index, follow">
+
+  <!-- Open Graph -->
+  <meta property="og:type"        content="website">
+  <meta property="og:title"       content="SertCode — Tecnologia com identidade e visão de futuro">
+  <meta property="og:description" content="Sistemas sob medida, automações e soluções digitais para empresas que querem escalar com eficiência.">
+  <meta property="og:image"       content="assets/logo-symbol.png">
+  <meta property="og:locale"      content="pt_BR">
+
+  <!-- Twitter -->
+  <meta name="twitter:card"        content="summary_large_image">
+  <meta name="twitter:title"       content="SertCode — Sistemas sob medida e automações">
+  <meta name="twitter:description" content="Tecnologia com identidade, força e visão de futuro.">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="assets/logo-symbol.png">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Orbitron:wght@600;700&family=Space+Grotesk:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/main.css">
+
+  <!-- Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "SertCode",
+    "description": "Empresa de desenvolvimento de sistemas sob medida, automações e soluções digitais.",
+    "foundingLocation": "Brasil",
+    "knowsAbout": ["Desenvolvimento de sistemas", "Automação de processos", "Dashboards", "Integração de sistemas"]
+  }
+  </script>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+     PRELOADER
+══════════════════════════════════════ -->
+<div id="preloader" role="status" aria-label="Carregando SertCode">
+  <img src="assets/logo-symbol.png" class="pre-logo" alt="SertCode símbolo" width="64" height="74">
+  <div class="pre-bar"><div class="pre-bar-fill"></div></div>
+</div>
+
+<!-- CURSOR -->
+<div id="cursor" aria-hidden="true"></div>
+<div id="cursor-ring" aria-hidden="true"></div>
+
+<!-- WhatsApp Float -->
+<a id="wa-float" href="https://wa.me/5588994355394?text=Olá!%20Gostaria%20de%20solicitar%20um%20orçamento."
+   target="_blank" rel="noopener" aria-label="Fale conosco no WhatsApp" title="WhatsApp">
+  <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+  </svg>
+</a>
+
+<!-- ══════════════════════════════════════
+     NAVBAR
+══════════════════════════════════════ -->
+<header id="navbar" role="banner">
+  <div class="container nav-inner">
+    <a href="#hero" class="nav-logo" aria-label="SertCode — Início">
+      <img src="assets/logo-symbol.png" alt="SertCode" width="38" height="44">
+      <span>Sert<em>Code</em></span>
+    </a>
+    <nav class="nav-links" aria-label="Navegação principal">
+      <a href="#sobre">Sobre</a>
+      <a href="#servicos">Serviços</a>
+      <a href="#processo">Processo</a>
+      <a href="#contato">Contato</a>
+    </nav>
+    <div class="nav-cta">
+      <a href="cliente.html" class="btn btn-outline btn-sm" style="font-size:12.5px;padding:8px 14px;gap:6px;">
+        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+        Área do Cliente
+      </a>
+      <a href="#contato" class="btn btn-primary">Solicitar orçamento</a>
+    </div>
+    <button class="hamburger" id="hamburger" aria-label="Abrir menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<!-- MOBILE MENU -->
+<nav id="mobile-menu" aria-label="Menu mobile" role="dialog">
+  <a href="#sobre">Sobre</a>
+  <a href="#servicos">Serviços</a>
+  <a href="#diferenciais">Diferenciais</a>
+  <a href="#processo">Processo</a>
+  <a href="#contato">Contato</a>
+  <a href="cliente.html" style="color:var(--orange);font-weight:600">🔐 Área do Cliente</a>
+</nav>
+
+<!-- ══════════════════════════════════════
+     HERO
+══════════════════════════════════════ -->
+<section id="hero" aria-label="Apresentação SertCode">
+  <canvas id="hero-canvas" aria-hidden="true"></canvas>
+  <div class="hero-glow" aria-hidden="true"></div>
+  <div class="container hero-inner">
+
+    <div class="hero-content">
+      <h1 class="reveal" data-delay="100">
+        Sistemas que<br>
+        <span class="grad-text">escalam com</span><br>
+        o seu negócio.
+      </h1>
+      <p class="reveal" data-delay="200">
+        A SertCode desenvolve sistemas web, automações e soluções digitais personalizadas para empresas que não aceitam soluções genéricas. Do diagnóstico à entrega — tecnologia com identidade, força e visão de futuro.
+      </p>
+      <div class="hero-btns reveal" data-delay="300">
+        <a href="#contato" class="btn btn-primary">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 01.06 1.18 2 2 0 012.03 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92v2z"/></svg>
+          Solicitar orçamento
+        </a>
+      </div>
+
+      <div class="hero-stats reveal" data-delay="400" aria-label="Números da SertCode">
+        <div class="hero-stat">
+          <div class="hero-stat-num" data-count="20" data-suffix="+">0+</div>
+          <div class="hero-stat-label">Projetos entregues</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-num" data-count="100" data-suffix="%">0%</div>
+          <div class="hero-stat-label">Clientes satisfeitos</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hero Visual -->
+    <div class="hero-visual" aria-hidden="true">
+      <div class="hero-symbol-wrap">
+        <div class="hero-symbol-bg"></div>
+        <div class="hero-symbol-ring"></div>
+        <div class="hero-symbol-ring-2"></div>
+        <img src="assets/logo-symbol.png" class="hero-symbol" alt="" width="260">
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     SOBRE
+══════════════════════════════════════ -->
+<section id="sobre" aria-labelledby="sobre-title">
+  <div class="container">
+    <div class="about-grid">
+
+      <div class="about-visual reveal-left">
+        <img src="assets/logo-symbol.png" class="about-symbol" alt="" aria-hidden="true">
+        <div class="about-numbers" data-stagger>
+          <div class="about-num-card">
+            <div class="num" data-count="20" data-suffix="+">0+</div>
+            <div class="label">Sistemas entregues</div>
+          </div>
+
+          <div class="about-num-card">
+            <div class="num" data-count="12" data-suffix="">0</div>
+            <div class="label">Segmentos atendidos</div>
+          </div>
+          <div class="about-num-card">
+            <div class="num" data-count="98" data-suffix="%">0%</div>
+            <div class="label">Taxa de satisfação</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="about-content reveal-right">
+        <div class="badge">Sobre a empresa</div>
+        <div style="height:20px"></div>
+        <h2 id="sobre-title">
+          Nascemos no sertão.<br>
+          <span class="grad-text">Programamos para o mundo.</span>
+        </h2>
+        <div class="divider"></div>
+        <p>
+          SertCode é a união de duas forças: a resistência e autenticidade do sertão nordestino, e a precisão da tecnologia. Somos uma empresa de desenvolvimento de software e automação, fundada com o propósito de construir soluções digitais que realmente fazem a diferença no dia a dia de quem empreende.
+        </p>
+        <p>
+          Não trabalhamos com templates prontos nem com soluções genéricas. Cada projeto é tratado como único — começamos entendendo profundamente o problema do cliente para, então, desenhar e construir a solução mais eficiente, escalável e adequada à realidade do negócio.
+        </p>
+        <p>
+          Nossa missão é simples: transformar operações manuais em sistemas inteligentes, entregar interfaces que as pessoas realmente queiram usar, e construir software que cresce junto com a empresa.
+        </p>
+        <div class="about-tags">
+          <span class="about-tag">Sistemas sob medida</span>
+          <span class="about-tag">Automações</span>
+          <span class="about-tag">Alta performance</span>
+          <span class="about-tag">Suporte contínuo</span>
+          <span class="about-tag">Segurança</span>
+          <span class="about-tag">Escalabilidade</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     SERVIÇOS
+══════════════════════════════════════ -->
+<section id="servicos" aria-labelledby="servicos-title">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="badge">O que fazemos</div>
+      <h2 id="servicos-title">Serviços que entregam resultado</h2>
+      <p>Desenvolvemos soluções digitais completas para empresas que precisam de tecnologia que funcione de verdade — não só pareça boa numa apresentação.</p>
+    </div>
+
+    <div class="services-grid" data-stagger>
+
+      <article class="card service-card">
+        <div class="icon-box" aria-hidden="true">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6M9 12h6M9 15h4"/></svg>
+        </div>
+        <h3>Sistemas Web sob Medida</h3>
+        <p>Desenvolvemos sistemas completos do zero: CRMs, ERPs, plataformas internas, portais de clientes e qualquer solução que a sua operação exige e o mercado não oferece pronto.</p>
+      </article>
+
+      <article class="card service-card">
+        <div class="icon-box" aria-hidden="true">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+        </div>
+        <h3>Dashboards e Painéis Administrativos</h3>
+        <p>Transformamos dados dispersos em inteligência visual. Criamos dashboards interativos com indicadores em tempo real para gestores e líderes tomarem decisões com segurança.</p>
+      </article>
+
+      <article class="card service-card">
+        <div class="icon-box" aria-hidden="true">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        </div>
+        <h3>Automações de Processos</h3>
+        <p>Eliminamos o retrabalho. Automatizamos fluxos operacionais repetitivos — notificações, relatórios, sincronização de dados, envio de documentos — para sua equipe focar no que importa.</p>
+      </article>
+
+      <article class="card service-card">
+        <div class="icon-box" aria-hidden="true">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M13 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
+        </div>
+        <h3>Integrações entre Sistemas</h3>
+        <p>Fazemos sistemas diferentes conversarem entre si. Integramos plataformas de vendas, ERPs, marketplaces, gateways de pagamento, APIs e qualquer ferramenta que você já usa.</p>
+      </article>
+
+      <article class="card service-card">
+        <div class="icon-box" aria-hidden="true">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+        </div>
+        <h3>Landing Pages de Alta Conversão</h3>
+        <p>Páginas de venda construídas com estratégia: copy persuasivo, design orientado a conversão, velocidade de carregamento e SEO desde a primeira linha de código.</p>
+      </article>
+
+      <article class="card service-card">
+        <div class="icon-box" aria-hidden="true">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 010 14.14M4.93 4.93a10 10 0 000 14.14"/></svg>
+        </div>
+        <h3>Painéis de Controle Internos</h3>
+        <p>Ferramentas de gestão usadas pela equipe interna: controle de projetos, aprovações, onboarding, formulários inteligentes e qualquer processo que acontece dentro da empresa.</p>
+      </article>
+
+      <article class="card service-card">
+        <div class="icon-box" aria-hidden="true">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        </div>
+        <h3>Soluções Internas sob Medida</h3>
+        <p>Toda empresa tem um problema específico que nenhum software do mercado resolve. A SertCode foi feita exatamente para esses casos — construímos o que não existe pronto.</p>
+      </article>
+
+      <article class="card service-card">
+        <div class="icon-box" aria-hidden="true">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+        </div>
+        <h3>Manutenção e Evolução de Sistemas</h3>
+        <p>Analisamos sistemas e ajustamos conforme necessidade/realidade de cada cliente. Seja para corrigir falhas, modernizar funcionalidades ou escalar a operação — o sistema evolui junto com o negócio.</p>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     DIFERENCIAIS
+══════════════════════════════════════ -->
+<section id="diferenciais" aria-labelledby="diff-title">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="badge">Por que a SertCode</div>
+      <h2 id="diff-title">O que nos diferencia</h2>
+    </div>
+
+    <div class="diff-grid" data-stagger>
+
+      <div class="card diff-card">
+        <div class="diff-icon" aria-hidden="true">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+        </div>
+        <div class="diff-text">
+          <h3>Atendimento Consultivo</h3>
+          <p>Não vendemos horas de programação — vendemos solução. Antes de qualquer linha de código, entendemos o seu negócio a fundo para garantir que estamos resolvendo o problema certo.</p>
+        </div>
+      </div>
+
+      <div class="card diff-card">
+        <div class="diff-icon" aria-hidden="true">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        </div>
+        <div class="diff-text">
+          <h3>Solução 100% Personalizada</h3>
+          <p>Nenhum projeto é igual ao anterior. Cada sistema é construído especificamente para o contexto, os processos e os objetivos do cliente. Zero templates, zero genérico.</p>
+        </div>
+      </div>
+
+      <div class="card diff-card">
+        <div class="diff-icon" aria-hidden="true">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+        </div>
+        <div class="diff-text">
+          <h3>Visual Profissional e Intuitivo</h3>
+          <p>Sistemas bonitos que as pessoas realmente querem usar. Design funcional com atenção a UX para garantir que a equipe adote o sistema sem resistência.</p>
+        </div>
+      </div>
+
+      <div class="card diff-card">
+        <div class="diff-icon" aria-hidden="true">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        </div>
+        <div class="diff-text">
+          <h3>Foco em Performance</h3>
+          <p>Código limpo, banco de dados otimizado, carregamento rápido. Sistemas que não travam quando a operação escala ou quando mais usuários acessam ao mesmo tempo.</p>
+        </div>
+      </div>
+
+      <div class="card diff-card">
+        <div class="diff-icon" aria-hidden="true">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <div class="diff-text">
+          <h3>Segurança por Padrão</h3>
+          <p>Autenticação robusta, controle de permissões por perfil, backups automáticos e boas práticas de segurança implementadas desde o início — não como um extra, mas como padrão.</p>
+        </div>
+      </div>
+
+      <div class="card diff-card">
+        <div class="diff-icon" aria-hidden="true">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+        </div>
+        <div class="diff-text">
+          <h3>Escalabilidade Planejada</h3>
+          <p>Construímos pensando no crescimento. Arquitetura que suporta 10x mais usuários sem refatoração emergencial, com código organizado para evolução contínua.</p>
+        </div>
+      </div>
+
+      <div class="card diff-card">
+        <div class="diff-icon" aria-hidden="true">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 010 14.14M4.93 4.93a10 10 0 000 14.14"/></svg>
+        </div>
+        <div class="diff-text">
+          <h3>Automações Inteligentes</h3>
+          <p>Identificamos o que pode ser automatizado dentro da sua operação e construímos fluxos que eliminam tarefas manuais repetitivas, reduzindo custos e erros humanos.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     PROCESSO
+══════════════════════════════════════ -->
+<section id="processo" aria-labelledby="processo-title">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="badge">Como trabalhamos</div>
+      <h2 id="processo-title">Do problema à solução</h2>
+      <p>Um processo claro, sem surpresas. Você sabe exatamente em que etapa está o projeto em cada momento.</p>
+    </div>
+
+    <div class="process-track reveal">
+
+      <div class="process-step">
+        <div class="step-num active">01</div>
+        <div>
+          <div class="step-title">Diagnóstico</div>
+          <div class="step-desc">Entendemos o negócio, os processos e o problema real que precisa ser resolvido antes de qualquer proposta.</div>
+        </div>
+      </div>
+
+      <div class="process-step">
+        <div class="step-num active">02</div>
+        <div>
+          <div class="step-title">Planejamento</div>
+          <div class="step-desc">Definimos escopo, tecnologias, cronograma e arquitetura. Você aprova antes de qualquer desenvolvimento começar.</div>
+        </div>
+      </div>
+
+      <div class="process-step">
+        <div class="step-num active">03</div>
+        <div>
+          <div class="step-title">Design</div>
+          <div class="step-desc">Criamos as telas e fluxos do sistema. Interface visual e UX revisados e aprovados antes da implementação.</div>
+        </div>
+      </div>
+
+      <div class="process-step">
+        <div class="step-num">04</div>
+        <div>
+          <div class="step-title">Desenvolvimento</div>
+          <div class="step-desc">Código limpo, documentado e com atualizações regulares de progresso. Você acompanha cada etapa do build.</div>
+        </div>
+      </div>
+
+      <div class="process-step">
+        <div class="step-num">05</div>
+        <div>
+          <div class="step-title">Testes</div>
+          <div class="step-desc">QA rigoroso antes da entrega. Testes funcionais, de carga e de usabilidade com a equipe real do cliente.</div>
+        </div>
+      </div>
+
+      <div class="process-step">
+        <div class="step-num">06</div>
+        <div>
+          <div class="step-title">Entrega e Suporte</div>
+          <div class="step-desc">Deploy em produção, treinamento da equipe e suporte contínuo. O projeto não termina na entrega.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     DEPOIMENTOS
+══════════════════════════════════════ -->
+<section id="depoimentos" aria-labelledby="testi-title" style="display:none">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="badge">Depoimentos</div>
+      <h2 id="testi-title">O que nossos clientes dizem</h2>
+    </div>
+
+    <!-- Depoimentos reais serão adicionados aqui após aprovação do gestor -->
+    <div class="testi-placeholder reveal" aria-hidden="true"></div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     FAQ
+══════════════════════════════════════ -->
+<section id="faq" aria-labelledby="faq-title">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="badge">Dúvidas frequentes</div>
+      <h2 id="faq-title">Perguntas frequentes</h2>
+      <p>Respostas diretas para as perguntas que mais recebemos antes de um projeto começar.</p>
+    </div>
+
+    <div class="faq-list reveal">
+
+      <div class="faq-item">
+        <button class="faq-question" aria-expanded="false">
+          A SertCode atende quais segmentos de mercado?
+          <span class="faq-icon" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-answer" role="region">
+          <div class="faq-answer-inner">
+            Atendemos empresas de todos os segmentos: saúde, logística, e-commerce, varejo, construção civil, serviços, indústria, educação, agronegócio e muito mais. Nossa especialidade não é um nicho específico, mas sim a capacidade de entender a fundo qualquer operação e construir a solução mais adequada para ela. Se você tem um processo que precisa de tecnologia, somos o parceiro certo.
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" aria-expanded="false">
+          Vocês criam sistemas completamente do zero?
+          <span class="faq-icon" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-answer" role="region">
+          <div class="faq-answer-inner">
+            Sim. Essa é, inclusive, nossa principal entrega. Desenvolvemos sistemas web completos do zero, desde o banco de dados até o front-end. Não trabalhamos com templates ou soluções de prateleira. Cada sistema é arquitetado especificamente para o contexto do cliente, com as funcionalidades que ele realmente precisa — sem inchaço desnecessário e sem limitações de plataformas prontas.
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" aria-expanded="false">
+          Vocês desenvolvem automações de processos?
+          <span class="faq-icon" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-answer" role="region">
+          <div class="faq-answer-inner">
+            Sim, é um dos nossos principais serviços. Automatizamos fluxos operacionais repetitivos: desde o envio automático de e-mails e notificações, até a sincronização de dados entre sistemas distintos, geração automática de relatórios, processamento de pedidos e qualquer outro processo que hoje depende de intervenção humana manual. A primeira etapa é sempre um mapeamento dos processos da empresa para identificar o que gera mais impacto ao ser automatizado.
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" aria-expanded="false">
+          A SertCode oferece suporte após a entrega do projeto?
+          <span class="faq-icon" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-answer" role="region">
+          <div class="faq-answer-inner">
+            Sim. A entrega do projeto não é o fim da nossa relação com o cliente — é o começo da fase de evolução. Oferecemos planos de suporte e manutenção com SLA definido, além de contratos de evolução contínua para clientes que precisam de novas funcionalidades regularmente. Nosso interesse é que o sistema continue funcionando perfeitamente e crescendo junto com o negócio.
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" aria-expanded="false">
+          O projeto é totalmente personalizado ou há limitações?
+          <span class="faq-icon" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-answer" role="region">
+          <div class="faq-answer-inner">
+            O projeto é 100% personalizado. Como desenvolvemos tudo do zero com código próprio, não há limitações impostas por plataformas de terceiros. Cada funcionalidade, cada tela, cada regra de negócio é construída especificamente para a sua realidade. A única limitação existente é o escopo definido em contrato — e esse escopo é desenhado junto com você antes do projeto começar, com total transparência.
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     CONTATO
+══════════════════════════════════════ -->
+<section id="contato" aria-labelledby="contato-title">
+  <div class="container">
+    <div class="contact-grid">
+
+      <div class="contact-info reveal-left">
+        <div class="badge">Fale conosco</div>
+        <div style="height:20px"></div>
+        <h2 id="contato-title">
+          Pronto para transformar<br>
+          <span class="grad-text">sua operação?</span>
+        </h2>
+        <div class="divider"></div>
+        <p>
+          Fale com a nossa equipe. Fazemos um diagnóstico inicial gratuito para entender o seu cenário e apresentar a solução mais adequada para o seu negócio.
+        </p>
+
+        <div class="contact-channels">
+          <a href="https://wa.me/5588994355394" target="_blank" rel="noopener" class="contact-channel" aria-label="Contato via WhatsApp">
+            <div class="contact-channel-icon" aria-hidden="true">
+              <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            </div>
+            <div>
+              <div class="contact-channel-label">WhatsApp</div>
+              <div class="contact-channel-value">+55 (88) 9 9435-5394</div>
+            </div>
+          </a>
+
+          <a href="mailto:contatosertcode@gmail.com" class="contact-channel" aria-label="Enviar e-mail">
+            <div class="contact-channel-icon" aria-hidden="true">
+              <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            </div>
+            <div>
+              <div class="contact-channel-label">E-mail</div>
+              <div class="contact-channel-value">contatosertcode@gmail.com</div>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <div class="reveal-right">
+        <form id="contact-form" class="contact-form" novalidate>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="nome">Nome completo</label>
+              <input type="text" id="nome" name="nome" placeholder="Seu nome" required autocomplete="name">
+            </div>
+            <div class="form-group">
+              <label for="empresa">Empresa</label>
+              <input type="text" id="empresa" name="empresa" placeholder="Nome da empresa" autocomplete="organization">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="email">E-mail</label>
+              <input type="email" id="email" name="email" placeholder="seu@email.com.br" required autocomplete="email">
+            </div>
+            <div class="form-group">
+              <label for="telefone">WhatsApp</label>
+              <input type="tel" id="telefone" name="telefone" placeholder="(00) 00000-0000" autocomplete="tel">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="segmento">Segmento</label>
+            <select id="segmento" name="segmento">
+              <option value="">Selecione seu segmento</option>
+              <option>Saúde</option>
+              <option>Logística e Distribuição</option>
+              <option>E-commerce e Varejo</option>
+              <option>Indústria e Manufatura</option>
+              <option>Construção Civil</option>
+              <option>Serviços e Consultoria</option>
+              <option>Educação</option>
+              <option>Agronegócio</option>
+              <option>Alimentícios</option>
+              <option>Outro</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="mensagem">O que você precisa?</label>
+            <textarea id="mensagem" name="mensagem" placeholder="Descreva brevemente o que você precisa desenvolver ou automatizar..." required></textarea>
+          </div>
+          <div class="form-submit">
+            <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;">
+              Enviar Mensagem
+              <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            </button>
+          </div>
+          <div id="form-feedback" class="form-feedback" role="alert" aria-live="polite"></div>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     FOOTER
+══════════════════════════════════════ -->
+<footer role="contentinfo">
+  <div class="container">
+    <div class="footer-top">
+
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <img src="assets/logo-symbol.png" alt="SertCode" width="36" height="42">
+          <span>Sert<em>Code</em></span>
+        </div>
+        <p>Tecnologia com identidade, força e visão de futuro. Sistemas sob medida para empresas que querem escalar com eficiência e segurança.</p>
+        <div class="footer-socials" aria-label="Redes sociais">
+          <a href="https://instagram.com/sertcode" target="_blank" rel="noopener" class="footer-social" aria-label="Instagram @sertcode">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <div class="footer-col">
+        <h4>Serviços</h4>
+        <a href="#servicos">Sistemas sob medida</a>
+        <a href="#servicos">Dashboards</a>
+        <a href="#servicos">Automações</a>
+        <a href="#servicos">Integrações</a>
+        <a href="#servicos">Landing pages</a>
+      </div>
+
+      <div class="footer-col">
+        <h4>Empresa</h4>
+        <a href="#sobre">Sobre a SertCode</a>
+        <a href="#diferenciais">Diferenciais</a>
+        <a href="#processo">Processo</a>
+        <a href="#depoimentos">Depoimentos</a>
+      </div>
+
+      <div class="footer-col">
+        <h4>Contato</h4>
+        <a href="#contato">Solicitar orçamento</a>
+        <a href="#faq">Dúvidas frequentes</a>
+        <a href="mailto:contatosertcode@gmail.com">contatosertcode@gmail.com</a>
+        <a href="https://wa.me/5588994355394" target="_blank" rel="noopener">WhatsApp</a>
+      </div>
+
+    </div>
+
+    <div class="footer-bottom">
+      <span>&copy; 2025 SertCode. Todos os direitos reservados.</span>
+    </div>
+  </div>
+</footer>
+
+<!-- JS -->
+<script src="js/animations.js" defer></script>
+<script src="js/faq.js" defer></script>
+<script src="js/main.js" defer></script>
+
+</body>
+</html>

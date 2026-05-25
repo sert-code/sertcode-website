@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Área do Cliente — SertCode</title>
+  <link rel="icon" type="image/png" href="assets/logo-symbol.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/portal.css">
+</head>
+<body>
+
+<div class="login-page">
+  <div class="login-glow"></div>
+
+  <!-- Partículas decorativas -->
+  <div style="position:absolute;inset:0;pointer-events:none;overflow:hidden" aria-hidden="true">
+    <div style="position:absolute;width:1px;height:1px;border-radius:50%;background:rgba(255,106,0,0.6);top:22%;left:18%;box-shadow:0 0 40px 12px rgba(255,106,0,0.08)"></div>
+    <div style="position:absolute;width:1px;height:1px;border-radius:50%;background:rgba(255,106,0,0.4);top:70%;left:80%;box-shadow:0 0 60px 18px rgba(255,106,0,0.06)"></div>
+  </div>
+
+  <div class="login-card">
+
+    <!-- Brand -->
+    <div class="login-brand">
+      <img src="assets/logo-symbol.png" alt="SertCode" width="36">
+      <span class="login-brand-text">Sert<em>Code</em></span>
+    </div>
+
+    <div style="height:22px"></div>
+
+    <div class="login-title">Área do Cliente</div>
+    <div class="login-sub">Acesse o portal exclusivo do seu projeto.</div>
+
+    <!-- Form -->
+    <form class="login-form" id="login-form" novalidate>
+      <div class="form-group">
+        <label>E-mail</label>
+        <input type="email" id="login-email" placeholder="seu@email.com.br" required autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label>Senha</label>
+        <input type="password" id="login-pass" placeholder="••••••••" required autocomplete="current-password">
+      </div>
+      <button type="submit" class="btn btn-primary" id="login-btn">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+        Entrar
+      </button>
+      <div id="login-error" style="display:none;margin-top:12px;font-size:12.5px;color:#EF4444;text-align:center;padding:10px;background:rgba(239,68,68,0.07);border-radius:8px;border:1px solid rgba(239,68,68,0.2)">
+        Credenciais inválidas. Verifique seu e-mail e senha.
+      </div>
+    </form>
+
+    <!-- Demo note -->
+    <div style="margin-top:20px;padding:13px 14px;background:rgba(255,106,0,0.05);border:1px solid rgba(255,106,0,0.14);border-radius:10px;font-size:12px;color:#666;text-align:center;line-height:1.7">
+      🔐 Acesso exclusivo para clientes SertCode.<br>
+      Ainda não é cliente?
+      <a href="index.html#contato" style="color:var(--orange);font-weight:600">Solicite um orçamento →</a>
+    </div>
+
+
+    <a href="index.html" class="login-back">← Voltar ao site</a>
+  </div>
+</div>
+
+<script type="module">
+import { supabase } from './js/supabase.js'
+
+document.getElementById('login-form').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const email = document.getElementById('login-email').value.trim();
+  const pass  = document.getElementById('login-pass').value;
+  const btn   = document.getElementById('login-btn');
+  const err   = document.getElementById('login-error');
+  const orig  = btn.innerHTML;
+
+  if (!email || !pass) {
+    err.textContent = 'Preencha o e-mail e a senha.';
+    err.style.display = 'block';
+    return;
+  }
+
+  btn.innerHTML = 'Entrando...';
+  btn.disabled  = true;
+  err.style.display = 'none';
+
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password: pass });
+
+  if (error) {
+    err.textContent = 'Credenciais inválidas. Verifique seu e-mail e senha.';
+    err.style.display = 'block';
+    btn.innerHTML = orig;
+    btn.disabled  = false;
+    return;
+  }
+
+  // Verificar se não é gestor tentando entrar aqui
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', data.user.id)
+    .single();
+
+  if (profile?.role === 'gestor') {
+    await supabase.auth.signOut();
+    err.textContent = 'Acesso de gestor deve ser feito pela área administrativa.';
+    err.style.display = 'block';
+    btn.innerHTML = orig;
+    btn.disabled  = false;
+    return;
+  }
+
+  window.location.href = 'portal.html';
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,45 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="g" x1="256" y1="185" x2="256" y2="402" gradientUnits="userSpaceOnUse">
+      <stop offset="0%"   stop-color="#FF8A00"/>
+      <stop offset="45%"  stop-color="#FF6A00"/>
+      <stop offset="75%"  stop-color="#F25C05"/>
+      <stop offset="100%" stop-color="#D94A00"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="512" height="512" rx="52" fill="#050505"/>
+
+  <!--
+    S formado por dois C empilhados (rounded-rectangle approach):
+    Topo-direita → braço esq → canto-ext-esq → lado-esq → canto-int-esq
+    → travessão → canto-int-dir → lado-dir → canto-ext-dir → braço esq → círculo-baixo
+  -->
+  <path d="
+    M 362 192
+    L 295 192
+    Q 178 192 178 262
+    L 178 278
+    Q 178 318 222 318
+    L 290 318
+    Q 334 318 334 358
+    L 334 362
+    Q 334 402 258 402
+    L 192 402
+  "
+    stroke="url(#g)"
+    stroke-width="44"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    fill="none"/>
+
+  <!-- Círculo oco — topo direita -->
+  <circle cx="362" cy="192" r="22"
+          stroke="url(#g)" stroke-width="17"
+          fill="#050505"/>
+
+  <!-- Círculo oco — baixo esquerda -->
+  <circle cx="192" cy="402" r="22"
+          stroke="url(#g)" stroke-width="17"
+          fill="#050505"/>
+</svg>

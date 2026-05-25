@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Acesso Gestor — SertCode</title>
+  <link rel="icon" type="image/png" href="assets/logo-symbol.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/portal.css">
+</head>
+<body>
+
+<div class="login-page">
+  <div class="login-glow"></div>
+
+  <div style="position:absolute;inset:0;pointer-events:none;overflow:hidden" aria-hidden="true">
+    <div style="position:absolute;width:1px;height:1px;top:15%;left:75%;box-shadow:0 0 80px 20px rgba(255,106,0,0.07)"></div>
+    <div style="position:absolute;width:1px;height:1px;top:80%;left:20%;box-shadow:0 0 60px 16px rgba(255,106,0,0.05)"></div>
+  </div>
+
+  <div class="login-card">
+
+    <div class="login-brand">
+      <img src="assets/logo-symbol.png" alt="SertCode" width="36">
+      <span class="login-brand-text">Sert<em>Code</em></span>
+    </div>
+
+    <div style="margin:14px 0 10px">
+      <span style="display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:800;background:rgba(255,106,0,0.1);color:var(--orange);border:1px solid rgba(255,106,0,0.22);padding:4px 13px;border-radius:99px;text-transform:uppercase;letter-spacing:.09em">
+        🔒 Acesso Restrito — Equipe SertCode
+      </span>
+    </div>
+
+    <div class="login-title">Painel do Gestor</div>
+    <div class="login-sub">Área administrativa exclusiva da equipe SertCode.</div>
+
+    <form class="login-form" id="gestor-form" novalidate>
+      <div class="form-group">
+        <label>E-mail</label>
+        <input type="email" id="gestor-email" placeholder="gestor@sertcode.com" required autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label>Senha</label>
+        <input type="password" id="gestor-pass" placeholder="••••••••" required autocomplete="current-password">
+      </div>
+      <button type="submit" class="btn btn-primary" id="gestor-btn">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+        Acessar painel
+      </button>
+      <div id="gestor-error" style="display:none;margin-top:12px;font-size:12.5px;color:#EF4444;text-align:center;padding:10px;background:rgba(239,68,68,0.07);border:1px solid rgba(239,68,68,0.2);border-radius:8px">
+        Credenciais inválidas. Verifique e tente novamente.
+      </div>
+    </form>
+
+    <div style="margin-top:20px;padding:11px 14px;background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:8px;font-size:11px;color:var(--text-dim);text-align:center;line-height:1.8">
+      🔒 Acesso exclusivo para a equipe SertCode. Credenciais fornecidas internamente.
+    </div>
+
+    <a href="cliente.html" class="login-back">← Área do Cliente</a>
+  </div>
+</div>
+
+<script type="module">
+import { supabase } from './js/supabase.js'
+
+document.getElementById('gestor-form').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const email = document.getElementById('gestor-email').value.trim();
+  const pass  = document.getElementById('gestor-pass').value;
+  const btn   = document.getElementById('gestor-btn');
+  const err   = document.getElementById('gestor-error');
+  const orig  = btn.innerHTML;
+
+  btn.innerHTML = 'Verificando...';
+  btn.disabled  = true;
+  err.style.display = 'none';
+
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password: pass });
+
+  if (error) {
+    err.style.display = 'block';
+    btn.innerHTML = orig;
+    btn.disabled  = false;
+    return;
+  }
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role, name')
+    .eq('id', data.user.id)
+    .single();
+
+  if (profile?.role !== 'gestor') {
+    await supabase.auth.signOut();
+    err.textContent = 'Acesso negado. Este portal é restrito à equipe SertCode.';
+    err.style.display = 'block';
+    btn.innerHTML = orig;
+    btn.disabled  = false;
+    return;
+  }
+
+  window.location.href = 'painel.html';
+});
+</script>
+
+</body>
+</html>
