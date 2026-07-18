@@ -666,7 +666,7 @@
   background:#0e0e0e; border:1px solid rgba(255,106,0,0.22);
   border-radius:16px; padding:20px 24px;
   box-shadow:0 8px 40px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04);
-  display:flex; align-items:center; gap:20px; flex-wrap:wrap;
+  align-items:center; gap:20px; flex-wrap:wrap;
   font-family:'Inter',sans-serif;
   animation: lgpdSlideUp .4s cubic-bezier(.16,1,.3,1) both;
 ">
@@ -733,9 +733,8 @@
 
   function dismiss(accepted) {
     localStorage.setItem(KEY, accepted ? 'accepted' : 'rejected');
-    banner.style.transition = 'opacity .35s, transform .35s';
+    banner.style.transition = 'opacity .35s ease';
     banner.style.opacity = '0';
-    banner.style.transform = banner.style.transform.replace('translateY(0)', 'translateY(20px)') || 'translateX(-50%) translateY(20px)';
     setTimeout(function () { banner.style.display = 'none'; }, 380);
   }
 
