@@ -196,37 +196,16 @@ section:nth-child(even) { background: var(--surface); }
 /* ══════════════════════════════════════
    SOBRE
 ══════════════════════════════════════ */
-.about-grid {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;
+.about-centered {
+  max-width: 760px; margin: 0 auto; text-align: center;
 }
-.about-visual {
-  position: relative; display: flex; align-items: center; justify-content: center;
-}
-.about-symbol {
-  width: 100px; opacity: 0.15; position: absolute;
-  filter: blur(2px);
-}
-.about-numbers {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 24px; position: relative; z-index: 1;
-}
-.about-num-card {
-  background: var(--bg); border: 1px solid var(--border);
-  border-radius: var(--radius); padding: 28px 24px; text-align: center;
-  transition: var(--transition);
-}
-.about-num-card:hover { border-color: var(--border-hover); }
-.about-num-card .num {
-  font-family: var(--font-head); font-size: 2.4rem; font-weight: 800;
-  background: var(--gradient-h); -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent; background-clip: text;
-}
-.about-num-card .label { font-size: 0.82rem; color: var(--text-dim); margin-top: 4px; }
-.about-content h2 {
+.about-centered .divider { margin: 16px auto; }
+.about-centered h2 {
   font-size: clamp(1.8rem, 3vw, 2.6rem); font-weight: 700;
   color: var(--text); margin-bottom: 20px;
 }
-.about-content p { font-size: 1rem; line-height: 1.8; margin-bottom: 20px; }
-.about-tags { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 32px; }
+.about-centered p { font-size: 1rem; line-height: 1.8; margin-bottom: 20px; }
+.about-tags { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 32px; }
 .about-tag {
   padding: 6px 16px; border-radius: 100px;
   border: 1px solid var(--border); font-size: 0.82rem;
@@ -559,7 +538,6 @@ footer {
   .hero-btns { justify-content: center; }
   .hero-stats { justify-content: center; }
   .hero-visual { display: none; }
-  .about-grid { grid-template-columns: 1fr; gap: 48px; }
   .contact-grid { grid-template-columns: 1fr; }
   .footer-top { grid-template-columns: 1fr 1fr; gap: 32px; }
 }
