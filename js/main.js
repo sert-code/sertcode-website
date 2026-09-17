@@ -1,3 +1,11 @@
+/* ── THEME TOGGLE (restore saved preference) ── */
+(function() {
+  try {
+    const saved = localStorage.getItem('sertcode_theme');
+    if (saved === 'light') document.documentElement.setAttribute('data-theme', 'light');
+  } catch(e) {}
+})();
+
 /* ── PRELOADER ── */
 window.addEventListener('load', () => {
   setTimeout(() => {
@@ -97,3 +105,18 @@ window.addEventListener('scroll', () => {
       ? 'var(--orange)' : '';
   });
 }, { passive: true });
+
+/* ── THEME TOGGLE (click handler) ── */
+const themeToggleBtn = document.getElementById('theme-toggle');
+if (themeToggleBtn) {
+  themeToggleBtn.addEventListener('click', () => {
+    const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+    if (isLight) {
+      document.documentElement.removeAttribute('data-theme');
+      try { localStorage.setItem('sertcode_theme', 'dark'); } catch(e) {}
+    } else {
+      document.documentElement.setAttribute('data-theme', 'light');
+      try { localStorage.setItem('sertcode_theme', 'light'); } catch(e) {}
+    }
+  });
+}

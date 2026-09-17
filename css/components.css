@@ -108,3 +108,31 @@
   background: var(--gradient-h); -webkit-background-clip: text;
   -webkit-text-fill-color: transparent; background-clip: text;
 }
+
+/* ── THEME TOGGLE ── */
+.theme-toggle {
+  width: 36px; height: 36px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border);
+  background: transparent;
+  color: var(--text-muted);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: var(--transition);
+  flex-shrink: 0;
+}
+.theme-toggle:hover {
+  border-color: var(--orange);
+  color: var(--orange);
+}
+/* mostrar só o ícone correto */
+[data-theme="light"] .theme-toggle .icon-sun  { display: none; }
+[data-theme="light"] .theme-toggle .icon-moon { display: block; }
+:not([data-theme="light"]) .theme-toggle .icon-sun  { display: block; }
+:not([data-theme="light"]) .theme-toggle .icon-moon { display: none; }
+
+/* ── FOOTER LOGO COMO LINK ── */
+a.footer-logo {
+  text-decoration: none;
+  transition: opacity var(--transition);
+}
+a.footer-logo:hover { opacity: 0.8; }

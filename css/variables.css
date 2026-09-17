@@ -23,3 +23,16 @@
   --max-w:        1200px;
   --section-gap:  120px;
 }
+
+/* ── TEMA CLARO ── */
+[data-theme="light"] {
+  --bg:           #F5F5F5;
+  --surface:      #FFFFFF;
+  --surface-2:    #EFEFEF;
+  --border:       rgba(255,106,0,0.15);
+  --border-hover: rgba(255,106,0,0.4);
+  --text:         #111111;
+  --text-muted:   #555555;
+  --text-dim:     #999999;
+  --shadow-card:  0 4px 32px rgba(0,0,0,0.1);
+}
