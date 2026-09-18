@@ -602,30 +602,32 @@ footer {
   flex-direction: column;
   gap: 28px;
 }
-.sertlink-header {
+a.sertlink-header {
   display: flex;
-  align-items: center;
-  gap: 16px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  text-decoration: none;
+  transition: opacity var(--transition);
 }
-.sistema-logo-wrap {
-  width: 56px; height: 56px;
-  background: rgba(255,106,0,0.08);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
+a.sertlink-header:hover { opacity: 0.82; }
+.sertlink-logo {
+  height: 46px;
+  width: auto;
+  display: block;
 }
-.sistema-name {
-  font-family: var(--font-head);
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--text);
-  line-height: 1.2;
-}
+.sertlink-logo-light { display: none; }
+[data-theme="light"] .sertlink-logo-dark  { display: none; }
+[data-theme="light"] .sertlink-logo-light { display: block; }
 .sistema-tag {
   font-size: 13px;
   color: var(--text-muted);
-  margin-top: 4px;
+}
+.sistema-desc {
+  font-size: 14.5px;
+  color: var(--text-muted);
+  line-height: 1.75;
+  max-width: 460px;
 }
 .sertlink-img-wrap {
   display: flex;
