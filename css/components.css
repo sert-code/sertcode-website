@@ -69,6 +69,7 @@
   content: ''; position: absolute; inset: 0;
   background: radial-gradient(circle at 50% 0%, rgba(255,106,0,0.06) 0%, transparent 60%);
   opacity: 0; transition: opacity var(--transition);
+  pointer-events: none;
 }
 .card:hover { border-color: var(--border-hover); transform: translateY(-4px); box-shadow: var(--shadow-card); }
 .card:hover::after { opacity: 1; }
