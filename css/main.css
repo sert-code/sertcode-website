@@ -54,7 +54,7 @@
 .nav-logo img { width: 38px; height: auto; }
 .nav-logo span {
   font-family: 'Orbitron', sans-serif; font-weight: 600; font-size: 1.1rem;
-  letter-spacing: 0.04em; color: #EAEAEA;
+  letter-spacing: 0.04em; color: var(--text);
 }
 .nav-logo span em {
   font-weight: 700; font-style: normal;
@@ -485,7 +485,7 @@ footer {
 .footer-logo img { width: 36px; }
 .footer-logo span {
   font-family: 'Orbitron', sans-serif; font-weight: 600; font-size: 1.05rem;
-  letter-spacing: 0.04em; color: #EAEAEA;
+  letter-spacing: 0.04em; color: var(--text);
 }
 .footer-logo span em {
   font-weight: 700; font-style: normal;
@@ -583,8 +583,6 @@ footer {
 [data-theme="light"] input, [data-theme="light"] select, [data-theme="light"] textarea {
   background: var(--surface-2); color: var(--text); border-color: rgba(0,0,0,0.12);
 }
-[data-theme="light"] .mock-browser, [data-theme="light"] .mock-browser-bar,
-[data-theme="light"] .mock-phone { border-color: rgba(0,0,0,0.1); }
 
 /* ══════════════════════════════════════
    SISTEMAS SERTCODE
