@@ -96,16 +96,16 @@ document.getElementById('login-form').addEventListener('submit', async function(
     return;
   }
 
-  // Verificar se não é gestor tentando entrar aqui
+  // Equipe SertCode entra pelo acesso próprio
   const { data: profile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', data.user.id)
     .single();
 
-  if (profile?.role === 'gestor') {
+  if (['gestor', 'colaborador'].includes(profile?.role)) {
     await supabase.auth.signOut();
-    err.textContent = 'Acesso de gestor deve ser feito pela área administrativa.';
+    err.textContent = 'O acesso da equipe SertCode é feito pela área da equipe.';
     err.style.display = 'block';
     btn.innerHTML = orig;
     btn.disabled  = false;

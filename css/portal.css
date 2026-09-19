@@ -875,6 +875,71 @@ button { font-family: var(--font); }
 }
 .login-back:hover { color: var(--orange); }
 
+/* ── Painel: aba Equipe ── */
+.table-scroll { overflow-x: auto; }
+.table-scroll .data-table { min-width: 620px; }
+.team-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+.team-btn {
+  padding: 6px 11px; border-radius: 7px; cursor: pointer; white-space: nowrap;
+  font: 600 11.5px var(--font); border: 1px solid var(--border);
+  background: transparent; color: var(--text-dim); transition: var(--tr);
+}
+.team-btn:hover { color: var(--text); border-color: rgba(255,255,255,0.18); }
+.team-btn.approve { color: var(--green); border-color: rgba(34,197,94,0.3); background: rgba(34,197,94,0.07); }
+.team-btn.danger:hover { color: var(--red); border-color: rgba(239,68,68,0.35); }
+.team-btn:disabled { opacity: .5; cursor: default; }
+.team-empty { padding: 14px 0; font-size: 13px; color: var(--text-dim); }
+
+/* ── Acesso da equipe: entrar / solicitar acesso ── */
+.login-page { padding: 32px 0; }
+.login-card-wide { width: min(500px, 92vw); }
+.login-badge {
+  display: inline-flex; align-items: center; gap: 6px; margin: 14px 0 18px;
+  font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .09em;
+  color: var(--orange); background: rgba(255,106,0,0.1);
+  border: 1px solid rgba(255,106,0,0.22); padding: 4px 13px; border-radius: 99px;
+}
+.login-tabs {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px;
+  margin-bottom: 24px; background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border); border-radius: 10px;
+}
+.login-tab {
+  padding: 9px 10px; border-radius: 7px; border: 0; background: transparent;
+  color: var(--text-dim); font: 600 13px var(--font); cursor: pointer; transition: var(--tr);
+}
+.login-tab:hover { color: var(--text); }
+.login-tab.active { background: rgba(255,106,0,0.12); color: var(--orange); }
+.login-form .form-group label {
+  display: block; margin-bottom: 6px; font-size: 12px; font-weight: 600; color: var(--text-dim);
+}
+.login-form .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.login-form input[type="date"] { color-scheme: dark; }
+.form-msg {
+  display: none; margin-top: 12px; padding: 10px 12px; border-radius: 8px;
+  font-size: 12.5px; line-height: 1.55; text-align: center;
+}
+.form-msg.show { display: block; }
+.form-msg.error   { color: var(--red);   background: rgba(239,68,68,0.07);  border: 1px solid rgba(239,68,68,0.2); }
+.form-msg.success { color: var(--green); background: rgba(34,197,94,0.07);  border: 1px solid rgba(34,197,94,0.22); }
+.form-msg.info    { color: var(--orange); background: rgba(255,106,0,0.06); border: 1px solid rgba(255,106,0,0.2); }
+.login-switch { margin-top: 18px; font-size: 12.5px; color: var(--text-dim); text-align: center; }
+.login-switch button {
+  border: 0; background: none; padding: 0; color: var(--orange);
+  font: 600 12.5px var(--font); cursor: pointer;
+}
+.login-switch button:hover { text-decoration: underline; }
+.login-note {
+  margin-top: 20px; padding: 11px 14px; border-radius: 8px; line-height: 1.7;
+  background: rgba(255,255,255,0.02); border: 1px solid var(--border);
+  font-size: 11px; color: var(--text-dim); text-align: center;
+}
+.login-note a { color: var(--orange); }
+@media (max-width: 480px) {
+  .login-card { padding: 30px 20px; }
+  .login-form .form-row { grid-template-columns: 1fr; gap: 0; }
+}
+
 /* ══════════════════════════════════════
    RESPONSIVE
 ══════════════════════════════════════ */

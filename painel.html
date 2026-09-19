@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/portal.css">
+  <link rel="stylesheet" href="css/portal.css?v=2">
   <style>
     .admin-badge {
       font-size: 9px; font-weight: 800;
@@ -120,7 +120,7 @@
     <div class="sidebar-project">
       <div class="sidebar-project-label">Modo de acesso</div>
       <div class="sidebar-project-name" style="display:flex;align-items:center;gap:7px">
-        Painel do Gestor <span class="admin-badge">Admin</span>
+        <span id="access-mode">Painel do Gestor</span> <span class="admin-badge" data-only="gestor">Admin</span>
       </div>
     </div>
 
@@ -146,18 +146,23 @@
         <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
         Arquivos
       </a>
-      <a href="#" data-tab="financeiro">
+      <a href="#" data-tab="financeiro" data-only="gestor">
         <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
         Financeiro
       </a>
-      <a href="#" data-tab="depoimentos">
+      <a href="#" data-tab="depoimentos" data-only="gestor">
         <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
         Depoimentos
         <span class="sidebar-badge" style="background:var(--green)">2</span>
       </a>
-      <a href="#" data-tab="feedbacks">
+      <a href="#" data-tab="feedbacks" data-only="gestor">
         <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
         Feedbacks
+      </a>
+      <a href="#" data-tab="equipe" data-only="gestor">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+        Equipe
+        <span class="sidebar-badge" id="equipe-badge" style="display:none"></span>
       </a>
     </nav>
 
@@ -165,7 +170,7 @@
       <div class="sidebar-avatar" style="background:linear-gradient(135deg,#1a1a1a,#0a0a0a);border:1px solid rgba(255,106,0,.3)">G</div>
       <div>
         <div class="sidebar-user-name">Gestor SertCode</div>
-        <div class="sidebar-user-role" style="color:var(--orange);font-size:10px;font-weight:700">ADMINISTRADOR</div>
+        <div class="sidebar-user-role" id="sidebar-role" style="color:var(--orange);font-size:10px;font-weight:700">ADMINISTRADOR</div>
       </div>
       <a href="gestor.html" class="sidebar-logout" title="Sair">
         <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
@@ -180,7 +185,7 @@
       <div>
         <div style="display:flex;align-items:center;gap:10px">
           <div class="portal-header-title" id="header-title">Dashboard</div>
-          <span class="admin-badge">Gestor</span>
+          <span class="admin-badge" id="header-role">Gestor</span>
         </div>
         <div class="portal-header-sub">Painel administrativo — SertCode</div>
       </div>
@@ -231,7 +236,7 @@
             <div class="stat-value">2</div>
             <div class="stat-hint">1 alta prioridade</div>
           </div>
-          <div class="stat-card">
+          <div class="stat-card" data-only="gestor">
             <div class="stat-card-top">
               <span class="stat-card-label">Receita recebida</span>
               <div class="stat-icon green">
@@ -738,6 +743,32 @@
 
       </section>
 
+      <!-- ════════════ EQUIPE ════════════ -->
+      <section class="tab-section" id="tab-equipe">
+        <div class="section-title">Equipe</div>
+        <div class="section-sub">Libere, recuse ou desative o acesso dos colaboradores da SertCode</div>
+
+        <div class="card" style="margin-bottom:18px">
+          <div class="card-title" style="margin-bottom:14px">Solicitações pendentes</div>
+          <div class="table-scroll">
+            <table class="data-table">
+              <thead><tr><th>Colaborador</th><th>Nascimento</th><th>Telefone</th><th>Solicitado em</th><th>Ações</th></tr></thead>
+              <tbody id="equipe-pendentes"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title" style="margin-bottom:14px">Membros da equipe</div>
+          <div class="table-scroll">
+            <table class="data-table">
+              <thead><tr><th>Colaborador</th><th>Papel</th><th>Telefone</th><th>Status</th><th>Ações</th></tr></thead>
+              <tbody id="equipe-membros"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
     </div><!-- /portal-content -->
   </main>
 </div><!-- /portal-layout -->
@@ -854,11 +885,22 @@ const { data: { session } } = await supabase.auth.getSession();
 if (!session) { window.location.href = 'gestor.html'; }
 
 const { data: myProfile } = await supabase
-  .from('profiles').select('role, name').eq('id', session.user.id).single();
-if (myProfile?.role !== 'gestor') { await supabase.auth.signOut(); window.location.href = 'gestor.html'; }
+  .from('profiles').select('*').eq('id', session.user.id).single();
+const myStatus = myProfile?.status ?? 'ativo';
+const isGestor = myProfile?.role === 'gestor' && myStatus === 'ativo';
+const isColab  = myProfile?.role === 'colaborador' && myStatus === 'ativo';
+if (!isGestor && !isColab) { await supabase.auth.signOut(); window.location.href = 'gestor.html'; }
 
-// Nome do gestor na sidebar
-document.querySelector('.sidebar-user-name').textContent = myProfile?.name || 'Gestor SertCode';
+// Colaborador não vê financeiro, depoimentos, feedbacks nem a gestão da equipe
+if (!isGestor) {
+  document.querySelectorAll('[data-only="gestor"]').forEach(el => el.remove());
+  document.getElementById('access-mode').textContent = 'Painel da Equipe';
+  document.getElementById('sidebar-role').textContent = 'COLABORADOR';
+  document.getElementById('header-role').textContent  = 'Colaborador';
+}
+const myName = myProfile?.nickname || myProfile?.name || 'Equipe SertCode';
+document.querySelector('.sidebar-user-name').textContent = myName;
+document.querySelector('.sidebar-avatar').textContent = myName.trim().charAt(0).toUpperCase();
 
 /* ── CARREGAR DADOS ── */
 let allClients = [], allProjects = [], allTickets = [], allInvoices = [], allTestimonials = [], allFeedbacks = [];
@@ -887,7 +929,88 @@ async function loadAll() {
   renderFinanceiro();
   renderDepoimentos();
   renderFeedbacks();
+  loadEquipe();
 }
+
+/* ── EQUIPE (somente gestor) ── */
+let allTeam = [];
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmtBirth = d => d ? d.split('-').reverse().join('/') : '—';
+const teamStatus = {
+  ativo:    '<span class="status status-done">Ativo</span>',
+  inativo:  '<span class="status" style="background:rgba(255,255,255,.05);color:var(--text-dim)">Inativo</span>',
+  recusado: '<span class="status" style="background:rgba(239,68,68,.08);color:var(--red)">Recusado</span>',
+};
+
+async function loadEquipe() {
+  if (!isGestor) return;
+  const { data } = await supabase.from('profiles').select('*')
+    .in('role', ['gestor', 'colaborador']).order('created_at', { ascending: false });
+  allTeam = data || [];
+  renderEquipe();
+}
+
+function teamPerson(m) {
+  const apelido = m.nickname || m.name || '—';
+  return `<div style="display:flex;align-items:center;gap:10px">
+    <div style="width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#FF8A00,#D94A00);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff;flex-shrink:0">${esc(ini(m.name || apelido))}</div>
+    <div><div style="font-weight:600">${esc(apelido)}</div>
+      <div style="font-size:11px;color:var(--text-dim)">${esc(m.name || '')}${m.email ? ' · ' + esc(m.email) : ''}</div></div>
+  </div>`;
+}
+const teamBtn = (id, status, label, cls = '') =>
+  `<button class="team-btn ${cls}" data-team-id="${esc(id)}" data-team-status="${status}">${label}</button>`;
+
+function renderEquipe() {
+  const pend = allTeam.filter(m => m.status === 'pendente');
+  const memb = allTeam.filter(m => m.status !== 'pendente');
+
+  const badge = document.getElementById('equipe-badge');
+  badge.textContent = pend.length;
+  badge.style.display = pend.length ? '' : 'none';
+
+  document.getElementById('equipe-pendentes').innerHTML = pend.length ? pend.map(m => `<tr>
+      <td>${teamPerson(m)}</td>
+      <td>${fmtBirth(m.birth_date)}</td>
+      <td>${esc(m.phone || '—')}</td>
+      <td style="color:var(--text-dim)">${fmtDate(m.created_at)}</td>
+      <td><div class="team-actions">${teamBtn(m.id, 'ativo', 'Aprovar', 'approve')}${teamBtn(m.id, 'recusado', 'Recusar', 'danger')}</div></td>
+    </tr>`).join('')
+    : '<tr><td colspan="5" class="team-empty">Nenhuma solicitação aguardando aprovação.</td></tr>';
+
+  document.getElementById('equipe-membros').innerHTML = memb.length ? memb.map(m => {
+    const acao = m.id === session.user.id ? '<span style="font-size:11.5px;color:var(--text-dim)">Você</span>'
+      : m.status === 'ativo' ? teamBtn(m.id, 'inativo', 'Desativar', 'danger')
+      : teamBtn(m.id, 'ativo', 'Reativar', 'approve');
+    return `<tr>
+      <td>${teamPerson(m)}</td>
+      <td>${m.role === 'gestor' ? 'Gestor' : 'Colaborador'}</td>
+      <td>${esc(m.phone || '—')}</td>
+      <td>${teamStatus[m.status] || esc(m.status)}</td>
+      <td><div class="team-actions">${acao}</div></td>
+    </tr>`;
+  }).join('')
+    : '<tr><td colspan="5" class="team-empty">Nenhum membro cadastrado.</td></tr>';
+}
+
+document.getElementById('tab-equipe')?.addEventListener('click', async e => {
+  const btn = e.target.closest('[data-team-id]');
+  if (!btn) return;
+  const id = btn.dataset.teamId, status = btn.dataset.teamStatus;
+  const m = allTeam.find(x => x.id === id);
+  const quem = m?.nickname || m?.name || 'este colaborador';
+  const pergunta = { ativo: `Liberar o acesso de ${quem} ao painel?`, recusado: `Recusar a solicitação de ${quem}?`, inativo: `Desativar o acesso de ${quem}?` }[status];
+  if (!confirm(pergunta)) return;
+
+  btn.disabled = true;
+  const { data, error } = await supabase.from('profiles').update({ status }).eq('id', id).select('id');
+  if (error || !data?.length) {
+    btn.disabled = false;
+    return alert('Não foi possível atualizar o acesso. ' + (error?.message || 'Verifique se o SQL de colaboradores foi aplicado no Supabase.'));
+  }
+  m.status = status;
+  renderEquipe();
+});
 
 /* ── HELPERS ── */
 function ini(name) { return (name||'?').split(' ').map(n=>n[0]).slice(0,2).join('').toUpperCase(); }
@@ -1254,7 +1377,7 @@ document.getElementById('prog-slider').addEventListener('input', function() {
   document.getElementById('prog-display').textContent = this.value+'%';
 });
 
-const tabTitles = {dashboard:'Dashboard',clientes:'Clientes',projetos:'Projetos',chamados:'Chamados',arquivos:'Arquivos',financeiro:'Financeiro',depoimentos:'Depoimentos',feedbacks:'Feedbacks'};
+const tabTitles = {dashboard:'Dashboard',clientes:'Clientes',projetos:'Projetos',chamados:'Chamados',arquivos:'Arquivos',financeiro:'Financeiro',depoimentos:'Depoimentos',feedbacks:'Feedbacks',equipe:'Equipe'};
 document.querySelectorAll('.sidebar-nav a[data-tab]').forEach(link => {
   link.addEventListener('click', e => {
     e.preventDefault();
