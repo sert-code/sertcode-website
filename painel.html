@@ -908,6 +908,53 @@
   </div>
 </div>
 
+<!-- ══ MODAL: Editar Cliente ══ -->
+<div class="modal-overlay" id="modal-editar">
+  <div class="modal-box" style="max-width:480px">
+    <button class="modal-close" onclick="closeModal('modal-editar')">&times;</button>
+    <div class="modal-title">Editar cliente</div>
+    <div class="modal-sub" id="ed-sub">Dados do cliente e do projeto acompanhado</div>
+
+    <div class="form-group">
+      <label>Nome do responsável</label>
+      <input type="text" id="ed-nome" maxlength="120">
+    </div>
+    <div class="form-group">
+      <label>Empresa</label>
+      <input type="text" id="ed-empresa" maxlength="120">
+    </div>
+    <div class="form-row-2">
+      <div class="form-group">
+        <label>E-mail de acesso</label>
+        <input type="email" id="ed-email" disabled title="O e-mail de login não pode ser alterado por aqui">
+      </div>
+      <div class="form-group">
+        <label>Telefone</label>
+        <input type="tel" id="ed-telefone" maxlength="15" inputmode="numeric">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Nome do projeto</label>
+      <input type="text" id="ed-projeto" maxlength="120">
+    </div>
+
+    <div style="display:flex;gap:10px;margin-bottom:12px">
+      <button class="btn btn-primary" style="flex:1;justify-content:center" id="ed-btn" onclick="window._salvarEdicao()">Salvar alterações</button>
+      <button class="btn btn-outline" onclick="closeModal('modal-editar')">Cancelar</button>
+    </div>
+
+    <div style="border-top:1px solid var(--border);padding-top:14px">
+      <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:4px">Senha de acesso</div>
+      <div style="font-size:11.5px;color:var(--text-dim);line-height:1.6;margin-bottom:10px">
+        Envia ao cliente um link para ele mesmo criar uma senha nova. A senha atual continua valendo até ele usar o link.
+      </div>
+      <button class="btn btn-outline" style="width:100%;justify-content:center" id="ed-reset" onclick="window._resetarSenha()">Enviar link de nova senha</button>
+    </div>
+
+    <div class="form-msg" id="ed-msg" role="alert"></div>
+  </div>
+</div>
+
 <!-- ══ MODAL: Responder Chamado ══ -->
 <div class="modal-overlay" id="modal-response">
   <div class="modal-box">
@@ -1229,13 +1276,93 @@ window._salvarCliente = async () => {
   set(`${nome} cadastrado. ${data.session ? 'O acesso já está liberado.' : 'O cliente precisa confirmar o e-mail antes do primeiro acesso.'} Envie a senha provisória por um canal privado.`, 'success');
 };
 
+/* ── EDITAR CLIENTE SOB MEDIDA ── */
+let edClienteId = null;
+const edMsg = () => document.getElementById('ed-msg');
+const edSet = (t, tipo = 'error') => { const m = edMsg(); m.textContent = t; m.className = 'form-msg show ' + tipo; };
+
+window._editarCliente = (id) => {
+  const cl = clientMap[id];
+  if (!cl) return;
+  const proj = allProjects.find(p => p.client_id === id);
+  edClienteId = id;
+
+  document.getElementById('ed-sub').textContent = cl.company || cl.name || 'Cliente';
+  document.getElementById('ed-nome').value     = cl.name || '';
+  document.getElementById('ed-empresa').value  = cl.company || '';
+  document.getElementById('ed-email').value    = cl.email || '';
+  document.getElementById('ed-telefone').value = cl.phone || '';
+  document.getElementById('ed-projeto').value  = proj?.name || '';
+  edMsg().className = 'form-msg';
+  openModal('modal-editar');
+};
+
+document.getElementById('ed-telefone').addEventListener('input', e => {
+  const d = e.target.value.replace(/\D/g, '').slice(0, 11);
+  let v = d;
+  if (d.length > 2) v = `(${d.slice(0,2)}) ${d.slice(2)}`;
+  if (d.length > 7) v = `(${d.slice(0,2)}) ${d.slice(2, d.length === 11 ? 7 : 6)}-${d.slice(d.length === 11 ? 7 : 6)}`;
+  e.target.value = v;
+});
+
+window._salvarEdicao = async () => {
+  const btn = document.getElementById('ed-btn'), orig = btn.textContent;
+  const nome    = document.getElementById('ed-nome').value.trim();
+  const empresa = document.getElementById('ed-empresa').value.trim();
+  const phone   = document.getElementById('ed-telefone').value.trim();
+  const projeto = document.getElementById('ed-projeto').value.trim();
+
+  if (!nome)    return edSet('Informe o nome do responsável.');
+  if (!empresa) return edSet('Informe a empresa.');
+
+  btn.textContent = 'Salvando...'; btn.disabled = true;
+  const fim = () => { btn.textContent = orig; btn.disabled = false; };
+
+  const { error } = await supabase.from('profiles')
+    .update({ name: nome, company: empresa, phone }).eq('id', edClienteId);
+  if (error) { fim(); return edSet('Não foi possível salvar: ' + error.message); }
+
+  const proj = allProjects.find(p => p.client_id === edClienteId);
+  if (projeto && proj && projeto !== proj.name) {
+    const { error: e2 } = await supabase.from('projects').update({ name: projeto }).eq('id', proj.id);
+    if (e2) { fim(); return edSet('Dados salvos, mas o projeto falhou: ' + e2.message); }
+  } else if (projeto && !proj) {
+    const { error: e3 } = await supabase.from('projects')
+      .insert({ client_id: edClienteId, name: projeto, status: 'analysis', progress: 0 });
+    if (e3) { fim(); return edSet('Dados salvos, mas o projeto falhou: ' + e3.message); }
+  }
+
+  await loadAll();
+  fim();
+  edSet('Alterações salvas.', 'success');
+};
+
+window._resetarSenha = async () => {
+  const cl = clientMap[edClienteId];
+  if (!cl?.email) return edSet('Este cliente não tem e-mail cadastrado.');
+  if (!confirm(`Enviar link de nova senha para ${cl.email}?`)) return;
+
+  const btn = document.getElementById('ed-reset'), orig = btn.textContent;
+  btn.textContent = 'Enviando...'; btn.disabled = true;
+
+  const { error } = await supabase.auth.resetPasswordForEmail(cl.email, {
+    redirectTo: new URL('cliente.html', location.href).href,
+  });
+
+  btn.textContent = orig; btn.disabled = false;
+  edSet(error ? 'Não foi possível enviar: ' + error.message
+              : `Link enviado para ${cl.email}.`, error ? 'error' : 'success');
+};
+
 /* ── CLIENTES SERTLINK ── */
 const slStatus = {
-  teste:     { label: 'Em teste',  cls: 'status-analysis' },
-  ativo:     { label: 'Ativo',     cls: 'status-done' },
-  expirado:  { label: 'Expirado',  cls: 'status-expirado' },
-  cancelado: { label: 'Cancelado', cls: 'status-cancelado' },
-  excluindo: { label: 'Excluindo', cls: 'status-cancelado' },
+  teste:        { label: 'Em teste',     cls: 'status-analysis' },
+  ativo:        { label: 'Ativo',        cls: 'status-done' },
+  cancelado:    { label: 'Cancelado',    cls: 'status-pending' },
+  inadimplente: { label: 'Inadimplente', cls: 'status-expirado' },
+  inativo:      { label: 'Inativo',      cls: 'status-cancelado' },
+  expirado:     { label: 'Expirado',     cls: 'status-expirado' },
+  excluindo:    { label: 'Excluindo',    cls: 'status-cancelado' },
 };
 
 function renderSertlinkClients() {
@@ -1247,11 +1374,16 @@ function renderSertlinkClients() {
     const chamados = slTickets.filter(t => t.company_id === c.id);
     const abertos  = chamados.filter(t => !['RESOLVIDO','CONCLUIDO'].includes(t.status)).length;
 
-    let detalhe = '—';
-    if (c.status === 'teste')     detalhe = `${c.trial_days_left ?? 0} dia(s) restante(s)`;
-    else if (c.status === 'ativo' && c.cycle) detalhe = c.cycle === 'ANUAL' ? 'Anual' : 'Mensal';
-    else if (c.status === 'cancelado' && c.period_end) detalhe = 'Acesso até ' + fmtDate(c.period_end);
-    else if (c.status === 'expirado') detalhe = 'Não assinou no prazo';
+    const detalhes = {
+      teste:        `${c.trial_days_left ?? 0} dia(s) restante(s)`,
+      ativo:        c.cycle === 'ANUAL' ? 'Anual' : 'Mensal',
+      cancelado:    c.period_end ? 'Acesso até ' + fmtDate(c.period_end) : 'Cancelamento pedido',
+      inadimplente: c.period_end ? 'Sem pagamento desde ' + fmtDate(c.period_end) : 'Pagamento pendente',
+      inativo:      'Cancelou a assinatura',
+      expirado:     'Não assinou no prazo',
+      excluindo:    'Exclusão de conta pedida',
+    };
+    const detalhe = detalhes[c.status] || '—';
 
     return `<tr>
       <td>
@@ -1304,7 +1436,7 @@ function renderClientes() {
       <td><span class="status ${proj?.status==='done'?'status-done':'status-dev'}">${proj?.status==='done'?'Entregue':'Ativo'}</span></td>
       <td>
         <div style="display:flex;gap:6px">
-          <a href="portal.html" class="btn btn-outline" style="padding:5px 10px;font-size:11px" target="_blank">Portal</a>
+          <button class="btn btn-outline" style="padding:5px 10px;font-size:11px" onclick="window._editarCliente('${cl.id}')">Editar</button>
           <button class="btn btn-outline" style="padding:5px 10px;font-size:11px" onclick="window._showCred('${cl.name||''}','${cl.id}')">Credenciais</button>
         </div>
       </td>
