@@ -357,7 +357,7 @@
                 <th>Ações</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody id="clientes-body">
               <tr>
                 <td>
                   <div style="display:flex;align-items:center;gap:10px">
@@ -1281,7 +1281,7 @@ function renderSertlinkClients() {
 
 /* ── CLIENTES ── */
 function renderClientes() {
-  const tbody = document.querySelector('#tab-clientes .data-table tbody');
+  const tbody = document.getElementById('clientes-body');
   if (!tbody) return;
   tbody.innerHTML = allClients.map(cl => {
     const proj = allProjects.find(p => p.client_id === cl.id);
