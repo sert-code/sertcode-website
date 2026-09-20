@@ -25,6 +25,9 @@ end $$;
 
 
 -- 2. Quem é da equipe ────────────────────────────────────────────
+-- Atenção: is_gestor() já existia neste banco e é usada pelas policies
+-- antigas. Esta definição substitui a anterior e passa a exigir também
+-- status = 'ativo', o que permite desativar um acesso sem apagar a conta.
 create or replace function public.is_gestor()
 returns boolean language sql stable security definer set search_path = public as $$
   select exists (
@@ -123,6 +126,10 @@ create policy "equipe_gerencia_projetos" on public.projects
 
 drop policy if exists "equipe_gerencia_arquivos" on public.files;
 create policy "equipe_gerencia_arquivos" on public.files
+  for all to authenticated using (public.is_equipe()) with check (public.is_equipe());
+
+drop policy if exists "equipe_gerencia_kanban" on public.kanban_items;
+create policy "equipe_gerencia_kanban" on public.kanban_items
   for all to authenticated using (public.is_equipe()) with check (public.is_equipe());
 
 

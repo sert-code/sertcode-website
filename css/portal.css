@@ -875,6 +875,21 @@ button { font-family: var(--font); }
 }
 .login-back:hover { color: var(--orange); }
 
+/* ── Formulário em duas colunas (modais) ── */
+.form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.form-group .pass-wrap input { padding-right: 42px; }
+@media (max-width: 560px) { .form-row-2 { grid-template-columns: 1fr; gap: 0; } }
+
+/* ── Origem do cliente / chamado ── */
+.origem-badge {
+  display: inline-flex; align-items: center; padding: 3px 9px; border-radius: 99px;
+  font-size: 10px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase;
+  color: var(--orange); background: rgba(255,106,0,0.1); border: 1px solid rgba(255,106,0,0.22);
+  white-space: nowrap;
+}
+.status-expirado  { background: rgba(239,68,68,0.1);    color: var(--red); }
+.status-cancelado { background: rgba(255,255,255,0.05); color: var(--text-dim); }
+
 /* ── Painel: aba Equipe ── */
 .table-scroll { overflow-x: auto; }
 .table-scroll .data-table { min-width: 620px; }

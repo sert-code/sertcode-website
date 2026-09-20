@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/portal.css?v=3">
+  <link rel="stylesheet" href="css/portal.css?v=4">
   <style>
     .admin-badge {
       font-size: 9px; font-weight: 800;
@@ -309,13 +309,42 @@
             <div class="section-title">Clientes</div>
             <div class="section-sub" style="margin-bottom:0">Gerenciamento de acesso, projetos e credenciais</div>
           </div>
-          <button class="btn btn-primary" onclick="alert('Em produção: cadastro de novo cliente com geração automática de credenciais e envio por e-mail.')">
+          <button class="btn btn-primary" onclick="window._novoCliente()">
             <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             Novo cliente
           </button>
         </div>
 
+        <div class="card" style="margin-bottom:18px">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px">
+            <div>
+              <div class="card-title">Clientes SertLink</div>
+              <div style="font-size:11.5px;color:var(--text-dim)">Empresas assinantes do sistema de agendamentos · sincronizado automaticamente</div>
+            </div>
+            <span class="origem-badge">via SertLink</span>
+          </div>
+          <div class="table-scroll">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Empresa</th>
+                  <th>Responsável</th>
+                  <th>Plano</th>
+                  <th>Situação</th>
+                  <th>Desde</th>
+                  <th>Chamados</th>
+                </tr>
+              </thead>
+              <tbody id="sertlink-clients-body"></tbody>
+            </table>
+          </div>
+        </div>
+
         <div class="card">
+          <div style="margin-bottom:14px">
+            <div class="card-title">Projetos sob medida</div>
+            <div style="font-size:11.5px;color:var(--text-dim)">Clientes cadastrados pela SertCode, com acesso à Área do Cliente</div>
+          </div>
           <table class="data-table">
             <thead>
               <tr>
@@ -831,6 +860,54 @@
   </div>
 </div>
 
+<!-- ══ MODAL: Novo Cliente ══ -->
+<div class="modal-overlay" id="modal-cliente">
+  <div class="modal-box" style="max-width:480px">
+    <button class="modal-close" onclick="closeModal('modal-cliente')">&times;</button>
+    <div class="modal-title">Novo cliente</div>
+    <div class="modal-sub">Cria o acesso à Área do Cliente e o projeto que ele vai acompanhar</div>
+
+    <div class="form-group">
+      <label>Nome do responsável</label>
+      <input type="text" id="nc-nome" placeholder="Ex.: Carlos Almeida" maxlength="120">
+    </div>
+    <div class="form-group">
+      <label>Empresa</label>
+      <input type="text" id="nc-empresa" placeholder="Ex.: Empresa ABC Ltda" maxlength="120">
+    </div>
+    <div class="form-row-2">
+      <div class="form-group">
+        <label>E-mail de acesso</label>
+        <input type="email" id="nc-email" placeholder="cliente@empresa.com.br" autocomplete="off">
+      </div>
+      <div class="form-group">
+        <label>Telefone</label>
+        <input type="tel" id="nc-telefone" placeholder="(00) 00000-0000" maxlength="15" inputmode="numeric">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Senha provisória</label>
+      <div class="pass-wrap">
+        <input type="text" id="nc-senha" placeholder="Mínimo 8 caracteres" autocomplete="off">
+        <button type="button" class="pass-toggle" title="Gerar senha" onclick="window._gerarSenha()">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M23 4v6h-6"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
+        </button>
+      </div>
+      <div style="font-size:11px;color:var(--text-dim);margin-top:6px">Entregue ao cliente por WhatsApp ou e-mail e peça que ele troque no primeiro acesso.</div>
+    </div>
+    <div class="form-group">
+      <label>Nome do projeto</label>
+      <input type="text" id="nc-projeto" placeholder="Ex.: ERP Comercial" maxlength="120">
+    </div>
+
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-primary" style="flex:1;justify-content:center" id="nc-btn" onclick="window._salvarCliente()">Cadastrar cliente</button>
+      <button class="btn btn-outline" onclick="closeModal('modal-cliente')">Cancelar</button>
+    </div>
+    <div class="form-msg" id="nc-msg" role="alert"></div>
+  </div>
+</div>
+
 <!-- ══ MODAL: Responder Chamado ══ -->
 <div class="modal-overlay" id="modal-response">
   <div class="modal-box">
@@ -878,7 +955,7 @@
 </div>
 
 <script type="module">
-import { supabase } from './js/supabase.js'
+import { supabase, createSignupClient } from './js/supabase.js'
 
 /* ── VERIFICAR SESSÃO E PAPEL ── */
 const { data: { session } } = await supabase.auth.getSession();
@@ -904,16 +981,19 @@ document.querySelector('.sidebar-avatar').textContent = myName.trim().charAt(0).
 
 /* ── CARREGAR DADOS ── */
 let allClients = [], allProjects = [], allTickets = [], allInvoices = [], allTestimonials = [], allFeedbacks = [];
+let slClients = [], slTickets = [];
 let clientMap = {}; // id → profile
 
 async function loadAll() {
-  const [c, p, t, i, te, f] = await Promise.all([
+  const [c, p, t, i, te, f, sc, st] = await Promise.all([
     supabase.from('profiles').select('*').eq('role','client'),
     supabase.from('projects').select('*').order('created_at'),
     supabase.from('tickets').select('*').order('created_at', {ascending:false}),
     supabase.from('invoices').select('*').order('due_date'),
     supabase.from('testimonials').select('*').eq('status','pending').order('created_at',{ascending:false}),
     supabase.from('feedbacks').select('*').order('created_at',{ascending:false}),
+    supabase.from('sertlink_clients').select('*').order('created_at',{ascending:false}),
+    supabase.from('sertlink_tickets').select('*').order('created_at',{ascending:false}),
   ]);
   allClients      = c.data || [];
   allProjects     = p.data || [];
@@ -921,7 +1001,10 @@ async function loadAll() {
   allInvoices     = i.data || [];
   allTestimonials = te.data || [];
   allFeedbacks    = f.data || [];
+  slClients       = sc.data || [];
+  slTickets       = st.data || [];
   allClients.forEach(cl => clientMap[cl.id] = cl);
+  renderSertlinkClients();
   renderDashboard();
   renderClientes();
   renderProjetos();
@@ -1023,14 +1106,19 @@ function projStatusLabel(s) { return {analysis:'Em análise',dev:'Em dev',testin
 
 /* ── DASHBOARD ── */
 function renderDashboard() {
-  const openTickets = allTickets.filter(t => t.status !== 'done').length;
+  const slAbertos = slTickets.filter(t => !['RESOLVIDO','CONCLUIDO'].includes(t.status)).length;
+  const openTickets = allTickets.filter(t => t.status !== 'done').length + slAbertos;
   const received = allInvoices.filter(i => i.status === 'paid').reduce((s,i) => s+Number(i.amount),0);
   const pending  = allInvoices.filter(i => i.status !== 'paid').reduce((s,i) => s+Number(i.amount),0);
   const inDev    = allProjects.filter(p => p.status !== 'done').length;
   const done     = allProjects.filter(p => p.status === 'done').length;
 
   const vals = document.querySelectorAll('#tab-dashboard .stat-value');
-  if (vals[0]) vals[0].textContent = allClients.length;
+  if (vals[0]) {
+    vals[0].textContent = allClients.length + slClients.length;
+    const hint = vals[0].closest('.stat-card').querySelector('.stat-hint');
+    if (hint) hint.textContent = `${slClients.length} via SertLink · ${allClients.length} sob medida`;
+  }
   if (vals[1]) { vals[1].textContent = inDev; vals[1].closest('.stat-card').querySelector('.stat-hint').textContent = '+'+done+' entregue(s)'; }
   if (vals[2]) vals[2].textContent = openTickets;
   if (vals[3]) { vals[3].textContent = fmtMoney(received); vals[3].closest('.stat-card').querySelector('.stat-hint').textContent = fmtMoney(pending)+' a receber'; }
@@ -1066,6 +1154,131 @@ function renderDashboard() {
   }
 }
 
+/* ── NOVO CLIENTE (projeto sob medida) ── */
+const ncMsg = () => document.getElementById('nc-msg');
+
+window._gerarSenha = () => {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789';
+  const bytes = crypto.getRandomValues(new Uint32Array(12));
+  document.getElementById('nc-senha').value = [...bytes].map(n => chars[n % chars.length]).join('');
+};
+
+window._novoCliente = () => {
+  ['nc-nome','nc-empresa','nc-email','nc-telefone','nc-projeto'].forEach(id => document.getElementById(id).value = '');
+  ncMsg().className = 'form-msg';
+  window._gerarSenha();
+  openModal('modal-cliente');
+};
+
+document.getElementById('nc-telefone').addEventListener('input', e => {
+  const d = e.target.value.replace(/\D/g, '').slice(0, 11);
+  let v = d;
+  if (d.length > 2) v = `(${d.slice(0,2)}) ${d.slice(2)}`;
+  if (d.length > 7) v = `(${d.slice(0,2)}) ${d.slice(2, d.length === 11 ? 7 : 6)}-${d.slice(d.length === 11 ? 7 : 6)}`;
+  e.target.value = v;
+});
+
+window._salvarCliente = async () => {
+  const msg = ncMsg(), btn = document.getElementById('nc-btn');
+  const set = (t, tipo = 'error') => { msg.textContent = t; msg.className = 'form-msg show ' + tipo; };
+
+  const nome    = document.getElementById('nc-nome').value.trim();
+  const empresa = document.getElementById('nc-empresa').value.trim();
+  const email   = document.getElementById('nc-email').value.trim();
+  const phone   = document.getElementById('nc-telefone').value.trim();
+  const senha   = document.getElementById('nc-senha').value;
+  const projeto = document.getElementById('nc-projeto').value.trim();
+
+  if (!nome)                                     return set('Informe o nome do responsável.');
+  if (!empresa)                                  return set('Informe a empresa.');
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return set('Informe um e-mail válido.');
+  if (phone.replace(/\D/g,'').length < 10)       return set('Informe um telefone com DDD.');
+  if (senha.length < 8)                          return set('A senha precisa ter pelo menos 8 caracteres.');
+  if (!projeto)                                  return set('Informe o nome do projeto.');
+
+  const orig = btn.textContent;
+  btn.textContent = 'Cadastrando...'; btn.disabled = true;
+  const fim = () => { btn.textContent = orig; btn.disabled = false; };
+
+  // Conta criada por um cliente isolado, para não trocar a sessão do gestor
+  const { data, error } = await createSignupClient().auth.signUp({
+    email, password: senha,
+    options: { data: { name: nome, company: empresa, phone, signup_type: 'client' } },
+  });
+
+  if (error || data.user?.identities?.length === 0) {
+    fim();
+    return set(data?.user?.identities?.length === 0 || /registered|already/i.test(error?.message || '')
+      ? 'Este e-mail já tem acesso cadastrado.'
+      : 'Não foi possível criar o acesso. ' + (error?.message || ''));
+  }
+
+  const clientId = data.user.id;
+
+  const { error: perfilErro } = await supabase.from('profiles')
+    .upsert({ id: clientId, email, name: nome, company: empresa, phone, role: 'client', status: 'ativo' },
+            { onConflict: 'id' });
+  if (perfilErro) { fim(); return set('Acesso criado, mas o perfil falhou: ' + perfilErro.message); }
+
+  const { error: projErro } = await supabase.from('projects')
+    .insert({ client_id: clientId, name: projeto, status: 'analysis', progress: 0 });
+  if (projErro) { fim(); return set('Cliente criado, mas o projeto falhou: ' + projErro.message); }
+
+  await loadAll();
+  fim();
+  set(`${nome} cadastrado. ${data.session ? 'O acesso já está liberado.' : 'O cliente precisa confirmar o e-mail antes do primeiro acesso.'} Envie a senha provisória por um canal privado.`, 'success');
+};
+
+/* ── CLIENTES SERTLINK ── */
+const slStatus = {
+  teste:     { label: 'Em teste',  cls: 'status-analysis' },
+  ativo:     { label: 'Ativo',     cls: 'status-done' },
+  expirado:  { label: 'Expirado',  cls: 'status-expirado' },
+  cancelado: { label: 'Cancelado', cls: 'status-cancelado' },
+  excluindo: { label: 'Excluindo', cls: 'status-cancelado' },
+};
+
+function renderSertlinkClients() {
+  const tbody = document.getElementById('sertlink-clients-body');
+  if (!tbody) return;
+
+  tbody.innerHTML = slClients.length ? slClients.map(c => {
+    const s = slStatus[c.status] || { label: c.status, cls: '' };
+    const chamados = slTickets.filter(t => t.company_id === c.id);
+    const abertos  = chamados.filter(t => !['RESOLVIDO','CONCLUIDO'].includes(t.status)).length;
+
+    let detalhe = '—';
+    if (c.status === 'teste')     detalhe = `${c.trial_days_left ?? 0} dia(s) restante(s)`;
+    else if (c.status === 'ativo' && c.cycle) detalhe = c.cycle === 'ANUAL' ? 'Anual' : 'Mensal';
+    else if (c.status === 'cancelado' && c.period_end) detalhe = 'Acesso até ' + fmtDate(c.period_end);
+    else if (c.status === 'expirado') detalhe = 'Não assinou no prazo';
+
+    return `<tr>
+      <td>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#FF8A00,#D94A00);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff;flex-shrink:0">${esc(ini(c.name))}</div>
+          <div><div style="font-weight:600">${esc(c.name)}</div>
+            <div style="font-size:11px;color:var(--text-dim)">${esc(c.email || '—')}</div></div>
+        </div>
+      </td>
+      <td>
+        <div>${esc(c.owner_nickname || c.owner_name || '—')}</div>
+        <div style="font-size:11px;color:var(--text-dim)">${esc(c.phone || '')}</div>
+      </td>
+      <td>${c.plan_name ? `<strong>${esc(c.plan_name)}</strong>` : '<span style="color:var(--text-dim)">—</span>'}</td>
+      <td>
+        <span class="status ${s.cls}">${s.label}</span>
+        <div style="font-size:11px;color:var(--text-dim);margin-top:3px">${esc(detalhe)}</div>
+      </td>
+      <td style="color:var(--text-dim);font-size:12px">${fmtDate(c.created_at)}</td>
+      <td>${chamados.length ? `${chamados.length}${abertos ? ` <span style="color:var(--orange);font-weight:700">(${abertos} aberto${abertos>1?'s':''})</span>` : ''}` : '<span style="color:var(--text-dim)">—</span>'}</td>
+    </tr>`;
+  }).join('')
+  : `<tr><td colspan="6" style="text-align:center;color:var(--text-dim);padding:18px 0">
+       Nenhum cliente sincronizado ainda. A lista é preenchida automaticamente pelo SertLink.
+     </td></tr>`;
+}
+
 /* ── CLIENTES ── */
 function renderClientes() {
   const tbody = document.querySelector('#tab-clientes .data-table tbody');
@@ -1076,7 +1289,7 @@ function renderClientes() {
       <td>
         <div style="display:flex;align-items:center;gap:10px">
           <div style="width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#FF8A00,#D94A00);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff;flex-shrink:0">${ini(cl.name)}</div>
-          <div><div style="font-weight:600">${cl.name||'—'}</div><div style="font-size:11px;color:var(--text-dim)">${session.user.email}</div></div>
+          <div><div style="font-weight:600">${cl.name||'—'}</div><div style="font-size:11px;color:var(--text-dim)">${esc(cl.email||'—')}</div></div>
         </div>
       </td>
       <td style="color:var(--text-dim)">${cl.company||'—'}</td>
@@ -1139,31 +1352,57 @@ function renderProjetos() {
 }
 
 /* ── CHAMADOS ── */
+// Situação do chamado do SertLink no vocabulário do painel
+const slTicketStatus = { ABERTO:'open', EM_ANDAMENTO:'analysis', RESOLVIDO:'done', CONCLUIDO:'done' };
+
 function renderChamados() {
   const tbody = document.getElementById('tickets-body');
   if (!tbody) return;
-  tbody.innerHTML = allTickets.map(t => {
+
+  const daSertcode = allTickets.map(t => {
     const cl = clientMap[t.client_id];
+    return {
+      id: t.id, origem: 'sertcode', ref: 'SC', status: t.status,
+      cliente: cl?.company || cl?.name || '—', assunto: t.subject,
+      marcador: {urgent:'Alta',bug:'Média',feature:'Baixa',doubt:'Baixa'}[t.type] || 'Média',
+      urgente: t.type === 'urgent', data: t.created_at,
+    };
+  });
+
+  const doSertlink = slTickets.map(t => ({
+    id: t.id, origem: 'sertlink', ref: 'SL', status: slTicketStatus[t.status] || 'open',
+    cliente: t.company_name || '—', assunto: t.subject,
+    marcador: t.category || 'Suporte', urgente: false, data: t.created_at,
+  }));
+
+  const lista = [...daSertcode, ...doSertlink]
+    .sort((a, b) => new Date(b.data || 0) - new Date(a.data || 0));
+
+  tbody.innerHTML = lista.map(t => {
     const isDone = t.status === 'done';
+    const acao = t.origem === 'sertlink'
+      ? '<span style="font-size:11.5px;color:var(--text-dim)">Responder no SertLink</span>'
+      : `<button class="btn ${isDone?'btn-outline':'btn-primary'}" style="padding:5px 12px;font-size:12px${isDone?';opacity:.45;pointer-events:none':''}"
+          onclick="window._openResponse('${t.id}','${String(t.assunto).replace(/'/g,"\\'")}','${String(t.cliente).replace(/'/g,"\\'")}','${t.status}')">
+          ${isDone?'Ver':'Responder'}
+        </button>`;
     return `<tr data-status="${t.status}">
-      <td><span class="ticket-id">#SC-${t.id.slice(-4).toUpperCase()}</span></td>
-      <td style="font-weight:600">${cl?.company||cl?.name||'—'}</td>
-      <td>${t.subject}</td>
-      <td><span class="status ${t.type==='urgent'?'':'status-pending'}" style="${t.type==='urgent'?'background:rgba(239,68,68,.1);color:var(--red)':''}">${{urgent:'Alta',bug:'Média',feature:'Baixa',doubt:'Baixa'}[t.type]||'Média'}</span></td>
-      <td style="color:var(--text-dim);font-size:12px">${fmtDate(t.created_at)}</td>
+      <td><span class="ticket-id">#${t.ref}-${t.id.slice(-4).toUpperCase()}</span></td>
+      <td style="font-weight:600">${esc(t.cliente)}
+        ${t.origem === 'sertlink' ? '<span class="origem-badge" style="margin-left:6px">SertLink</span>' : ''}</td>
+      <td>${esc(t.assunto)}</td>
+      <td><span class="status ${t.urgente?'':'status-pending'}" style="${t.urgente?'background:rgba(239,68,68,.1);color:var(--red)':''}">${esc(t.marcador)}</span></td>
+      <td style="color:var(--text-dim);font-size:12px">${fmtDate(t.data)}</td>
       <td><span class="status ${statusCls(t.status)}" id="st-${t.id}">${statusLabel(t.status)}</span></td>
-      <td><button class="btn ${isDone?'btn-outline':'btn-primary'}" style="padding:5px 12px;font-size:12px${isDone?';opacity:.45;pointer-events:none':''}"
-        onclick="window._openResponse('${t.id}','${t.subject.replace(/'/g,"\\'")}','${cl?.company||cl?.name||''}','${t.status}')">
-        ${isDone?'Ver':'Responder'}
-      </button></td>
+      <td>${acao}</td>
     </tr>`;
   }).join('') || '<tr><td colspan="7" style="text-align:center;color:var(--text-dim)">Nenhum chamado.</td></tr>';
 
   // Contagens nos filtros
-  const all  = allTickets.length;
-  const open = allTickets.filter(t=>t.status==='open').length;
-  const ana  = allTickets.filter(t=>t.status==='analysis').length;
-  const done = allTickets.filter(t=>t.status==='done').length;
+  const all  = lista.length;
+  const open = lista.filter(t=>t.status==='open').length;
+  const ana  = lista.filter(t=>t.status==='analysis').length;
+  const done = lista.filter(t=>t.status==='done').length;
   document.querySelectorAll('.filter-tab').forEach(tab => {
     const cnt = {all,open,analysis:ana,done}[tab.dataset.filter];
     tab.innerHTML = tab.textContent.split('(')[0] + `<span style="opacity:.5">(${cnt})</span>`;
@@ -1367,6 +1606,7 @@ window.sendResponse = async () => {
 
 /* ── MODALS / TABS ── */
 window.closeModal = id => document.getElementById(id).classList.remove('open');
+window.openModal  = id => document.getElementById(id).classList.add('open');
 document.querySelectorAll('.modal-overlay').forEach(m => {
   m.addEventListener('click', e => { if (e.target===m) m.classList.remove('open'); });
 });
