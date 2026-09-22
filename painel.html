@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/portal.css?v=5">
+  <link rel="stylesheet" href="css/portal.css?v=6">
   <style>
     .admin-badge {
       font-size: 9px; font-weight: 800;
@@ -426,94 +426,67 @@
 
       <!-- ════════════ PROJETOS ════════════ -->
       <section class="tab-section" id="tab-projetos">
-        <div class="section-title">Projetos</div>
-        <div class="section-sub">Gerencie progresso, fases e atividades de cada projeto</div>
-
-        <div class="proj-grid">
-
-          <div class="proj-card">
-            <div class="proj-card-top">
-              <div class="proj-initials">ABC</div>
-              <div style="flex:1;min-width:0">
-                <div class="proj-client">Empresa ABC Ltda</div>
-                <div class="proj-name">Sistema ERP Comercial</div>
-              </div>
-              <span class="status status-dev">Em dev</span>
-            </div>
-            <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px">
-              <span style="color:var(--text-dim)">Progresso</span>
-              <span style="font-weight:700;color:var(--orange)" id="prog-abc-val">72%</span>
-            </div>
-            <div class="progress-bar-track" style="height:8px">
-              <div class="progress-bar-fill" id="prog-abc-bar" style="width:72%"></div>
-            </div>
-            <div style="font-size:11px;color:var(--text-dim);margin-top:7px">Fase: Desenvolvimento · Entrega: 10 Jul 2026</div>
-            <div class="proj-actions">
-              <button class="btn btn-primary" style="font-size:12px;padding:7px 12px" onclick="openProgressModal('abc','Sistema ERP Comercial',72)">
-                <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-                Atualizar progresso
-              </button>
-              <button class="btn btn-outline" style="font-size:12px;padding:7px 12px" onclick="openActivityModal('Sistema ERP Comercial')">
-                <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                Adicionar atividade
-              </button>
-            </div>
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:14px;margin-bottom:20px">
+          <div>
+            <div class="section-title">Projetos</div>
+            <div class="section-sub" style="margin-bottom:0">Pedidos e projetos em andamento, por ordem de solicitação</div>
           </div>
+          <button class="btn btn-primary" onclick="window._novoProjeto()">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Novo projeto
+          </button>
+        </div>
 
-          <div class="proj-card">
-            <div class="proj-card-top">
-              <div class="proj-initials" style="background:linear-gradient(135deg,#8B5CF6,#6D28D9)">VPL</div>
-              <div style="flex:1;min-width:0">
-                <div class="proj-client">Clínica Vida Plena</div>
-                <div class="proj-name">Portal de Agendamentos</div>
-              </div>
-              <span class="status status-dev">Em dev</span>
+        <div class="card" style="margin-bottom:18px">
+          <div class="proj-filtros">
+            <div class="form-group" style="margin:0">
+              <label>Cliente ou empresa</label>
+              <input type="text" id="fp-cliente" placeholder="Buscar...">
             </div>
-            <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px">
-              <span style="color:var(--text-dim)">Progresso</span>
-              <span style="font-weight:700;color:var(--orange)" id="prog-vpl-val">45%</span>
+            <div class="form-group" style="margin:0">
+              <label>Tipo</label>
+              <select id="fp-tipo"><option value="">Todos</option></select>
             </div>
-            <div class="progress-bar-track" style="height:8px">
-              <div class="progress-bar-fill" id="prog-vpl-bar" style="width:45%"></div>
+            <div class="form-group" style="margin:0">
+              <label>Status</label>
+              <select id="fp-status">
+                <option value="">Todos</option>
+                <option value="cadastrado">Cadastrado</option>
+                <option value="andamento">Andamento</option>
+                <option value="pausado">Pausado</option>
+                <option value="cancelado">Cancelado</option>
+                <option value="concluido">Concluído</option>
+              </select>
             </div>
-            <div style="font-size:11px;color:var(--text-dim);margin-top:7px">Fase: Desenvolvimento · Entrega: 20 Ago 2026</div>
-            <div class="proj-actions">
-              <button class="btn btn-primary" style="font-size:12px;padding:7px 12px" onclick="openProgressModal('vpl','Portal de Agendamentos',45)">
-                <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-                Atualizar progresso
-              </button>
-              <button class="btn btn-outline" style="font-size:12px;padding:7px 12px" onclick="openActivityModal('Portal de Agendamentos')">
-                <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                Adicionar atividade
-              </button>
+            <div class="form-group" style="margin:0">
+              <label>Solicitado de</label>
+              <input type="date" id="fp-de">
             </div>
+            <div class="form-group" style="margin:0">
+              <label>até</label>
+              <input type="date" id="fp-ate">
+            </div>
+            <button class="btn btn-outline" style="height:42px" onclick="window._limparFiltros()">Limpar</button>
           </div>
+        </div>
 
-          <div class="proj-card" style="border-color:rgba(34,197,94,.15)">
-            <div class="proj-card-top">
-              <div class="proj-initials" style="background:linear-gradient(135deg,#22C55E,#16A34A)">NLD</div>
-              <div style="flex:1;min-width:0">
-                <div class="proj-client">Distribuidora NordLog</div>
-                <div class="proj-name">App de Logística</div>
-              </div>
-              <span class="status status-done">Entregue</span>
-            </div>
-            <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px">
-              <span style="color:var(--text-dim)">Progresso</span>
-              <span style="font-weight:700;color:var(--green)">100%</span>
-            </div>
-            <div class="progress-bar-track" style="height:8px">
-              <div class="progress-bar-fill" style="width:100%;background:var(--green)"></div>
-            </div>
-            <div style="font-size:11px;color:var(--text-dim);margin-top:7px">Entregue em 01 Mai 2026 · Suporte ativo</div>
-            <div class="proj-actions">
-              <button class="btn btn-outline" style="font-size:12px;padding:7px 12px" onclick="openActivityModal('App de Logística')">
-                <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                Registrar atividade
-              </button>
-            </div>
+        <div class="card">
+          <div class="table-scroll">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Solicitado em</th>
+                  <th>Cliente</th>
+                  <th>Projeto</th>
+                  <th>Tipo</th>
+                  <th>Progresso</th>
+                  <th>Status</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="projetos-body"></tbody>
+            </table>
           </div>
-
         </div>
       </section>
 
@@ -854,24 +827,34 @@
   <div class="modal-box" style="max-width:480px">
     <button class="modal-close" onclick="closeModal('modal-cliente')">&times;</button>
     <div class="modal-title">Novo cliente</div>
-    <div class="modal-sub">Cria o acesso à Área do Cliente e o projeto que ele vai acompanhar</div>
+    <div class="modal-sub">Cria o acesso à Área do Cliente. Os projetos são abertos depois, na aba Projetos.</div>
 
     <div class="form-group">
       <label>Nome do responsável</label>
       <input type="text" id="nc-nome" placeholder="Ex.: Carlos Almeida" maxlength="120">
     </div>
+    <div class="form-row-2">
+      <div class="form-group">
+        <label>Como gostaria de ser chamado</label>
+        <input type="text" id="nc-apelido" placeholder="Ex.: Carlos" maxlength="40">
+      </div>
+      <div class="form-group">
+        <label>Empresa</label>
+        <input type="text" id="nc-empresa" placeholder="Ex.: Empresa ABC Ltda" maxlength="120">
+      </div>
+    </div>
     <div class="form-group">
-      <label>Empresa</label>
-      <input type="text" id="nc-empresa" placeholder="Ex.: Empresa ABC Ltda" maxlength="120">
+      <label>E-mail de acesso</label>
+      <input type="email" id="nc-email" placeholder="cliente@empresa.com.br" autocomplete="off">
     </div>
     <div class="form-row-2">
       <div class="form-group">
-        <label>E-mail de acesso</label>
-        <input type="email" id="nc-email" placeholder="cliente@empresa.com.br" autocomplete="off">
+        <label>Telefone 01</label>
+        <input type="tel" id="nc-telefone" placeholder="(00) 00000-0000" maxlength="15" inputmode="numeric">
       </div>
       <div class="form-group">
-        <label>Telefone</label>
-        <input type="tel" id="nc-telefone" placeholder="(00) 00000-0000" maxlength="15" inputmode="numeric">
+        <label>Telefone 02 (opcional)</label>
+        <input type="tel" id="nc-telefone2" placeholder="(00) 00000-0000" maxlength="15" inputmode="numeric">
       </div>
     </div>
     <div class="form-group">
@@ -884,10 +867,6 @@
       </div>
       <div style="font-size:11px;color:var(--text-dim);margin-top:6px">Entregue ao cliente por WhatsApp ou e-mail e peça que ele troque no primeiro acesso.</div>
     </div>
-    <div class="form-group">
-      <label>Nome do projeto</label>
-      <input type="text" id="nc-projeto" placeholder="Ex.: ERP Comercial" maxlength="120">
-    </div>
 
     <div style="display:flex;gap:10px">
       <button class="btn btn-primary" style="flex:1;justify-content:center" id="nc-btn" onclick="window._salvarCliente()">Cadastrar cliente</button>
@@ -897,34 +876,123 @@
   </div>
 </div>
 
+<!-- ══ MODAL: Novo / Editar Projeto ══ -->
+<div class="modal-overlay" id="modal-projeto">
+  <div class="modal-box" style="max-width:520px">
+    <button class="modal-close" onclick="closeModal('modal-projeto')">&times;</button>
+    <div class="modal-title" id="pj-titulo">Novo projeto</div>
+    <div class="modal-sub">O contato é o do cadastro do cliente. Para alterá-lo, use a aba Clientes.</div>
+
+    <div class="form-group">
+      <label>Cliente</label>
+      <select id="pj-cliente"></select>
+      <div style="font-size:11px;color:var(--text-dim);margin-top:6px" id="pj-contato"></div>
+    </div>
+    <div class="form-group">
+      <label>Nome do projeto</label>
+      <input type="text" id="pj-nome" placeholder="Ex.: ERP Comercial" maxlength="120">
+    </div>
+    <div class="form-row-2">
+      <div class="form-group">
+        <label>Tipo</label>
+        <select id="pj-tipo"></select>
+      </div>
+      <div class="form-group">
+        <label>Data da solicitação</label>
+        <input type="date" id="pj-data">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Descrição</label>
+      <textarea id="pj-descricao" placeholder="O que o cliente precisa, com o máximo de detalhes."></textarea>
+    </div>
+
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-primary" style="flex:1;justify-content:center" id="pj-btn" onclick="window._salvarProjeto()">Cadastrar projeto</button>
+      <button class="btn btn-outline" onclick="closeModal('modal-projeto')">Cancelar</button>
+    </div>
+    <div class="form-msg" id="pj-msg" role="alert"></div>
+  </div>
+</div>
+
+<!-- ══ MODAL: Mudar situação ══ -->
+<div class="modal-overlay" id="modal-status">
+  <div class="modal-box" style="max-width:440px">
+    <button class="modal-close" onclick="closeModal('modal-status')">&times;</button>
+    <div class="modal-title">Mudar situação</div>
+    <div class="modal-sub" id="st-projeto">—</div>
+
+    <div class="form-group">
+      <label>Nova situação</label>
+      <select id="st-novo">
+        <option value="cadastrado">Cadastrado</option>
+        <option value="andamento">Andamento</option>
+        <option value="pausado">Pausado</option>
+        <option value="cancelado">Cancelado</option>
+        <option value="concluido">Concluído</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label id="st-label-nota">Justificativa</label>
+      <textarea id="st-nota" placeholder="Explique o motivo. Fica registrado no histórico do projeto."></textarea>
+    </div>
+
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-primary" style="flex:1;justify-content:center" id="st-btn" onclick="window._salvarStatus()">Registrar mudança</button>
+      <button class="btn btn-outline" onclick="closeModal('modal-status')">Cancelar</button>
+    </div>
+    <div class="form-msg" id="st-msg" role="alert"></div>
+  </div>
+</div>
+
+<!-- ══ MODAL: Histórico do projeto ══ -->
+<div class="modal-overlay" id="modal-historico">
+  <div class="modal-box" style="max-width:560px">
+    <button class="modal-close" onclick="closeModal('modal-historico')">&times;</button>
+    <div class="modal-title">Histórico do projeto</div>
+    <div class="modal-sub" id="hist-projeto">—</div>
+    <div id="hist-lista" class="hist-lista"></div>
+    <button class="btn btn-outline" style="width:100%;justify-content:center;margin-top:16px" onclick="window._baixarPdf()">
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Baixar histórico em PDF
+    </button>
+  </div>
+</div>
+
 <!-- ══ MODAL: Editar Cliente ══ -->
 <div class="modal-overlay" id="modal-editar">
   <div class="modal-box" style="max-width:480px">
     <button class="modal-close" onclick="closeModal('modal-editar')">&times;</button>
     <div class="modal-title">Editar cliente</div>
-    <div class="modal-sub" id="ed-sub">Dados do cliente e do projeto acompanhado</div>
+    <div class="modal-sub" id="ed-sub">Dados de contato do cliente</div>
 
     <div class="form-group">
       <label>Nome do responsável</label>
       <input type="text" id="ed-nome" maxlength="120">
     </div>
+    <div class="form-row-2">
+      <div class="form-group">
+        <label>Como gostaria de ser chamado</label>
+        <input type="text" id="ed-apelido" maxlength="40">
+      </div>
+      <div class="form-group">
+        <label>Empresa</label>
+        <input type="text" id="ed-empresa" maxlength="120">
+      </div>
+    </div>
     <div class="form-group">
-      <label>Empresa</label>
-      <input type="text" id="ed-empresa" maxlength="120">
+      <label>E-mail de acesso</label>
+      <input type="email" id="ed-email" disabled title="O e-mail de login não pode ser alterado por aqui">
     </div>
     <div class="form-row-2">
       <div class="form-group">
-        <label>E-mail de acesso</label>
-        <input type="email" id="ed-email" disabled title="O e-mail de login não pode ser alterado por aqui">
-      </div>
-      <div class="form-group">
-        <label>Telefone</label>
+        <label>Telefone 01</label>
         <input type="tel" id="ed-telefone" maxlength="15" inputmode="numeric">
       </div>
-    </div>
-    <div class="form-group">
-      <label>Nome do projeto</label>
-      <input type="text" id="ed-projeto" maxlength="120">
+      <div class="form-group">
+        <label>Telefone 02</label>
+        <input type="tel" id="ed-telefone2" maxlength="15" inputmode="numeric">
+      </div>
     </div>
 
     <div style="display:flex;gap:10px;margin-bottom:12px">
@@ -1038,6 +1106,7 @@ async function loadAll() {
   allFeedbacks    = f.data || [];
   slClients       = sc.data || [];
   allClients.forEach(cl => clientMap[cl.id] = cl);
+  montarSelectsTipo();
   renderSertlinkClients();
   renderDashboard();
   renderClientes();
@@ -1135,16 +1204,14 @@ function fmtDate(d) { return d ? new Date(d).toLocaleDateString('pt-BR',{day:'2-
 function fmtMoney(v) { return 'R$ ' + Number(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2}); }
 function statusCls(s) { return {open:'status-dev',analysis:'status-analysis',done:'status-done',dev:'status-dev',testing:'status-analysis'}[s]||''; }
 function statusLabel(s) { return {open:'Aberto',analysis:'Em análise',done:'Concluído',dev:'Em dev',testing:'Testes'}[s]||s; }
-function projStatusCls(s) { return {analysis:'status-analysis',dev:'status-dev',testing:'status-analysis',done:'status-done'}[s]||'status-dev'; }
-function projStatusLabel(s) { return {analysis:'Em análise',dev:'Em dev',testing:'Testes',done:'Entregue'}[s]||s; }
 
 /* ── DASHBOARD ── */
 function renderDashboard() {
   const openTickets = allTickets.filter(t => t.status !== 'done').length;
   const received = allInvoices.filter(i => i.status === 'paid').reduce((s,i) => s+Number(i.amount),0);
   const pending  = allInvoices.filter(i => i.status !== 'paid').reduce((s,i) => s+Number(i.amount),0);
-  const inDev    = allProjects.filter(p => p.status !== 'done').length;
-  const done     = allProjects.filter(p => p.status === 'done').length;
+  const inDev    = allProjects.filter(p => ['cadastrado','andamento','pausado'].includes(p.status)).length;
+  const done     = allProjects.filter(p => p.status === 'concluido').length;
 
   const vals = document.querySelectorAll('#tab-dashboard .stat-value');
   if (vals[0]) {
@@ -1152,7 +1219,7 @@ function renderDashboard() {
     const hint = vals[0].closest('.stat-card').querySelector('.stat-hint');
     if (hint) hint.textContent = `${slClients.length} via SertLink · ${allClients.length} sob medida`;
   }
-  if (vals[1]) { vals[1].textContent = inDev; vals[1].closest('.stat-card').querySelector('.stat-hint').textContent = '+'+done+' entregue(s)'; }
+  if (vals[1]) { vals[1].textContent = inDev; vals[1].closest('.stat-card').querySelector('.stat-hint').textContent = '+'+done+' concluído(s)'; }
   if (vals[2]) vals[2].textContent = openTickets;
   if (vals[3]) { vals[3].textContent = fmtMoney(received); vals[3].closest('.stat-card').querySelector('.stat-hint').textContent = fmtMoney(pending)+' a receber'; }
 
@@ -1197,19 +1264,21 @@ window._gerarSenha = () => {
 };
 
 window._novoCliente = () => {
-  ['nc-nome','nc-empresa','nc-email','nc-telefone','nc-projeto'].forEach(id => document.getElementById(id).value = '');
+  ['nc-nome','nc-apelido','nc-empresa','nc-email','nc-telefone','nc-telefone2'].forEach(id => document.getElementById(id).value = '');
   ncMsg().className = 'form-msg';
   window._gerarSenha();
   openModal('modal-cliente');
 };
 
-document.getElementById('nc-telefone').addEventListener('input', e => {
+function mascaraTelefone(e) {
   const d = e.target.value.replace(/\D/g, '').slice(0, 11);
   let v = d;
   if (d.length > 2) v = `(${d.slice(0,2)}) ${d.slice(2)}`;
   if (d.length > 7) v = `(${d.slice(0,2)}) ${d.slice(2, d.length === 11 ? 7 : 6)}-${d.slice(d.length === 11 ? 7 : 6)}`;
   e.target.value = v;
-});
+}
+['nc-telefone','nc-telefone2','ed-telefone','ed-telefone2'].forEach(id =>
+  document.getElementById(id).addEventListener('input', mascaraTelefone));
 
 window._salvarCliente = async () => {
   const msg = ncMsg(), btn = document.getElementById('nc-btn');
@@ -1218,16 +1287,16 @@ window._salvarCliente = async () => {
   const nome    = document.getElementById('nc-nome').value.trim();
   const empresa = document.getElementById('nc-empresa').value.trim();
   const email   = document.getElementById('nc-email').value.trim();
+  const apelido = document.getElementById('nc-apelido').value.trim();
   const phone   = document.getElementById('nc-telefone').value.trim();
+  const phone2  = document.getElementById('nc-telefone2').value.trim();
   const senha   = document.getElementById('nc-senha').value;
-  const projeto = document.getElementById('nc-projeto').value.trim();
 
   if (!nome)                                     return set('Informe o nome do responsável.');
   if (!empresa)                                  return set('Informe a empresa.');
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return set('Informe um e-mail válido.');
   if (phone.replace(/\D/g,'').length < 10)       return set('Informe um telefone com DDD.');
   if (senha.length < 8)                          return set('A senha precisa ter pelo menos 8 caracteres.');
-  if (!projeto)                                  return set('Informe o nome do projeto.');
 
   const orig = btn.textContent;
   btn.textContent = 'Cadastrando...'; btn.disabled = true;
@@ -1249,17 +1318,338 @@ window._salvarCliente = async () => {
   const clientId = data.user.id;
 
   const { error: perfilErro } = await supabase.from('profiles')
-    .upsert({ id: clientId, email, name: nome, company: empresa, phone, role: 'client', status: 'ativo' },
+    .upsert({ id: clientId, email, name: nome, nickname: apelido || null, company: empresa, phone, phone2: phone2 || null, role: 'client', status: 'ativo' },
             { onConflict: 'id' });
   if (perfilErro) { fim(); return set('Acesso criado, mas o perfil falhou: ' + perfilErro.message); }
 
-  const { error: projErro } = await supabase.from('projects')
-    .insert({ client_id: clientId, name: projeto, status: 'analysis', progress: 0 });
-  if (projErro) { fim(); return set('Cliente criado, mas o projeto falhou: ' + projErro.message); }
 
   await loadAll();
   fim();
-  set(`${nome} cadastrado. ${data.session ? 'O acesso já está liberado.' : 'O cliente precisa confirmar o e-mail antes do primeiro acesso.'} Envie a senha provisória por um canal privado.`, 'success');
+  set(`${nome} cadastrado. ${data.session ? 'O acesso já está liberado.' : 'O cliente precisa confirmar o e-mail antes do primeiro acesso.'} Envie a senha provisória por um canal privado e abra o projeto na aba Projetos.`, 'success');
+};
+
+/* ── PROJETOS ── */
+const TIPOS_PROJETO = [
+  'Landing pages', 'Sites', 'Sistemas', 'Dashboard', 'Painéis Administrativos',
+  'Automação', 'Controle e Gestão', 'Sistema de atendimento e vendas',
+  'Manutenção', 'Evolução e aprimoramento',
+];
+const PJ_STATUS = {
+  cadastrado: { label: 'Cadastrado', cls: 'status-pending' },
+  andamento:  { label: 'Andamento',  cls: 'status-dev' },
+  pausado:    { label: 'Pausado',    cls: 'status-analysis' },
+  cancelado:  { label: 'Cancelado',  cls: 'status-expirado' },
+  concluido:  { label: 'Concluído',  cls: 'status-done' },
+};
+// Pausa e cancelamento precisam de explicação: são as duas situações em que
+// alguém vai perguntar depois por que o projeto parou.
+const EXIGE_NOTA = ['pausado', 'cancelado'];
+
+let projEditId = null, stProjId = null, histProjId = null, projHistorico = [];
+
+const fmtDateTime = d => d
+  ? new Date(d).toLocaleString('pt-BR', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' })
+  : '—';
+const nomeCliente = id => { const c = clientMap[id]; return c?.company || c?.name || '—'; };
+
+// Preenche as listas de tipo (filtro e formulário) uma única vez
+function montarSelectsTipo() {
+  const opcoes = TIPOS_PROJETO.map(t => `<option value="${t}">${t}</option>`).join('');
+  document.getElementById('fp-tipo').innerHTML = '<option value="">Todos</option>' + opcoes;
+  document.getElementById('pj-tipo').innerHTML = opcoes;
+}
+
+function projetosFiltrados() {
+  const busca  = document.getElementById('fp-cliente').value.trim().toLowerCase();
+  const tipo   = document.getElementById('fp-tipo').value;
+  const status = document.getElementById('fp-status').value;
+  const de     = document.getElementById('fp-de').value;
+  const ate    = document.getElementById('fp-ate').value;
+
+  return allProjects.filter(p => {
+    const quando = (p.requested_at || p.created_at || '').slice(0, 10);
+    if (busca) {
+      const cl = clientMap[p.client_id];
+      const alvo = `${cl?.name || ''} ${cl?.company || ''} ${p.name || ''}`.toLowerCase();
+      if (!alvo.includes(busca)) return false;
+    }
+    if (tipo && p.type !== tipo)       return false;
+    if (status && p.status !== status) return false;
+    if (de && quando < de)             return false;
+    if (ate && quando > ate)           return false;
+    return true;
+  }).sort((a, b) => new Date(b.requested_at || b.created_at || 0) - new Date(a.requested_at || a.created_at || 0));
+}
+
+function renderProjetos() {
+  const tbody = document.getElementById('projetos-body');
+  if (!tbody) return;
+  const lista = projetosFiltrados();
+
+  tbody.innerHTML = lista.length ? lista.map(p => {
+    const s = PJ_STATUS[p.status] || { label: p.status || '—', cls: '' };
+    const encerrado = ['cancelado', 'concluido'].includes(p.status);
+    return `<tr>
+      <td style="color:var(--text-dim);font-size:12px;white-space:nowrap">${fmtDateTime(p.requested_at || p.created_at)}</td>
+      <td style="font-weight:600">${esc(nomeCliente(p.client_id))}</td>
+      <td>${esc(p.name || '—')}</td>
+      <td style="color:var(--text-dim)">${esc(p.type || '—')}</td>
+      <td>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="progress-bar-track" style="width:56px"><div class="progress-bar-fill" style="width:${p.progress || 0}%"></div></div>
+          <span style="font-size:12px;font-weight:700;color:var(--orange)">${p.progress || 0}%</span>
+        </div>
+      </td>
+      <td><span class="status ${s.cls}">${s.label}</span></td>
+      <td>
+        <div class="team-actions">
+          <button class="team-btn" onclick="window._editarProjeto('${p.id}')">Editar</button>
+          <button class="team-btn" onclick="window._mudarStatus('${p.id}')">Situação</button>
+          ${!encerrado ? `<button class="team-btn" onclick="window._openProgress('${p.id}','${String(p.name).replace(/'/g,"\\'")}',${p.progress || 0})">Progresso</button>` : ''}
+          <button class="team-btn" onclick="window._verHistorico('${p.id}')">Histórico</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('')
+  : `<tr><td colspan="7" style="text-align:center;color:var(--text-dim);padding:18px 0">${allProjects.length ? 'Nenhum projeto para os filtros escolhidos.' : 'Nenhum projeto cadastrado.'}</td></tr>`;
+}
+
+['fp-cliente','fp-tipo','fp-status','fp-de','fp-ate'].forEach(id => {
+  document.getElementById(id).addEventListener('input', renderProjetos);
+});
+window._limparFiltros = () => {
+  ['fp-cliente','fp-tipo','fp-status','fp-de','fp-ate'].forEach(id => document.getElementById(id).value = '');
+  renderProjetos();
+};
+
+/* ── NOVO / EDITAR PROJETO ── */
+const pjSet = (t, tipo = 'error') => {
+  const m = document.getElementById('pj-msg'); m.textContent = t; m.className = 'form-msg show ' + tipo;
+};
+
+function preencherClientes(selecionado) {
+  const sel = document.getElementById('pj-cliente');
+  sel.innerHTML = allClients.length
+    ? allClients.map(c => `<option value="${c.id}">${esc(c.company || c.name || 'Cliente')}</option>`).join('')
+    : '<option value="">Nenhum cliente cadastrado</option>';
+  if (selecionado) sel.value = selecionado;
+  mostrarContato();
+}
+function mostrarContato() {
+  const c = clientMap[document.getElementById('pj-cliente').value];
+  const tel = [c?.phone, c?.phone2].filter(Boolean).join(' · ');
+  document.getElementById('pj-contato').textContent = c
+    ? [c.name, c.email, tel].filter(Boolean).join(' · ')
+    : 'Cadastre um cliente antes de abrir um projeto.';
+}
+document.getElementById('pj-cliente').addEventListener('change', mostrarContato);
+
+window._novoProjeto = () => {
+  if (!allClients.length) { alert('Cadastre um cliente antes de abrir um projeto.'); return; }
+  projEditId = null;
+  document.getElementById('pj-titulo').textContent = 'Novo projeto';
+  document.getElementById('pj-btn').textContent = 'Cadastrar projeto';
+  document.getElementById('pj-nome').value = '';
+  document.getElementById('pj-descricao').value = '';
+  document.getElementById('pj-data').value = new Date().toISOString().slice(0, 10);
+  document.getElementById('pj-tipo').value = TIPOS_PROJETO[0];
+  document.getElementById('pj-msg').className = 'form-msg';
+  preencherClientes();
+  openModal('modal-projeto');
+};
+
+window._editarProjeto = (id) => {
+  const p = allProjects.find(x => x.id === id);
+  if (!p) return;
+  projEditId = id;
+  document.getElementById('pj-titulo').textContent = 'Editar projeto';
+  document.getElementById('pj-btn').textContent = 'Salvar alterações';
+  document.getElementById('pj-nome').value = p.name || '';
+  document.getElementById('pj-descricao').value = p.description || '';
+  document.getElementById('pj-data').value = (p.requested_at || p.created_at || '').slice(0, 10);
+  document.getElementById('pj-tipo').value = p.type || TIPOS_PROJETO[0];
+  document.getElementById('pj-msg').className = 'form-msg';
+  preencherClientes(p.client_id);
+  openModal('modal-projeto');
+};
+
+window._salvarProjeto = async () => {
+  const btn = document.getElementById('pj-btn'), orig = btn.textContent;
+  const clientId  = document.getElementById('pj-cliente').value;
+  const nome      = document.getElementById('pj-nome').value.trim();
+  const tipo      = document.getElementById('pj-tipo').value;
+  const data      = document.getElementById('pj-data').value;
+  const descricao = document.getElementById('pj-descricao').value.trim();
+
+  if (!clientId) return pjSet('Escolha o cliente.');
+  if (!nome)     return pjSet('Informe o nome do projeto.');
+  if (!data)     return pjSet('Informe a data da solicitação.');
+
+  // A hora vem da abertura do registro; o gestor escolhe apenas o dia.
+  const agora = new Date();
+  const quando = new Date(`${data}T${agora.toTimeString().slice(0, 8)}`).toISOString();
+
+  btn.textContent = 'Salvando...'; btn.disabled = true;
+  const fim = () => { btn.textContent = orig; btn.disabled = false; };
+
+  if (projEditId) {
+    const { error } = await supabase.from('projects')
+      .update({ client_id: clientId, name: nome, type: tipo, description: descricao, requested_at: quando })
+      .eq('id', projEditId);
+    if (error) { fim(); return pjSet('Não foi possível salvar: ' + error.message); }
+  } else {
+    const { data: criado, error } = await supabase.from('projects')
+      .insert({ client_id: clientId, name: nome, type: tipo, description: descricao,
+                requested_at: quando, status: 'cadastrado', progress: 0, created_by: session.user.id })
+      .select('id').single();
+    if (error) { fim(); return pjSet('Não foi possível cadastrar: ' + error.message); }
+    await registrarHistorico(criado.id, 'cadastrado', 'Projeto cadastrado.');
+  }
+
+  await loadAll();
+  fim();
+  pjSet('Projeto salvo.', 'success');
+};
+
+/* ── SITUAÇÃO E HISTÓRICO ── */
+async function registrarHistorico(projectId, status, note) {
+  return supabase.from('project_history').insert({
+    project_id: projectId, status, note: note || null,
+    changed_by: session.user.id, changed_by_name: myName,
+  });
+}
+
+window._mudarStatus = (id) => {
+  const p = allProjects.find(x => x.id === id);
+  if (!p) return;
+  stProjId = id;
+  document.getElementById('st-projeto').textContent = `${p.name} · ${nomeCliente(p.client_id)}`;
+  document.getElementById('st-novo').value = p.status || 'cadastrado';
+  document.getElementById('st-nota').value = '';
+  document.getElementById('st-msg').className = 'form-msg';
+  atualizarRotuloNota();
+  openModal('modal-status');
+};
+
+function atualizarRotuloNota() {
+  const novo = document.getElementById('st-novo').value;
+  document.getElementById('st-label-nota').textContent =
+    EXIGE_NOTA.includes(novo) ? 'Justificativa (obrigatória)' : 'Observação (opcional)';
+}
+document.getElementById('st-novo').addEventListener('change', atualizarRotuloNota);
+
+window._salvarStatus = async () => {
+  const btn = document.getElementById('st-btn'), orig = btn.textContent;
+  const msg = document.getElementById('st-msg');
+  const set = (t, tipo = 'error') => { msg.textContent = t; msg.className = 'form-msg show ' + tipo; };
+
+  const novo = document.getElementById('st-novo').value;
+  const nota = document.getElementById('st-nota').value.trim();
+  if (EXIGE_NOTA.includes(novo) && !nota) {
+    return set(`Explique o motivo para deixar o projeto como ${PJ_STATUS[novo].label.toLowerCase()}.`);
+  }
+
+  btn.textContent = 'Registrando...'; btn.disabled = true;
+  const fim = () => { btn.textContent = orig; btn.disabled = false; };
+
+  const campos = { status: novo };
+  if (novo === 'andamento') campos.started_at = new Date().toISOString();
+  if (['concluido','cancelado'].includes(novo)) campos.finished_at = new Date().toISOString();
+  if (novo === 'concluido') campos.progress = 100;
+
+  const { error } = await supabase.from('projects').update(campos).eq('id', stProjId);
+  if (error) { fim(); return set('Não foi possível mudar a situação: ' + error.message); }
+
+  const { error: e2 } = await registrarHistorico(stProjId, novo, nota);
+  if (e2) { fim(); return set('Situação alterada, mas o histórico falhou: ' + e2.message); }
+
+  await loadAll();
+  fim();
+  set('Mudança registrada no histórico.', 'success');
+};
+
+window._verHistorico = async (id) => {
+  const p = allProjects.find(x => x.id === id);
+  if (!p) return;
+  histProjId = id;
+  document.getElementById('hist-projeto').textContent = `${p.name} · ${nomeCliente(p.client_id)}`;
+  document.getElementById('hist-lista').innerHTML = '<div style="color:var(--text-dim);font-size:13px">Carregando...</div>';
+  openModal('modal-historico');
+
+  const { data } = await supabase.from('project_history').select('*')
+    .eq('project_id', id).order('changed_at', { ascending: true });
+  projHistorico = data || [];
+
+  document.getElementById('hist-lista').innerHTML = projHistorico.length
+    ? projHistorico.map(h => {
+        const s = PJ_STATUS[h.status] || { label: h.status, cls: '' };
+        return `<div class="hist-item">
+          <div class="hist-topo">
+            <span class="status ${s.cls}">${s.label}</span>
+            <span class="hist-data">${fmtDateTime(h.changed_at)}</span>
+          </div>
+          ${h.note ? `<div class="hist-nota">${esc(h.note)}</div>` : ''}
+          <div class="hist-autor">por ${esc(h.changed_by_name || 'equipe SertCode')}</div>
+        </div>`;
+      }).join('')
+    : '<div style="color:var(--text-dim);font-size:13px">Nenhuma mudança registrada ainda.</div>';
+};
+
+// O PDF sai pela impressão do navegador: abre uma página já formatada e o
+// próprio "Salvar como PDF" gera o arquivo, sem depender de biblioteca.
+window._baixarPdf = () => {
+  const p = allProjects.find(x => x.id === histProjId);
+  if (!p) return;
+  const cl = clientMap[p.client_id];
+  const s = PJ_STATUS[p.status] || { label: p.status };
+
+  const linhas = projHistorico.map(h => `
+    <tr>
+      <td>${fmtDateTime(h.changed_at)}</td>
+      <td>${(PJ_STATUS[h.status] || { label: h.status }).label}</td>
+      <td>${esc(h.note || '—')}</td>
+      <td>${esc(h.changed_by_name || 'Equipe SertCode')}</td>
+    </tr>`).join('') || '<tr><td colspan="4">Nenhuma mudança registrada.</td></tr>';
+
+  const doc = `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="utf-8">
+<title>Projeto ${esc(p.name)} — SertCode</title>
+<style>
+  body { font-family: Arial, Helvetica, sans-serif; color:#111; margin:32px; }
+  h1 { font-size:20px; margin:0 0 4px; }
+  .sub { color:#666; font-size:12px; margin-bottom:22px; }
+  .ficha { border:1px solid #ddd; border-radius:8px; padding:14px 16px; margin-bottom:22px; font-size:13px; }
+  .ficha div { margin-bottom:5px; }
+  table { width:100%; border-collapse:collapse; font-size:12px; }
+  th, td { border-bottom:1px solid #e5e5e5; padding:8px 6px; text-align:left; vertical-align:top; }
+  th { background:#f5f5f5; }
+  .rodape { margin-top:26px; font-size:11px; color:#888; }
+</style></head><body>
+  <h1>${esc(p.name)}</h1>
+  <div class="sub">Histórico do projeto · SertCode</div>
+  <div class="ficha">
+    <div><strong>Cliente:</strong> ${esc(cl?.company || cl?.name || '—')}</div>
+    <div><strong>Responsável:</strong> ${esc(cl?.name || '—')}</div>
+    <div><strong>Contato:</strong> ${esc([cl?.email, cl?.phone, cl?.phone2].filter(Boolean).join(' · ') || '—')}</div>
+    <div><strong>Tipo:</strong> ${esc(p.type || '—')}</div>
+    <div><strong>Solicitado em:</strong> ${fmtDateTime(p.requested_at || p.created_at)}</div>
+    <div><strong>Início:</strong> ${fmtDateTime(p.started_at)}</div>
+    <div><strong>Encerramento:</strong> ${fmtDateTime(p.finished_at)}</div>
+    <div><strong>Situação atual:</strong> ${s.label} · ${p.progress || 0}% concluído</div>
+    ${p.description ? `<div><strong>Descrição:</strong> ${esc(p.description)}</div>` : ''}
+  </div>
+  <table>
+    <thead><tr><th>Data e hora</th><th>Situação</th><th>Descrição</th><th>Registrado por</th></tr></thead>
+    <tbody>${linhas}</tbody>
+  </table>
+  <div class="rodape">Emitido em ${fmtDateTime(new Date())} — SertCode</div>
+</body></html>`;
+
+  const janela = window.open('', '_blank');
+  if (!janela) { alert('Libere as janelas pop-up para gerar o PDF.'); return; }
+  janela.document.write(doc);
+  janela.document.close();
+  janela.focus();
+  setTimeout(() => janela.print(), 400);
 };
 
 /* ── EDITAR CLIENTE SOB MEDIDA ── */
@@ -1270,33 +1660,27 @@ const edSet = (t, tipo = 'error') => { const m = edMsg(); m.textContent = t; m.c
 window._editarCliente = (id) => {
   const cl = clientMap[id];
   if (!cl) return;
-  const proj = allProjects.find(p => p.client_id === id);
   edClienteId = id;
 
   document.getElementById('ed-sub').textContent = cl.company || cl.name || 'Cliente';
   document.getElementById('ed-nome').value     = cl.name || '';
+  document.getElementById('ed-apelido').value  = cl.nickname || '';
+  document.getElementById('ed-telefone2').value = cl.phone2 || '';
   document.getElementById('ed-empresa').value  = cl.company || '';
   document.getElementById('ed-email').value    = cl.email || '';
   document.getElementById('ed-telefone').value = cl.phone || '';
-  document.getElementById('ed-projeto').value  = proj?.name || '';
   edMsg().className = 'form-msg';
   openModal('modal-editar');
 };
 
-document.getElementById('ed-telefone').addEventListener('input', e => {
-  const d = e.target.value.replace(/\D/g, '').slice(0, 11);
-  let v = d;
-  if (d.length > 2) v = `(${d.slice(0,2)}) ${d.slice(2)}`;
-  if (d.length > 7) v = `(${d.slice(0,2)}) ${d.slice(2, d.length === 11 ? 7 : 6)}-${d.slice(d.length === 11 ? 7 : 6)}`;
-  e.target.value = v;
-});
 
 window._salvarEdicao = async () => {
   const btn = document.getElementById('ed-btn'), orig = btn.textContent;
   const nome    = document.getElementById('ed-nome').value.trim();
   const empresa = document.getElementById('ed-empresa').value.trim();
+  const apelido = document.getElementById('ed-apelido').value.trim();
   const phone   = document.getElementById('ed-telefone').value.trim();
-  const projeto = document.getElementById('ed-projeto').value.trim();
+  const phone2  = document.getElementById('ed-telefone2').value.trim();
 
   if (!nome)    return edSet('Informe o nome do responsável.');
   if (!empresa) return edSet('Informe a empresa.');
@@ -1305,18 +1689,9 @@ window._salvarEdicao = async () => {
   const fim = () => { btn.textContent = orig; btn.disabled = false; };
 
   const { error } = await supabase.from('profiles')
-    .update({ name: nome, company: empresa, phone }).eq('id', edClienteId);
+    .update({ name: nome, nickname: apelido || null, company: empresa, phone, phone2: phone2 || null }).eq('id', edClienteId);
   if (error) { fim(); return edSet('Não foi possível salvar: ' + error.message); }
 
-  const proj = allProjects.find(p => p.client_id === edClienteId);
-  if (projeto && proj && projeto !== proj.name) {
-    const { error: e2 } = await supabase.from('projects').update({ name: projeto }).eq('id', proj.id);
-    if (e2) { fim(); return edSet('Dados salvos, mas o projeto falhou: ' + e2.message); }
-  } else if (projeto && !proj) {
-    const { error: e3 } = await supabase.from('projects')
-      .insert({ client_id: edClienteId, name: projeto, status: 'analysis', progress: 0 });
-    if (e3) { fim(); return edSet('Dados salvos, mas o projeto falhou: ' + e3.message); }
-  }
 
   await loadAll();
   fim();
@@ -1405,44 +1780,6 @@ function renderClientes() {
   }).join('') || '<tr><td colspan="7" style="text-align:center;color:var(--text-dim)">Nenhum cliente cadastrado.</td></tr>';
 }
 
-/* ── PROJETOS ── */
-function renderProjetos() {
-  const grid = document.querySelector('.proj-grid');
-  if (!grid) return;
-  grid.innerHTML = allProjects.map(p => {
-    const cl = clientMap[p.client_id];
-    const isDone = p.status === 'done';
-    const color  = isDone ? 'var(--green)' : 'var(--orange)';
-    return `<div class="proj-card" ${isDone?'style="border-color:rgba(34,197,94,.15)"':''}>
-      <div class="proj-card-top">
-        <div class="proj-initials">${ini(cl?.company||cl?.name||'?')}</div>
-        <div style="flex:1;min-width:0">
-          <div class="proj-client">${cl?.company||cl?.name||'—'}</div>
-          <div class="proj-name">${p.name}</div>
-        </div>
-        <span class="status ${projStatusCls(p.status)}">${projStatusLabel(p.status)}</span>
-      </div>
-      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px">
-        <span style="color:var(--text-dim)">Progresso</span>
-        <span style="font-weight:700;color:${color}" id="prog-val-${p.id}">${p.progress}%</span>
-      </div>
-      <div class="progress-bar-track" style="height:8px">
-        <div class="progress-bar-fill" id="prog-bar-${p.id}" style="width:${p.progress}%;background:${color}"></div>
-      </div>
-      <div style="font-size:11px;color:var(--text-dim);margin-top:7px">Fase: ${p.current_phase||'—'} · Entrega: ${fmtDate(p.end_date)}</div>
-      <div class="proj-actions">
-        ${!isDone ? `<button class="btn btn-primary" style="font-size:12px;padding:7px 12px" onclick="window._openProgress('${p.id}','${p.name.replace(/'/g,"\\'")}',${p.progress})">
-          <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-          Atualizar progresso
-        </button>` : ''}
-        <button class="btn btn-outline" style="font-size:12px;padding:7px 12px" onclick="window._openActivity('${p.id}','${p.name.replace(/'/g,"\\'")}')">
-          <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          ${isDone?'Registrar atividade':'Adicionar atividade'}
-        </button>
-      </div>
-    </div>`;
-  }).join('') || '<p style="color:var(--text-dim)">Nenhum projeto cadastrado.</p>';
-}
 
 /* ── CHAMADOS ── */
 function renderChamados() {
@@ -1630,17 +1967,16 @@ window._rejectTesti = async (id) => {
 };
 
 /* ── SAVE PROGRESS ── */
+// Progresso e situação andam separados: chegar a 100% não conclui o projeto
+// sozinho, porque concluir é uma decisão que precisa ficar no histórico.
 window.saveProgress = async () => {
   const val   = +document.getElementById('prog-slider').value;
   const phase = document.getElementById('prog-phase').value;
-  const status = val === 100 ? 'done' : val >= 50 ? 'dev' : 'analysis';
-  await supabase.from('projects').update({ progress:val, current_phase:phase, status }).eq('id', _currentProjId);
-  const bar = document.getElementById('prog-bar-'+_currentProjId);
-  const lbl = document.getElementById('prog-val-'+_currentProjId);
-  if (bar) bar.style.width = val+'%';
-  if (lbl) lbl.textContent = val+'%';
+  const { error } = await supabase.from('projects')
+    .update({ progress: val, current_phase: phase }).eq('id', _currentProjId);
+  if (error) { alert('Não foi possível salvar o progresso: ' + error.message); return; }
   closeModal('modal-progress');
-  renderDashboard();
+  await loadAll();
 };
 
 /* ── SAVE ACTIVITY (kanban_items) ── */

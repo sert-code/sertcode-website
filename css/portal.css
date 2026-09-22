@@ -896,6 +896,29 @@ button { font-family: var(--font); }
 @media (max-width: 900px) { .sertlink-resumo { grid-template-columns: repeat(3, 1fr); } }
 @media (max-width: 520px) { .sertlink-resumo { grid-template-columns: repeat(2, 1fr); } }
 
+/* ── Projetos: filtros e histórico ── */
+.proj-filtros {
+  display: grid; gap: 12px; align-items: end;
+  grid-template-columns: 1.4fr 1fr 1fr 0.9fr 0.9fr auto;
+}
+.proj-filtros label {
+  display: block; margin-bottom: 6px;
+  font-size: 11.5px; font-weight: 600; color: var(--text-dim);
+}
+.proj-filtros input[type="date"] { color-scheme: dark; }
+@media (max-width: 1000px) { .proj-filtros { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 560px)  { .proj-filtros { grid-template-columns: 1fr; } }
+
+.hist-lista { display: flex; flex-direction: column; gap: 10px; max-height: 420px; overflow-y: auto; }
+.hist-item {
+  border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px;
+  background: rgba(255,255,255,0.02);
+}
+.hist-topo { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.hist-data { font-size: 11.5px; color: var(--text-dim); white-space: nowrap; }
+.hist-nota { margin-top: 8px; font-size: 13px; color: var(--text); line-height: 1.6; }
+.hist-autor { margin-top: 6px; font-size: 11px; color: var(--text-dim); }
+
 /* ── Origem do cliente / chamado ── */
 .origem-badge {
   display: inline-flex; align-items: center; padding: 3px 9px; border-radius: 99px;

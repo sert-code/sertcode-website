@@ -844,7 +844,8 @@ async function loadPortalData() {
 
 /* ── HELPERS ── */
 function labelStatus(s) {
-  return { analysis:'Em análise', dev:'Em desenvolvimento', testing:'Em testes', done:'Entregue' }[s] || s;
+  return { cadastrado:'Cadastrado', andamento:'Em andamento', pausado:'Pausado',
+           cancelado:'Cancelado', concluido:'Concluído' }[s] || s;
 }
 function labelStatus2(s) {
   return { open:'Aberto', analysis:'Em análise', done:'Concluído' }[s] || s;
