@@ -832,7 +832,20 @@
             </div>
           </div>
         </div>
-        <div class="rh-painel" id="rh-beneficios"><div class="card rh-embreve">Benefícios — em construção.</div></div>
+        <div class="rh-painel" id="rh-beneficios">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:18px">
+            <div class="rh-bloco-texto" style="margin:0">Catálogo de benefícios. Para incluir num colaborador, abra o cadastro dele, na aba Benefícios.</div>
+            <button class="btn btn-primary" onclick="window._novoBeneficio()">+ Novo benefício</button>
+          </div>
+          <div class="card">
+            <div class="table-scroll">
+              <table class="data-table">
+                <thead><tr><th>Benefício</th><th>Tipo</th><th>Custo mensal</th><th>Desconto</th><th>Colaboradores</th></tr></thead>
+                <tbody id="rh-benef-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
         <div class="rh-painel" id="rh-documentos"><div class="card rh-embreve">Documentos e contratos — em construção.</div></div>
       </section>
 
@@ -1205,6 +1218,36 @@
       <button class="btn btn-outline" onclick="closeModal('modal-rh-colab')">Cancelar</button>
     </div>
     <div class="form-msg" id="rc-msg" role="alert"></div>
+  </div>
+</div>
+
+<!-- ══ MODAL: Benefício (RH) ══ -->
+<div class="modal-overlay" id="modal-rh-benef">
+  <div class="modal-box" style="max-width:460px">
+    <button class="modal-close" onclick="closeModal('modal-rh-benef')">&times;</button>
+    <div class="modal-title" id="rb-titulo">Novo benefício</div>
+    <div class="modal-sub">Catálogo usado no cadastro dos colaboradores</div>
+
+    <div class="form-row-2">
+      <div class="form-group"><label>Nome</label><input type="text" id="rb-nome" maxlength="60"></div>
+      <div class="form-group"><label>Tipo</label><select id="rb-tipo"></select></div>
+    </div>
+    <div class="form-row-2">
+      <div class="form-group"><label>Custo mensal padrão (R$)</label><input type="number" id="rb-valor" min="0" step="0.01"></div>
+      <div class="form-group">
+        <label>Desconto do colaborador (% do salário)</label>
+        <input type="number" id="rb-desconto" min="0" max="100" step="0.01" value="0">
+        <div style="font-size:11px;color:var(--text-dim);margin-top:5px" id="rb-dica"></div>
+      </div>
+    </div>
+
+    <label class="rh-check"><input type="checkbox" id="rb-ativo" checked> Benefício ativo</label>
+
+    <div style="display:flex;gap:10px;margin-top:14px">
+      <button class="btn btn-primary" style="flex:1;justify-content:center" id="rb-btn" onclick="window._salvarBeneficio()">Salvar benefício</button>
+      <button class="btn btn-outline" onclick="closeModal('modal-rh-benef')">Cancelar</button>
+    </div>
+    <div class="form-msg" id="rb-msg" role="alert"></div>
   </div>
 </div>
 
@@ -1613,21 +1656,26 @@ document.querySelectorAll('#rc-abas .rh-aba').forEach(b => b.addEventListener('c
 
 async function loadRh() {
   if (!isGestor) return;
-  const [cg, co, af, bn] = await Promise.all([
+  const [cg, co, af, bn, uso] = await Promise.all([
     supabase.from('rh_cargos').select('*').order('nome'),
     supabase.from('rh_colaboradores').select('*').order('nome'),
     supabase.from('rh_afastamentos').select('*').order('inicio', { ascending: false }),
-    supabase.from('rh_beneficios').select('*').eq('ativo', true).order('nome'),
+    supabase.from('rh_beneficios').select('*').order('nome'),
+    supabase.from('rh_colaborador_beneficios').select('beneficio_id'),
   ]);
   rhCargos = cg.data || [];
   rhColabs = co.data || [];
   rhAfastamentos = af.data || [];
-  rhBeneficios = bn.data || [];
+  rhBenefTodos = bn.data || [];
+  rhBeneficios = rhBenefTodos.filter(b => b.ativo);   // só os ativos entram na escolha
+  rhBenefUso = {};
+  (uso.data || []).forEach(u => { rhBenefUso[u.beneficio_id] = (rhBenefUso[u.beneficio_id] || 0) + 1; });
   montarSelectsRh();
   renderRhVisao();
   renderRhColabs();
   renderRhCargos();
   renderRhAfastamentos();
+  renderRhBeneficios();
 }
 
 function montarSelectsRh() {
@@ -2044,6 +2092,90 @@ async function carregarHistorico(id) {
       </div>`).join('')
     : 'Nenhum registro.';
 }
+
+/* ── catálogo de benefícios ── */
+const TIPO_BENEF = {
+  VALE_TRANSPORTE:'Vale-transporte', VALE_ALIMENTACAO:'Vale-alimentação', VALE_REFEICAO:'Vale-refeição',
+  PLANO_SAUDE:'Plano de saúde', PLANO_ODONTO:'Plano odontológico', OUTRO:'Outro',
+};
+// O desconto do vale-transporte tem teto legal de 6% do salário; os demais
+// são acordo da empresa, então entram sem sugestão.
+const DESCONTO_SUGERIDO = { VALE_TRANSPORTE: { valor: 6, dica: 'Vale-transporte: até 6%.' } };
+const rbSet = (t, tipo = 'error') => { const m = el('rb-msg'); m.textContent = t; m.className = 'form-msg show ' + tipo; };
+let rbEditId = null, rhBenefTodos = [], rhBenefUso = {};
+
+function renderRhBeneficios() {
+  el('rh-benef-body').innerHTML = rhBenefTodos.length ? rhBenefTodos.map(b => `<tr class="rh-linha" onclick="window._editarBeneficio('${b.id}')">
+      <td>
+        <div style="font-weight:600">${esc(b.nome)}</div>
+        ${b.ativo ? '' : '<div style="font-size:11px;color:var(--text-dim)">Inativo</div>'}
+      </td>
+      <td style="color:var(--text-dim)">${TIPO_BENEF[b.tipo] || b.tipo}</td>
+      <td>${moeda(b.valor_padrao)}</td>
+      <td style="color:var(--text-dim)">${Number(b.desconto_percent) ? Number(b.desconto_percent) + '% do salário' : '—'}</td>
+      <td>${rhBenefUso[b.id] || 0}</td>
+    </tr>`).join('')
+  : '<tr><td colspan="5" class="team-empty">Nenhum benefício cadastrado.</td></tr>';
+}
+
+el('rb-tipo').addEventListener('change', e => {
+  const sugestao = DESCONTO_SUGERIDO[e.target.value];
+  el('rb-dica').textContent = sugestao?.dica || '';
+  if (sugestao && !rbEditId) el('rb-desconto').value = sugestao.valor;
+});
+
+window._novoBeneficio = () => {
+  rbEditId = null;
+  el('rb-tipo').innerHTML = Object.entries(TIPO_BENEF).map(([v, l]) => `<option value="${v}">${l}</option>`).join('');
+  el('rb-nome').value = ''; el('rb-valor').value = '';
+  el('rb-tipo').value = 'VALE_TRANSPORTE';
+  el('rb-desconto').value = DESCONTO_SUGERIDO.VALE_TRANSPORTE.valor;
+  el('rb-dica').textContent = DESCONTO_SUGERIDO.VALE_TRANSPORTE.dica;
+  el('rb-ativo').checked = true;
+  el('rb-titulo').textContent = 'Novo benefício';
+  el('rb-msg').className = 'form-msg';
+  openModal('modal-rh-benef');
+};
+
+window._editarBeneficio = (id) => {
+  const b = rhBenefTodos.find(x => x.id === id);
+  if (!b) return;
+  rbEditId = id;
+  el('rb-tipo').innerHTML = Object.entries(TIPO_BENEF).map(([v, l]) => `<option value="${v}">${l}</option>`).join('');
+  el('rb-nome').value = b.nome ?? '';
+  el('rb-tipo').value = b.tipo || 'OUTRO';
+  el('rb-valor').value = b.valor_padrao ?? '';
+  el('rb-desconto').value = b.desconto_percent ?? 0;
+  el('rb-dica').textContent = DESCONTO_SUGERIDO[b.tipo]?.dica || '';
+  el('rb-ativo').checked = b.ativo !== false;
+  el('rb-titulo').textContent = 'Editar benefício';
+  el('rb-msg').className = 'form-msg';
+  openModal('modal-rh-benef');
+};
+
+window._salvarBeneficio = async () => {
+  const btn = el('rb-btn'), orig = btn.textContent;
+  if (!val('rb-nome')) return rbSet('Informe o nome do benefício.');
+  const desconto = Number(val('rb-desconto')) || 0;
+  if (desconto < 0 || desconto > 100) return rbSet('O desconto precisa ficar entre 0% e 100%.');
+
+  const dados = {
+    nome: val('rb-nome'), tipo: val('rb-tipo'),
+    valor_padrao: Number(val('rb-valor')) || 0,
+    desconto_percent: desconto, ativo: el('rb-ativo').checked,
+  };
+
+  btn.textContent = 'Salvando...'; btn.disabled = true;
+  const { error } = rbEditId
+    ? await supabase.from('rh_beneficios').update(dados).eq('id', rbEditId)
+    : await supabase.from('rh_beneficios').insert(dados);
+  btn.textContent = orig; btn.disabled = false;
+  if (error) return rbSet('Não foi possível salvar: ' + error.message);
+
+  await loadRh();
+  rbSet('Benefício salvo.', 'success');
+  setTimeout(() => closeModal('modal-rh-benef'), 1000);
+};
 
 /* ── férias e afastamentos ── */
 const TIPO_AFAST = {
