@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/portal.css?v=9">
+  <link rel="stylesheet" href="css/portal.css?v=10">
   <style>
     .admin-badge {
       font-size: 9px; font-weight: 800;
@@ -807,7 +807,7 @@
           <div class="card">
             <div class="table-scroll">
               <table class="data-table">
-                <thead><tr><th>Cargo</th><th>Setor</th><th>CBO</th><th>Faixa salarial</th><th>Colaboradores</th><th>Ações</th></tr></thead>
+                <thead><tr><th>Cargo</th><th>Setor</th><th>CBO</th><th>Faixa salarial</th><th>Colaboradores</th></tr></thead>
                 <tbody id="rh-cargos-body"></tbody>
               </table>
             </div>
@@ -1194,24 +1194,42 @@
 
 <!-- ══ MODAL: Cargo (RH) ══ -->
 <div class="modal-overlay" id="modal-rh-cargo">
-  <div class="modal-box" style="max-width:460px">
+  <div class="modal-box" style="max-width:470px">
     <button class="modal-close" onclick="closeModal('modal-rh-cargo')">&times;</button>
     <div class="modal-title" id="rg-titulo">Novo cargo</div>
     <div class="modal-sub">Usado no cadastro dos colaboradores</div>
 
-    <div class="form-group"><label>Nome do cargo</label><input type="text" id="rg-nome" maxlength="80"></div>
-    <div class="form-row-2">
-      <div class="form-group"><label>Setor</label><input type="text" id="rg-setor" maxlength="60"></div>
-      <div class="form-group"><label>CBO (opcional)</label><input type="text" id="rg-cbo" maxlength="10" placeholder="0000-00"></div>
+    <div class="form-group" id="rg-bloco-cbo">
+      <label>Cargo (CBO)</label>
+      <div class="cbo-busca">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="rg-cbo-busca" placeholder="Busque pelo nome ou código da CBO" autocomplete="off">
+      </div>
+      <div class="cbo-lista" id="rg-cbo-lista" hidden></div>
+      <div class="cbo-escolhido" id="rg-cbo-escolhido" hidden>
+        <span id="rg-cbo-texto"></span>
+        <button type="button" class="team-btn" onclick="window._limparCbo()">Trocar</button>
+      </div>
+      <button type="button" class="cbo-link" onclick="window._cargoLivre(true)">Não está na lista? Escrever o cargo</button>
     </div>
-    <div class="form-row-2">
-      <div class="form-group"><label>Salário mínimo (R$)</label><input type="number" id="rg-min" min="0" step="0.01"></div>
-      <div class="form-group"><label>Salário máximo (R$)</label><input type="number" id="rg-max" min="0" step="0.01"></div>
-    </div>
-    <div class="form-group"><label>Descrição</label><textarea id="rg-descricao" placeholder="Atribuições do cargo"></textarea></div>
 
-    <div style="display:flex;gap:10px">
-      <button class="btn btn-primary" style="flex:1;justify-content:center" id="rg-btn" onclick="window._salvarCargo()">Cadastrar</button>
+    <div class="form-group" id="rg-bloco-livre" hidden>
+      <label>Nome do cargo</label>
+      <input type="text" id="rg-nome" maxlength="80" placeholder="Ex.: Desenvolvedor de sistemas">
+      <button type="button" class="cbo-link" onclick="window._cargoLivre(false)">Buscar na lista da CBO</button>
+    </div>
+
+    <div class="form-group"><label>Setor</label><input type="text" id="rg-setor" maxlength="60"></div>
+    <div class="form-row-2">
+      <div class="form-group"><label>Salário mínimo da faixa (R$)</label><input type="number" id="rg-min" min="0" step="0.01"></div>
+      <div class="form-group"><label>Salário máximo da faixa (R$)</label><input type="number" id="rg-max" min="0" step="0.01"></div>
+    </div>
+    <div class="form-group"><label>Descrição das atividades</label><textarea id="rg-descricao"></textarea></div>
+
+    <label class="rh-check"><input type="checkbox" id="rg-ativo" checked> Cargo ativo</label>
+
+    <div style="display:flex;gap:10px;margin-top:14px">
+      <button class="btn btn-primary" style="flex:1;justify-content:center" id="rg-btn" onclick="window._salvarCargo()">Salvar cargo</button>
       <button class="btn btn-outline" onclick="closeModal('modal-rh-cargo')">Cancelar</button>
     </div>
     <div class="form-msg" id="rg-msg" role="alert"></div>
@@ -1981,30 +1999,91 @@ async function carregarHistorico(id) {
     : 'Nenhum registro.';
 }
 
-/* ── cargos ── */
+const rgSet = (t, tipo = 'error') => { const m = el('rg-msg'); m.textContent = t; m.className = 'form-msg show ' + tipo; };
+
+// A lista da CBO tem 2.719 ocupações: só vale carregar quando alguém abre o
+// cadastro de cargo, e uma única vez por sessão.
+let CBO = null;
+async function carregarCbo() {
+  if (CBO) return CBO;
+  ({ CBO_OCUPACOES: CBO } = await import('./js/cbo.js'));
+  return CBO;
+}
+
+window._cargoLivre = (livre) => {
+  el('rg-bloco-cbo').hidden = livre;
+  el('rg-bloco-livre').hidden = !livre;
+  if (livre) el('rg-nome').focus(); else el('rg-cbo-busca').focus();
+};
+window._limparCbo = () => {
+  el('rg-cbo-escolhido').hidden = true;
+  el('rg-cbo-busca').value = '';
+  el('rg-cbo-busca').dataset.codigo = '';
+  el('rg-cbo-busca').parentElement.hidden = false;
+  el('rg-cbo-busca').focus();
+};
+function escolherCbo(codigo, titulo) {
+  const campo = el('rg-cbo-busca');
+  campo.dataset.codigo = codigo;
+  campo.dataset.titulo = titulo;
+  campo.parentElement.hidden = true;
+  el('rg-cbo-lista').hidden = true;
+  el('rg-cbo-texto').textContent = `${titulo} · ${codigo}`;
+  el('rg-cbo-escolhido').hidden = false;
+}
+
+el('rg-cbo-busca').addEventListener('input', async e => {
+  const termo = e.target.value.trim().toLowerCase();
+  const lista = el('rg-cbo-lista');
+  if (termo.length < 2) { lista.hidden = true; return; }
+
+  const dados = await carregarCbo();
+  const achados = dados
+    .filter(([codigo, titulo]) => titulo.toLowerCase().includes(termo) || codigo.includes(termo))
+    .slice(0, 8);
+
+  lista.innerHTML = achados.length
+    ? achados.map(([codigo, titulo]) =>
+        `<button type="button" class="cbo-op" data-codigo="${codigo}" data-titulo="${esc(titulo)}">
+           <span>${esc(titulo)}</span><span class="cbo-codigo">${codigo}</span>
+         </button>`).join('')
+    : '<div class="cbo-vazio">Nenhuma ocupação encontrada. Use "Escrever o cargo".</div>';
+  lista.hidden = false;
+});
+el('rg-cbo-lista').addEventListener('click', e => {
+  const op = e.target.closest('.cbo-op');
+  if (op) escolherCbo(op.dataset.codigo, op.dataset.titulo);
+});
+
 function renderRhCargos() {
   const quantos = id => rhColabs.filter(c => c.cargo_id === id && c.situacao !== 'DESLIGADO').length;
   el('rh-cargos-body').innerHTML = rhCargos.length ? rhCargos.map(c => {
     const faixa = c.salario_min || c.salario_max ? `${moeda(c.salario_min)} a ${moeda(c.salario_max)}` : '—';
-    return `<tr>
-      <td style="font-weight:600">${esc(c.nome)}</td>
+    return `<tr class="rh-linha" onclick="window._editarCargo('${c.id}')">
+      <td>
+        <div style="font-weight:600">${esc(c.nome)}</div>
+        ${c.ativo ? '' : '<div style="font-size:11px;color:var(--text-dim)">Inativo</div>'}
+      </td>
       <td style="color:var(--text-dim)">${esc(c.setor || '—')}</td>
       <td style="color:var(--text-dim)">${esc(c.cbo || '—')}</td>
       <td>${faixa}</td>
       <td>${quantos(c.id)}</td>
-      <td><div class="team-actions"><button class="team-btn" onclick="window._editarCargo('${c.id}')">Editar</button></div></td>
     </tr>`;
   }).join('')
-  : '<tr><td colspan="6" class="team-empty">Nenhum cargo cadastrado.</td></tr>';
+  : '<tr><td colspan="5" class="team-empty">Nenhum cargo cadastrado.</td></tr>';
 }
-
-const rgSet = (t, tipo = 'error') => { const m = el('rg-msg'); m.textContent = t; m.className = 'form-msg show ' + tipo; };
 
 window._novoCargo = () => {
   rgEditId = null;
-  ['rg-nome','rg-setor','rg-cbo','rg-min','rg-max','rg-descricao'].forEach(id => el(id).value = '');
+  ['rg-nome','rg-setor','rg-min','rg-max','rg-descricao','rg-cbo-busca'].forEach(id => el(id).value = '');
+  el('rg-cbo-busca').dataset.codigo = '';
+  el('rg-cbo-busca').dataset.titulo = '';
+  el('rg-cbo-escolhido').hidden = true;
+  el('rg-cbo-lista').hidden = true;
+  el('rg-cbo-busca').parentElement.hidden = false;
+  el('rg-ativo').checked = true;
+  window._cargoLivre(false);
   el('rg-titulo').textContent = 'Novo cargo';
-  el('rg-btn').textContent = 'Cadastrar';
   el('rg-msg').className = 'form-msg';
   openModal('modal-rh-cargo');
 };
@@ -2013,32 +2092,54 @@ window._editarCargo = (id) => {
   const c = rhCargos.find(x => x.id === id);
   if (!c) return;
   rgEditId = id;
-  const v = (campo, valor) => el(campo).value = valor ?? '';
-  v('rg-nome', c.nome); v('rg-setor', c.setor); v('rg-cbo', c.cbo);
-  v('rg-min', c.salario_min); v('rg-max', c.salario_max); v('rg-descricao', c.descricao);
+  el('rg-setor').value = c.setor ?? '';
+  el('rg-min').value = c.salario_min ?? '';
+  el('rg-max').value = c.salario_max ?? '';
+  el('rg-descricao').value = c.descricao ?? '';
+  el('rg-ativo').checked = c.ativo !== false;
+  el('rg-cbo-lista').hidden = true;
+
+  // Cargo veio da CBO: mostra a ocupação escolhida. Sem código, é texto livre.
+  if (c.cbo) {
+    window._cargoLivre(false);
+    escolherCbo(c.cbo, c.nome);
+  } else {
+    el('rg-nome').value = c.nome ?? '';
+    window._cargoLivre(true);
+  }
   el('rg-titulo').textContent = 'Editar cargo';
-  el('rg-btn').textContent = 'Salvar alterações';
   el('rg-msg').className = 'form-msg';
   openModal('modal-rh-cargo');
 };
 
 window._salvarCargo = async () => {
   const btn = el('rg-btn'), orig = btn.textContent;
-  if (!val('rg-nome')) return rgSet('Informe o nome do cargo.');
+  const livre = !el('rg-bloco-livre').hidden;
+  const nome = livre ? val('rg-nome') : (el('rg-cbo-busca').dataset.titulo || '');
+  const cbo  = livre ? null : (el('rg-cbo-busca').dataset.codigo || null);
+  if (!nome) return rgSet(livre ? 'Informe o nome do cargo.' : 'Escolha uma ocupação da CBO.');
+
+  const min = val('rg-min') ? Number(val('rg-min')) : null;
+  const max = val('rg-max') ? Number(val('rg-max')) : null;
+  if (min !== null && max !== null && min > max) return rgSet('O salário mínimo não pode ser maior que o máximo.');
+
   const dados = {
-    nome: val('rg-nome'), setor: val('rg-setor') || null, cbo: val('rg-cbo') || null,
-    salario_min: val('rg-min') ? Number(val('rg-min')) : null,
-    salario_max: val('rg-max') ? Number(val('rg-max')) : null,
+    nome, cbo, setor: val('rg-setor') || null,
+    salario_min: min, salario_max: max,
     descricao: val('rg-descricao') || null,
+    ativo: el('rg-ativo').checked,
   };
+
   btn.textContent = 'Salvando...'; btn.disabled = true;
   const { error } = rgEditId
     ? await supabase.from('rh_cargos').update(dados).eq('id', rgEditId)
     : await supabase.from('rh_cargos').insert(dados);
   btn.textContent = orig; btn.disabled = false;
   if (error) return rgSet('Não foi possível salvar: ' + error.message);
+
   await loadRh();
   rgSet('Cargo salvo.', 'success');
+  setTimeout(() => closeModal('modal-rh-cargo'), 1000);
 };
 
 /* ── auditoria ── */
