@@ -752,6 +752,8 @@
           <button class="rh-aba" data-rh="afastamentos">Férias e Afastamentos</button>
           <button class="rh-aba" data-rh="beneficios">Benefícios</button>
           <button class="rh-aba" data-rh="documentos">Documentos e Contratos</button>
+          <button class="rh-aba" data-rh="pagamentos">Histórico de Pagamentos</button>
+          <button class="rh-aba" data-rh="relatorios">Relatórios de RH</button>
         </nav>
 
         <!-- Visão geral -->
@@ -846,7 +848,63 @@
             </div>
           </div>
         </div>
-        <div class="rh-painel" id="rh-documentos"><div class="card rh-embreve">Documentos e contratos — em construção.</div></div>
+        <div class="rh-painel" id="rh-documentos">
+          <div class="form-group"><input type="text" id="rh-doc-busca" placeholder="Buscar por colaborador ou arquivo"></div>
+          <div class="form-group"><select id="rh-doc-filtro"><option value="">Todos os tipos</option></select></div>
+          <div class="rh-bloco-texto">Para enviar um documento, abra o cadastro do colaborador, na aba Documentos. Cada download fica registrado.</div>
+          <div class="card">
+            <div class="table-scroll">
+              <table class="data-table">
+                <thead><tr><th>Arquivo</th><th>Colaborador</th><th>Tipo</th><th>Enviado em</th><th>Validade</th><th>Ações</th></tr></thead>
+                <tbody id="rh-docs-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Histórico de pagamentos -->
+        <div class="rh-painel" id="rh-pagamentos">
+          <div class="sertlink-resumo" id="rh-pag-resumo" style="grid-template-columns:repeat(3,1fr);margin-bottom:18px"></div>
+          <div class="form-group"><input type="text" id="rh-pag-busca" placeholder="Buscar por colaborador, descrição ou competência"></div>
+          <div class="card">
+            <div class="table-scroll">
+              <table class="data-table">
+                <thead><tr><th>Data</th><th>Competência</th><th>Colaborador</th><th>Descrição</th><th>Valor</th></tr></thead>
+                <tbody id="rh-pag-body"></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="rh-bloco-texto" style="margin-top:14px">
+            Extrato do que já foi pago à equipe. Nada é digitado aqui: as linhas vêm da folha aprovada e dos custos de pessoal marcados como pagos, e por isso não podem ser alteradas à mão.
+          </div>
+        </div>
+
+        <!-- Relatórios de RH -->
+        <div class="rh-painel" id="rh-relatorios">
+          <div class="card" style="margin-bottom:22px">
+            <div class="card-title" style="margin-bottom:4px">Relatório de RH</div>
+            <div class="rh-bloco-texto">
+              Colaboradores, folhas das competências do período (bruto, descontos, líquido, encargos e custo), custos de pessoal provisionados, a pagar e pagos, e férias e afastamentos.
+            </div>
+            <div class="rh-add-linha" style="grid-template-columns:1fr 1fr auto auto;margin-top:0">
+              <div class="form-group" style="margin:0"><label>De</label><input type="date" id="rh-rel-de"></div>
+              <div class="form-group" style="margin:0"><label>Até</label><input type="date" id="rh-rel-ate"></div>
+              <button class="btn btn-primary" style="height:42px" onclick="window._relatorioPdf()">Baixar em PDF</button>
+              <button class="btn btn-outline" style="height:42px" onclick="window._relatorioCsv()">Baixar em Excel</button>
+            </div>
+          </div>
+
+          <div class="card-title" style="margin-bottom:3px">Histórico de acessos a dados sensíveis</div>
+          <div class="rh-bloco-texto">Quem visualizou ou alterou salários, documentos e a folha.</div>
+          <div class="card">
+            <div class="table-scroll">
+              <table class="data-table">
+                <thead><tr><th>Data</th><th>Pessoa</th><th>Ação</th><th>O quê</th><th>Detalhe</th></tr></thead>
+                <tbody id="rh-audit-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
       </section>
 
       <!-- ════════════ EQUIPE ════════════ -->
@@ -1631,7 +1689,7 @@ const TIPO_DOC = {
   CONTRATO:'Contrato', DOCUMENTO_PESSOAL:'Documento pessoal', COMPROVANTE:'Comprovante',
   ATESTADO:'Atestado', TERMO:'Termo / aditivo', OUTRO:'Outro',
 };
-let rhCargos = [], rhColabs = [], rhAfastamentos = [], rhBeneficios = [];
+let rhCargos = [], rhColabs = [], rhAfastamentos = [], rhBeneficios = [], rhFolhas = [];
 let rcEditId = null, rgEditId = null;
 
 const moeda = v => 'R$ ' + Number(v || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
@@ -1656,26 +1714,34 @@ document.querySelectorAll('#rc-abas .rh-aba').forEach(b => b.addEventListener('c
 
 async function loadRh() {
   if (!isGestor) return;
-  const [cg, co, af, bn, uso] = await Promise.all([
+  const [cg, co, af, bn, uso, fl] = await Promise.all([
     supabase.from('rh_cargos').select('*').order('nome'),
     supabase.from('rh_colaboradores').select('*').order('nome'),
     supabase.from('rh_afastamentos').select('*').order('inicio', { ascending: false }),
     supabase.from('rh_beneficios').select('*').order('nome'),
     supabase.from('rh_colaborador_beneficios').select('beneficio_id'),
+    supabase.from('rh_folhas').select('*').order('competencia', { ascending: false }),
   ]);
   rhCargos = cg.data || [];
   rhColabs = co.data || [];
   rhAfastamentos = af.data || [];
+  rhFolhas = fl.data || [];
   rhBenefTodos = bn.data || [];
   rhBeneficios = rhBenefTodos.filter(b => b.ativo);   // só os ativos entram na escolha
   rhBenefUso = {};
   (uso.data || []).forEach(u => { rhBenefUso[u.beneficio_id] = (rhBenefUso[u.beneficio_id] || 0) + 1; });
   montarSelectsRh();
+  if (!val('rh-rel-de')) {
+    const hoje = new Date().toISOString().slice(0, 10);
+    el('rh-rel-de').value = hoje.slice(0, 4) + '-01-01';
+    el('rh-rel-ate').value = hoje;
+  }
   renderRhVisao();
   renderRhColabs();
   renderRhCargos();
   renderRhAfastamentos();
   renderRhBeneficios();
+  await loadRhLeitura();
 }
 
 function montarSelectsRh() {
@@ -1685,6 +1751,8 @@ function montarSelectsRh() {
   el('rc-cargo').innerHTML = '<option value="">Sem cargo</option>' +
     rhCargos.filter(c => c.ativo).map(c => `<option value="${c.id}">${esc(c.nome)}</option>`).join('');
   el('rc-uf').innerHTML = '<option value="">—</option>' + UFS.map(u => `<option>${u}</option>`).join('');
+  el('rh-doc-filtro').innerHTML = '<option value="">Todos os tipos</option>' +
+    Object.entries(TIPO_DOC).map(([v, l]) => `<option value="${v}">${l}</option>`).join('');
   el('rh-f-tipo').innerHTML = '<option value="">Todos os tipos</option>' +
     Object.entries(TIPO_AFAST).map(([v, l]) => `<option value="${v}">${l}</option>`).join('');
   el('rc-ben-sel').innerHTML = '<option value="">Escolha</option>' +
@@ -2092,6 +2160,209 @@ async function carregarHistorico(id) {
       </div>`).join('')
     : 'Nenhum registro.';
 }
+
+/* ── documentos, pagamentos e relatórios ── */
+// Estas três telas só leem o que foi registrado em outros pontos do RH.
+let rhDocs = [], rhPagamentos = [], rhAuditoria = [];
+
+async function loadRhLeitura() {
+  if (!isGestor) return;
+  const [docs, itens, custos, audit] = await Promise.all([
+    supabase.from('rh_documentos').select('*').order('created_at', { ascending: false }),
+    supabase.from('rh_folha_itens').select('*').eq('status_pagamento', 'PAGO'),
+    supabase.from('rh_custos').select('*').eq('status', 'PAGO'),
+    supabase.from('rh_auditoria').select('*').order('created_at', { ascending: false }).limit(200),
+  ]);
+  rhDocs = docs.data || [];
+  rhAuditoria = audit.data || [];
+
+  const folhaPorId = Object.fromEntries(rhFolhas.map(f => [f.id, f.competencia]));
+  rhPagamentos = [
+    ...(itens.data || []).map(i => ({
+      data: i.pago_em, competencia: folhaPorId[i.folha_id] || '—', quem: i.colaborador_nome,
+      descricao: 'Salário líquido', valor: Number(i.salario_liquido), grupo: 'salario',
+    })),
+    ...(custos.data || []).map(c => ({
+      data: c.pago_em, competencia: c.competencia, quem: '—',
+      descricao: c.descricao, valor: Number(c.valor), grupo: 'encargo',
+    })),
+  ].sort((a, b) => new Date(b.data || 0) - new Date(a.data || 0));
+
+  renderRhDocs();
+  renderRhPagamentos();
+  renderRhAuditoria();
+}
+
+/* documentos de toda a equipe */
+function renderRhDocs() {
+  const busca = val('rh-doc-busca').toLowerCase();
+  const tipo  = val('rh-doc-filtro');
+  const nomes = Object.fromEntries(rhColabs.map(c => [c.id, c.nome]));
+
+  const lista = rhDocs.filter(d => {
+    if (tipo && d.tipo !== tipo) return false;
+    if (busca && !`${nomes[d.colaborador_id] || ''} ${d.nome}`.toLowerCase().includes(busca)) return false;
+    return true;
+  });
+
+  el('rh-docs-body').innerHTML = lista.length ? lista.map(d => `<tr>
+      <td style="font-weight:600">${esc(d.nome)}</td>
+      <td>${esc(nomes[d.colaborador_id] || '—')}</td>
+      <td style="color:var(--text-dim)">${TIPO_DOC[d.tipo] || d.tipo}</td>
+      <td style="color:var(--text-dim);font-size:12px">${fmtDate(d.created_at)}</td>
+      <td style="color:var(--text-dim);font-size:12px">${d.valido_ate ? fmtDate(d.valido_ate) : '—'}</td>
+      <td><div class="team-actions"><button class="team-btn" onclick="window._baixarDocLista('${d.caminho}','${d.colaborador_id}')">Baixar</button></div></td>
+    </tr>`).join('')
+  : `<tr><td colspan="6" class="team-empty">${rhDocs.length ? 'Nenhum documento para a busca.' : 'Nenhum documento.'}</td></tr>`;
+}
+window._baixarDocLista = async (caminho, colaboradorId) => {
+  const { data, error } = await supabase.storage.from('rh-documentos').createSignedUrl(caminho, 60);
+  if (error) return alert('Não foi possível abrir: ' + error.message);
+  window.open(data.signedUrl, '_blank');
+  await registrarRh('VISUALIZOU', 'Documento', caminho, colaboradorId);
+};
+
+/* histórico de pagamentos */
+function renderRhPagamentos() {
+  const busca = val('rh-pag-busca').toLowerCase();
+  const lista = rhPagamentos.filter(p =>
+    !busca || `${p.quem} ${p.descricao} ${p.competencia}`.toLowerCase().includes(busca));
+
+  const soma = g => rhPagamentos.filter(p => !g || p.grupo === g).reduce((t, p) => t + p.valor, 0);
+  el('rh-pag-resumo').innerHTML = [
+    { label: 'Total pago', valor: soma(null), cor: 'var(--text)' },
+    { label: 'Salários pagos', valor: soma('salario'), cor: 'var(--green)' },
+    { label: 'Encargos e benefícios pagos', valor: soma('encargo'), cor: 'var(--orange)' },
+  ].map(c => `<div class="resumo-card">
+      <div class="resumo-valor" style="color:${c.cor};font-size:17px">${moeda(c.valor)}</div>
+      <div class="resumo-label">${c.label}</div>
+    </div>`).join('');
+
+  el('rh-pag-body').innerHTML = lista.length ? lista.map(p => `<tr>
+      <td style="color:var(--text-dim);font-size:12px">${fmtDate(p.data)}</td>
+      <td>${esc(competenciaLabel(p.competencia))}</td>
+      <td style="font-weight:600">${esc(p.quem)}</td>
+      <td style="color:var(--text-dim)">${esc(p.descricao)}</td>
+      <td>${moeda(p.valor)}</td>
+    </tr>`).join('')
+  : `<tr><td colspan="5" class="team-empty">${rhPagamentos.length ? 'Nada para a busca.' : 'Nenhum pagamento registrado.'}</td></tr>`;
+}
+const MESES = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+function competenciaLabel(c) {
+  if (!c || !c.includes('-')) return c || '—';
+  const [ano, mes] = c.split('-');
+  return `${MESES[Number(mes) - 1] || mes}/${ano}`;
+}
+
+/* histórico de acessos */
+function renderRhAuditoria() {
+  const acao = { CRIOU:'Criou', ALTEROU:'Alterou', EXCLUIU:'Removeu', VISUALIZOU:'Visualizou' };
+  el('rh-audit-body').innerHTML = rhAuditoria.length ? rhAuditoria.map(a => `<tr>
+      <td style="color:var(--text-dim);font-size:12px;white-space:nowrap">${fmtDateTime(a.created_at)}</td>
+      <td style="font-weight:600">${esc(a.autor_nome || '—')}</td>
+      <td><span class="status status-pending">${acao[a.acao] || a.acao}</span></td>
+      <td>${esc(a.alvo)}</td>
+      <td style="color:var(--text-dim)">${esc(a.detalhe || '—')}</td>
+    </tr>`).join('')
+  : '<tr><td colspan="5" class="team-empty">Nenhum acesso registrado.</td></tr>';
+}
+
+['rh-doc-busca','rh-doc-filtro'].forEach(id => el(id).addEventListener('input', renderRhDocs));
+el('rh-pag-busca').addEventListener('input', renderRhPagamentos);
+
+/* relatório */
+function dadosRelatorio() {
+  const de  = val('rh-rel-de')  || '0000-01-01';
+  const ate = val('rh-rel-ate') || '9999-12-31';
+  const dentro = d => d && d.slice(0, 10) >= de && d.slice(0, 10) <= ate;
+  return {
+    de, ate,
+    colaboradores: rhColabs.filter(c => c.situacao !== 'DESLIGADO'),
+    folhas: rhFolhas.filter(f => f.created_at && dentro(f.created_at)),
+    pagamentos: rhPagamentos.filter(p => dentro(p.data)),
+    afastamentos: rhAfastamentos.filter(a => a.status !== 'CANCELADO' && a.inicio <= ate && a.fim >= de),
+  };
+}
+
+window._relatorioPdf = () => {
+  const d = dadosRelatorio();
+  const periodo = `${fmtDate(d.de)} a ${fmtDate(d.ate)}`;
+  const nomes = Object.fromEntries(rhColabs.map(c => [c.id, c.nome]));
+  const cargo = id => rhCargos.find(c => c.id === id)?.nome || '—';
+
+  const tabela = (titulo, cabecalho, linhas) => `
+    <h2>${titulo}</h2>
+    <table><thead><tr>${cabecalho.map(c => `<th>${c}</th>`).join('')}</tr></thead>
+    <tbody>${linhas.length ? linhas.map(l => `<tr>${l.map(c => `<td>${c}</td>`).join('')}</tr>`).join('')
+      : `<tr><td colspan="${cabecalho.length}">Nada no período.</td></tr>`}</tbody></table>`;
+
+  const doc = `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="utf-8">
+<title>Relatório de RH — SertCode</title>
+<style>
+  body { font-family: Arial, Helvetica, sans-serif; color:#111; margin:32px; }
+  h1 { font-size:20px; margin:0 0 4px; }
+  h2 { font-size:14px; margin:26px 0 8px; }
+  .sub { color:#666; font-size:12px; }
+  table { width:100%; border-collapse:collapse; font-size:11.5px; }
+  th, td { border-bottom:1px solid #e5e5e5; padding:7px 6px; text-align:left; }
+  th { background:#f5f5f5; }
+  .rodape { margin-top:26px; font-size:11px; color:#888; }
+</style></head><body>
+  <h1>Relatório de RH</h1>
+  <div class="sub">SertCode · período de ${periodo}</div>
+  ${tabela('Colaboradores', ['Nome','Cargo','Vínculo','Admissão','Salário-base'],
+    d.colaboradores.map(c => [esc(c.nome), esc(cargo(c.cargo_id)), VINCULOS[c.vinculo] || c.vinculo,
+      c.data_admissao ? fmtDate(c.data_admissao) : '—', moeda(c.salario_base)]))}
+  ${tabela('Folhas do período', ['Competência','Situação','Vencimento','Aprovada por'],
+    d.folhas.map(f => [competenciaLabel(f.competencia), esc(f.status), fmtDate(f.vencimento), esc(f.aprovada_por || '—')]))}
+  ${tabela('Pagamentos', ['Data','Competência','Colaborador','Descrição','Valor'],
+    d.pagamentos.map(p => [fmtDate(p.data), competenciaLabel(p.competencia), esc(p.quem), esc(p.descricao), moeda(p.valor)]))}
+  ${tabela('Férias e afastamentos', ['Colaborador','Tipo','Início','Fim','Dias'],
+    d.afastamentos.map(a => [esc(nomes[a.colaborador_id] || '—'), TIPO_AFAST[a.tipo] || a.tipo,
+      fmtDate(a.inicio), fmtDate(a.fim), diasEntre(a.inicio, a.fim)]))}
+  <div class="rodape">Emitido em ${fmtDateTime(new Date())} — controle interno da SertCode. Não substitui a folha oficial do contador nem o eSocial.</div>
+</body></html>`;
+
+  const janela = window.open('', '_blank');
+  if (!janela) return alert('Libere as janelas pop-up para gerar o PDF.');
+  janela.document.write(doc);
+  janela.document.close();
+  janela.focus();
+  setTimeout(() => janela.print(), 400);
+  registrarRh('VISUALIZOU', 'Relatório de RH', `PDF · ${periodo}`);
+};
+
+// CSV com ponto e vírgula e BOM: é o que o Excel em português abre sem
+// pedir importação e sem embaralhar os acentos.
+window._relatorioCsv = () => {
+  const d = dadosRelatorio();
+  const cargo = id => rhCargos.find(c => c.id === id)?.nome || '';
+  const nomes = Object.fromEntries(rhColabs.map(c => [c.id, c.nome]));
+  const campo = v => `"${String(v ?? '').replace(/"/g, '""')}"`;
+  const num = v => `"${Number(v || 0).toFixed(2).replace('.', ',')}"`;
+
+  const linhas = [['SEÇÃO','A','B','C','D','E']];
+  linhas.push([], ['COLABORADORES'], ['Nome','Cargo','Vínculo','Admissão','Salário-base']);
+  d.colaboradores.forEach(c => linhas.push([c.nome, cargo(c.cargo_id), VINCULOS[c.vinculo] || c.vinculo,
+    c.data_admissao || '', Number(c.salario_base || 0).toFixed(2).replace('.', ',')]));
+  linhas.push([], ['FOLHAS'], ['Competência','Situação','Vencimento','Aprovada por']);
+  d.folhas.forEach(f => linhas.push([competenciaLabel(f.competencia), f.status, f.vencimento || '', f.aprovada_por || '']));
+  linhas.push([], ['PAGAMENTOS'], ['Data','Competência','Colaborador','Descrição','Valor']);
+  d.pagamentos.forEach(p => linhas.push([p.data ? p.data.slice(0, 10) : '', competenciaLabel(p.competencia),
+    p.quem, p.descricao, Number(p.valor).toFixed(2).replace('.', ',')]));
+  linhas.push([], ['FÉRIAS E AFASTAMENTOS'], ['Colaborador','Tipo','Início','Fim','Dias']);
+  d.afastamentos.forEach(a => linhas.push([nomes[a.colaborador_id] || '', TIPO_AFAST[a.tipo] || a.tipo,
+    a.inicio, a.fim, diasEntre(a.inicio, a.fim)]));
+
+  const csv = '\uFEFF' + linhas.map(l => l.map(campo).join(';')).join('\r\n');
+  const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `relatorio-rh-${d.de}-a-${d.ate}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+  registrarRh('VISUALIZOU', 'Relatório de RH', `Excel · ${fmtDate(d.de)} a ${fmtDate(d.ate)}`);
+};
 
 /* ── catálogo de benefícios ── */
 const TIPO_BENEF = {
@@ -3378,6 +3649,11 @@ document.addEventListener('keydown', e => {
 });
 document.getElementById('prog-slider').addEventListener('input', function() {
   document.getElementById('prog-display').textContent = this.value+'%';
+});
+
+// Abrir a Gestão de Pessoas expõe salários: a LGPD pede registro de quem viu.
+document.querySelector('.sidebar-nav a[data-tab="pessoas"]')?.addEventListener('click', () => {
+  registrarRh('VISUALIZOU', 'Gestão de Pessoas', 'Abriu a Gestão de Pessoas com salários');
 });
 
 const tabTitles = {dashboard:'Dashboard',clientes:'Clientes',projetos:'Projetos',chamados:'Chamados',arquivos:'Arquivos',financeiro:'Financeiro',depoimentos:'Depoimentos',feedbacks:'Feedbacks',pessoas:'Gestão de Pessoas',equipe:'Equipe'};
