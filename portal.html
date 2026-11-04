@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/portal.css">
+  <link rel="stylesheet" href="css/portal.css?v=6">
 </head>
 <body>
 
@@ -742,14 +742,25 @@ async function loadPortalData() {
 
   if (tickets?.length) {
     const tbody = document.querySelector('#tab-suporte .data-table tbody');
+    // A resposta da equipe vem logo abaixo do chamado: é o que o cliente
+    // abre o portal para ver, e ficava invisível até agora.
     tbody.innerHTML = tickets.map((t, i) => `
       <tr>
         <td><span class="ticket-id">#SC-${String(i+1).padStart(3,'0')}</span></td>
-        <td>${t.subject}</td>
+        <td>${escapeHtml(t.subject)}</td>
         <td style="color:var(--text-dim)">${labelType(t.type)}</td>
         <td style="color:var(--text-dim)">${formatDate(t.created_at)}</td>
         <td><span class="status ${statusClass(t.status)}">${labelStatus2(t.status)}</span></td>
       </tr>
+      ${t.description ? `<tr class="ticket-detalhe"><td colspan="5">
+        <div class="ticket-descricao">${escapeHtml(t.description)}</div>
+      </td></tr>` : ''}
+      ${t.response ? `<tr class="ticket-detalhe"><td colspan="5">
+        <div class="ticket-resposta">
+          <div class="ticket-resposta-topo">Resposta da SertCode${t.updated_at ? ` · ${formatDate(t.updated_at)}` : ''}</div>
+          ${escapeHtml(t.response)}
+        </div>
+      </td></tr>` : ''}
     `).join('');
 
     const open = tickets.filter(t => t.status !== 'done').length;
@@ -843,6 +854,9 @@ async function loadPortalData() {
 }
 
 /* ── HELPERS ── */
+function escapeHtml(v) {
+  return String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
 function labelStatus(s) {
   return { cadastrado:'Cadastrado', andamento:'Em andamento', pausado:'Pausado',
            cancelado:'Cancelado', concluido:'Concluído' }[s] || s;

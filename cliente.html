@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/portal.css">
+  <link rel="stylesheet" href="css/portal.css?v=6">
 </head>
 <body>
 
@@ -51,10 +51,47 @@
       <div id="login-error" style="display:none;margin-top:12px;font-size:12.5px;color:#EF4444;text-align:center;padding:10px;background:rgba(239,68,68,0.07);border-radius:8px;border:1px solid rgba(239,68,68,0.2)">
         Credenciais inválidas. Verifique seu e-mail e senha.
       </div>
+      <p class="login-switch"><button type="button" id="abrir-recuperar">Esqueci minha senha</button></p>
     </form>
 
+    <!-- ══ RECUPERAR SENHA ══ -->
+    <section id="view-recuperar" hidden>
+      <div class="login-title">Recuperar senha</div>
+      <div class="login-sub">Informe o e-mail do seu acesso. Enviaremos um link para você criar uma senha nova.</div>
+
+      <form class="login-form" id="recuperar-form" novalidate>
+        <div class="form-group">
+          <label for="rec-email">E-mail</label>
+          <input type="email" id="rec-email" placeholder="seu@email.com.br" required autocomplete="email">
+        </div>
+        <button type="submit" class="btn btn-primary" id="rec-btn">Enviar link de recuperação</button>
+        <div class="form-msg" id="rec-msg" role="alert"></div>
+      </form>
+
+      <p class="login-switch">Lembrou a senha? <button type="button" id="voltar-login">Entrar</button></p>
+    </section>
+
+    <!-- ══ DEFINIR NOVA SENHA (chegou pelo link do e-mail) ══ -->
+    <section id="view-nova-senha" hidden>
+      <div class="login-title">Criar nova senha</div>
+      <div class="login-sub">Escolha a senha que você vai usar para entrar na Área do Cliente.</div>
+
+      <form class="login-form" id="nova-senha-form" novalidate>
+        <div class="form-group">
+          <label for="ns-senha">Nova senha</label>
+          <input type="password" id="ns-senha" placeholder="Mínimo 8 caracteres" required autocomplete="new-password" minlength="8">
+        </div>
+        <div class="form-group">
+          <label for="ns-senha2">Confirmar senha</label>
+          <input type="password" id="ns-senha2" placeholder="Repita a senha" required autocomplete="new-password" minlength="8">
+        </div>
+        <button type="submit" class="btn btn-primary" id="ns-btn">Salvar e entrar</button>
+        <div class="form-msg" id="ns-msg" role="alert"></div>
+      </form>
+    </section>
+
     <!-- Demo note -->
-    <div style="margin-top:20px;padding:13px 14px;background:rgba(255,106,0,0.05);border:1px solid rgba(255,106,0,0.14);border-radius:10px;font-size:12px;color:#666;text-align:center;line-height:1.7">
+    <div id="login-extra" style="margin-top:20px;padding:13px 14px;background:rgba(255,106,0,0.05);border:1px solid rgba(255,106,0,0.14);border-radius:10px;font-size:12px;color:#666;text-align:center;line-height:1.7">
       🔐 Acesso exclusivo para clientes SertCode.<br>
       Ainda não é cliente?
       <a href="index.html#contato" style="color:var(--orange);font-weight:600">Solicite um orçamento →</a>
@@ -67,6 +104,70 @@
 
 <script type="module">
 import { supabase } from './js/supabase.js'
+
+const $ = id => document.getElementById(id);
+const msgSet = (id, texto, tipo = 'error') => {
+  const el = $(id); el.textContent = texto; el.className = 'form-msg show ' + tipo;
+};
+
+/* ── ALTERNAR ENTRE LOGIN, RECUPERAÇÃO E NOVA SENHA ── */
+function mostrarTela(tela) {
+  $('login-form').hidden       = tela !== 'login';
+  $('login-extra').hidden      = tela !== 'login';
+  $('view-recuperar').hidden   = tela !== 'recuperar';
+  $('view-nova-senha').hidden  = tela !== 'nova-senha';
+  document.querySelector('.login-title').hidden = tela !== 'login';
+  document.querySelector('.login-sub').hidden   = tela !== 'login';
+}
+$('abrir-recuperar').addEventListener('click', () => mostrarTela('recuperar'));
+$('voltar-login').addEventListener('click', () => mostrarTela('login'));
+
+// O link enviado por e-mail volta para cá já com uma sessão de recuperação:
+// nesse caso a pessoa não digita senha antiga, apenas define a nova.
+supabase.auth.onAuthStateChange((evento) => {
+  if (evento === 'PASSWORD_RECOVERY') mostrarTela('nova-senha');
+});
+
+/* ── PEDIR O LINK ── */
+$('recuperar-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const email = $('rec-email').value.trim();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return msgSet('rec-msg', 'Informe um e-mail válido.');
+
+  const btn = $('rec-btn'), orig = btn.textContent;
+  btn.textContent = 'Enviando...'; btn.disabled = true;
+
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: new URL('cliente.html', location.href).href,
+  });
+
+  btn.textContent = orig; btn.disabled = false;
+  // A mensagem não revela se o e-mail existe: dizer "não encontrado" permitiria
+  // descobrir quem é cliente da SertCode.
+  msgSet('rec-msg', error
+    ? 'Não foi possível enviar agora. Tente novamente em instantes.'
+    : 'Se este e-mail tiver acesso, o link de recuperação chegará em instantes. Verifique também a caixa de spam.',
+    error ? 'error' : 'success');
+});
+
+/* ── DEFINIR A NOVA SENHA ── */
+$('nova-senha-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const senha = $('ns-senha').value, senha2 = $('ns-senha2').value;
+  if (senha.length < 8)   return msgSet('ns-msg', 'A senha precisa ter pelo menos 8 caracteres.');
+  if (senha !== senha2)   return msgSet('ns-msg', 'As senhas não conferem.');
+
+  const btn = $('ns-btn'), orig = btn.textContent;
+  btn.textContent = 'Salvando...'; btn.disabled = true;
+
+  const { error } = await supabase.auth.updateUser({ password: senha });
+  if (error) {
+    btn.textContent = orig; btn.disabled = false;
+    return msgSet('ns-msg', 'Não foi possível salvar: ' + error.message);
+  }
+  msgSet('ns-msg', 'Senha alterada. Entrando...', 'success');
+  setTimeout(() => { window.location.href = 'portal.html'; }, 900);
+});
 
 document.getElementById('login-form').addEventListener('submit', async function(e) {
   e.preventDefault();
