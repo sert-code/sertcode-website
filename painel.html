@@ -815,7 +815,23 @@
         </div>
 
         <div class="rh-painel" id="rh-folha"><div class="card rh-embreve">Folha de pagamento — em construção.</div></div>
-        <div class="rh-painel" id="rh-afastamentos"><div class="card rh-embreve">Férias e afastamentos — em construção.</div></div>
+        <div class="rh-painel" id="rh-afastamentos">
+          <div class="rh-add-linha" style="grid-template-columns:1fr auto;margin-top:0;margin-bottom:18px">
+            <div class="form-group" style="margin:0">
+              <label>Tipo</label>
+              <select id="rh-f-tipo"><option value="">Todos os tipos</option></select>
+            </div>
+            <button class="btn btn-primary" style="height:42px" onclick="window._programarAfastamento()">+ Programar</button>
+          </div>
+          <div class="card">
+            <div class="table-scroll">
+              <table class="data-table">
+                <thead><tr><th>Colaborador</th><th>Tipo</th><th>Período</th><th>Dias</th><th>Situação</th><th>Ações</th></tr></thead>
+                <tbody id="rh-afast-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
         <div class="rh-painel" id="rh-beneficios"><div class="card rh-embreve">Benefícios — em construção.</div></div>
         <div class="rh-painel" id="rh-documentos"><div class="card rh-embreve">Documentos e contratos — em construção.</div></div>
       </section>
@@ -1189,6 +1205,29 @@
       <button class="btn btn-outline" onclick="closeModal('modal-rh-colab')">Cancelar</button>
     </div>
     <div class="form-msg" id="rc-msg" role="alert"></div>
+  </div>
+</div>
+
+<!-- ══ MODAL: Férias e afastamento ══ -->
+<div class="modal-overlay" id="modal-rh-afast">
+  <div class="modal-box" style="max-width:440px">
+    <button class="modal-close" onclick="closeModal('modal-rh-afast')">&times;</button>
+    <div class="modal-title">Programar férias ou afastamento</div>
+    <div class="modal-sub">Fica registrado no histórico do colaborador</div>
+
+    <div class="form-group"><label>Colaborador</label><select id="ra-colab"></select></div>
+    <div class="form-group"><label>Tipo</label><select id="ra-tipo"></select></div>
+    <div class="form-row-2">
+      <div class="form-group"><label>Início</label><input type="date" id="ra-inicio"></div>
+      <div class="form-group"><label>Fim</label><input type="date" id="ra-fim"></div>
+    </div>
+    <div class="form-group"><label>Observação</label><input type="text" id="ra-obs" maxlength="200"></div>
+
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-primary" style="flex:1;justify-content:center" id="ra-btn" onclick="window._salvarAfastamento()">Salvar</button>
+      <button class="btn btn-outline" onclick="closeModal('modal-rh-afast')">Cancelar</button>
+    </div>
+    <div class="form-msg" id="ra-msg" role="alert"></div>
   </div>
 </div>
 
@@ -1577,7 +1616,7 @@ async function loadRh() {
   const [cg, co, af, bn] = await Promise.all([
     supabase.from('rh_cargos').select('*').order('nome'),
     supabase.from('rh_colaboradores').select('*').order('nome'),
-    supabase.from('rh_afastamentos').select('*').eq('status','PROGRAMADO').order('inicio'),
+    supabase.from('rh_afastamentos').select('*').order('inicio', { ascending: false }),
     supabase.from('rh_beneficios').select('*').eq('ativo', true).order('nome'),
   ]);
   rhCargos = cg.data || [];
@@ -1588,6 +1627,7 @@ async function loadRh() {
   renderRhVisao();
   renderRhColabs();
   renderRhCargos();
+  renderRhAfastamentos();
 }
 
 function montarSelectsRh() {
@@ -1597,6 +1637,8 @@ function montarSelectsRh() {
   el('rc-cargo').innerHTML = '<option value="">Sem cargo</option>' +
     rhCargos.filter(c => c.ativo).map(c => `<option value="${c.id}">${esc(c.nome)}</option>`).join('');
   el('rc-uf').innerHTML = '<option value="">—</option>' + UFS.map(u => `<option>${u}</option>`).join('');
+  el('rh-f-tipo').innerHTML = '<option value="">Todos os tipos</option>' +
+    Object.entries(TIPO_AFAST).map(([v, l]) => `<option value="${v}">${l}</option>`).join('');
   el('rc-ben-sel').innerHTML = '<option value="">Escolha</option>' +
     rhBeneficios.map(b => `<option value="${b.id}">${esc(b.nome)}</option>`).join('');
 }
@@ -1618,8 +1660,11 @@ function renderRhVisao() {
     </div>`).join('');
 
   const nomes = Object.fromEntries(rhColabs.map(c => [c.id, c.nome]));
-  el('rh-proximos').innerHTML = rhAfastamentos.length
-    ? rhAfastamentos.slice(0, 5).map(a =>
+  const hoje = new Date().toISOString().slice(0, 10);
+  const proximos = rhAfastamentos.filter(a => a.status !== 'CANCELADO' && a.fim >= hoje)
+    .sort((a, b) => a.inicio.localeCompare(b.inicio));
+  el('rh-proximos').innerHTML = proximos.length
+    ? proximos.slice(0, 5).map(a =>
         `<div style="padding:6px 0">${esc(nomes[a.colaborador_id] || '—')} · ${esc(a.tipo)} · ${fmtDate(a.inicio)} a ${fmtDate(a.fim)}</div>`).join('')
     : 'Nada programado.';
 }
@@ -1661,6 +1706,7 @@ function renderRhColabs() {
 
 ['rh-busca','rh-f-situacao','rh-f-vinculo'].forEach(id =>
   el(id).addEventListener('input', renderRhColabs));
+el('rh-f-tipo').addEventListener('input', renderRhAfastamentos);
 
 /* ── cadastro: abrir ── */
 const rcSet = (t, tipo = 'error') => { const m = el('rc-msg'); m.textContent = t; m.className = 'form-msg show ' + tipo; };
@@ -1999,6 +2045,95 @@ async function carregarHistorico(id) {
     : 'Nenhum registro.';
 }
 
+/* ── férias e afastamentos ── */
+const TIPO_AFAST = {
+  FERIAS:'Férias', ATESTADO:'Atestado médico', LICENCA_MATERNIDADE:'Licença-maternidade',
+  LICENCA_PATERNIDADE:'Licença-paternidade', AFASTAMENTO:'Afastamento (INSS)', OUTRO:'Outro',
+};
+const raSet = (t, tipo = 'error') => { const m = el('ra-msg'); m.textContent = t; m.className = 'form-msg show ' + tipo; };
+
+// A situação sai das datas: programado hoje vira em andamento amanhã sozinho,
+// sem ninguém precisar atualizar o registro.
+function situacaoAfast(a) {
+  if (a.status === 'CANCELADO') return { label: 'Cancelado', cls: 'status-cancelado' };
+  const hoje = new Date().toISOString().slice(0, 10);
+  if (a.fim < hoje)    return { label: 'Concluído',    cls: 'status-done' };
+  if (a.inicio > hoje) return { label: 'Programado',   cls: 'status-pending' };
+  return { label: 'Em andamento', cls: 'status-analysis' };
+}
+const diasEntre = (a, b) =>
+  Math.round((new Date(b + 'T00:00:00') - new Date(a + 'T00:00:00')) / 86400000) + 1;
+
+function renderRhAfastamentos() {
+  const filtro = val('rh-f-tipo');
+  const nomes = Object.fromEntries(rhColabs.map(c => [c.id, c.nome]));
+  const lista = rhAfastamentos.filter(a => !filtro || a.tipo === filtro);
+
+  el('rh-afast-body').innerHTML = lista.length ? lista.map(a => {
+    const s = situacaoAfast(a);
+    const encerrado = a.status === 'CANCELADO' || s.label === 'Concluído';
+    return `<tr>
+      <td style="font-weight:600">${esc(nomes[a.colaborador_id] || '—')}</td>
+      <td style="color:var(--text-dim)">${TIPO_AFAST[a.tipo] || a.tipo}</td>
+      <td style="font-size:12px">${fmtDate(a.inicio)} a ${fmtDate(a.fim)}
+        ${a.observacoes ? `<div style="font-size:11px;color:var(--text-dim)">${esc(a.observacoes)}</div>` : ''}</td>
+      <td>${diasEntre(a.inicio, a.fim)}</td>
+      <td><span class="status ${s.cls}">${s.label}</span></td>
+      <td>${encerrado ? '<span style="font-size:11.5px;color:var(--text-dim)">—</span>'
+        : `<div class="team-actions"><button class="team-btn danger" onclick="window._cancelarAfastamento('${a.id}')">Cancelar</button></div>`}</td>
+    </tr>`;
+  }).join('')
+  : `<tr><td colspan="6" class="team-empty">${rhAfastamentos.length ? 'Nada para este tipo.' : 'Nenhuma férias ou afastamento.'}</td></tr>`;
+}
+
+window._programarAfastamento = () => {
+  if (!rhColabs.length) { alert('Cadastre um colaborador antes de programar férias.'); return; }
+  el('ra-colab').innerHTML = rhColabs.filter(c => c.situacao !== 'DESLIGADO')
+    .map(c => `<option value="${c.id}">${esc(c.nome)}</option>`).join('');
+  el('ra-tipo').innerHTML = Object.entries(TIPO_AFAST).map(([v, l]) => `<option value="${v}">${l}</option>`).join('');
+  ['ra-inicio','ra-fim','ra-obs'].forEach(id => el(id).value = '');
+  el('ra-msg').className = 'form-msg';
+  openModal('modal-rh-afast');
+};
+
+window._salvarAfastamento = async () => {
+  const btn = el('ra-btn'), orig = btn.textContent;
+  const colab = val('ra-colab'), inicio = val('ra-inicio'), fim = val('ra-fim');
+  if (!colab)         return raSet('Escolha o colaborador.');
+  if (!inicio || !fim) return raSet('Informe o início e o fim.');
+  if (fim < inicio)    return raSet('O fim não pode ser antes do início.');
+
+  // Dois afastamentos sobrepostos para a mesma pessoa quase sempre é engano,
+  // e bagunçaria o cálculo da folha.
+  const choque = rhAfastamentos.find(a =>
+    a.colaborador_id === colab && a.status !== 'CANCELADO' && a.inicio <= fim && a.fim >= inicio);
+  if (choque) return raSet(`Já existe ${(TIPO_AFAST[choque.tipo] || choque.tipo).toLowerCase()} de ${fmtDate(choque.inicio)} a ${fmtDate(choque.fim)} para esta pessoa.`);
+
+  btn.textContent = 'Salvando...'; btn.disabled = true;
+  const { error } = await supabase.from('rh_afastamentos').insert({
+    colaborador_id: colab, tipo: val('ra-tipo'), inicio, fim,
+    observacoes: val('ra-obs') || null, autor: myName,
+  });
+  btn.textContent = orig; btn.disabled = false;
+  if (error) return raSet('Não foi possível salvar: ' + error.message);
+
+  await registrarRh('CRIOU', 'Afastamento',
+    `${TIPO_AFAST[val('ra-tipo')]} · ${fmtDate(inicio)} a ${fmtDate(fim)}`, colab);
+  await loadRh();
+  raSet('Registrado.', 'success');
+  setTimeout(() => closeModal('modal-rh-afast'), 1000);
+};
+
+window._cancelarAfastamento = async (id) => {
+  const a = rhAfastamentos.find(x => x.id === id);
+  if (!a || !confirm('Cancelar este registro?')) return;
+  const { error } = await supabase.from('rh_afastamentos').update({ status: 'CANCELADO' }).eq('id', id);
+  if (error) return alert('Não foi possível cancelar: ' + error.message);
+  await registrarRh('ALTEROU', 'Afastamento', 'Cancelado', a.colaborador_id);
+  await loadRh();
+};
+
+/* ── cargos ── */
 const rgSet = (t, tipo = 'error') => { const m = el('rg-msg'); m.textContent = t; m.className = 'form-msg show ' + tipo; };
 
 // A lista da CBO tem 2.719 ocupações: só vale carregar quando alguém abre o
