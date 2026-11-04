@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/portal.css?v=6">
+  <link rel="stylesheet" href="css/portal.css?v=7">
 </head>
 <body>
 
@@ -25,13 +25,6 @@
 
     <div class="login-badge">🔒 Acesso restrito — Equipe SertCode</div>
 
-    <div class="login-tabs" role="tablist">
-      <button type="button" class="login-tab active" data-view="entrar" role="tab" aria-selected="true">Entrar</button>
-      <button type="button" class="login-tab" data-view="cadastro" role="tab" aria-selected="false">Solicitar acesso</button>
-    </div>
-
-    <!-- ══ ENTRAR ══ -->
-    <section class="login-view" id="view-entrar">
       <div class="login-title">Painel da equipe</div>
       <div class="login-sub">Gestão de clientes, assinaturas e chamados.</div>
 
@@ -51,57 +44,10 @@
         <div class="form-msg" id="login-msg" role="alert"></div>
       </form>
 
-      <p class="login-switch">Ainda não tem acesso? <button type="button" data-goto="cadastro">Solicitar acesso</button></p>
-    </section>
-
-    <!-- ══ CADASTRO ══ -->
-    <section class="login-view" id="view-cadastro" hidden>
-      <div class="login-title">Solicitar acesso</div>
-      <div class="login-sub">Preencha seus dados. Um gestor da SertCode vai revisar e liberar o seu acesso.</div>
-
-      <form class="login-form" id="cadastro-form" novalidate>
-        <div class="form-group">
-          <label for="cad-nome">Nome completo</label>
-          <input type="text" id="cad-nome" placeholder="Seu nome completo" required autocomplete="name" maxlength="120">
-        </div>
-        <div class="form-group">
-          <label for="cad-apelido">Como gostaria de ser chamado</label>
-          <input type="text" id="cad-apelido" placeholder="Ex.: Ana, Dr. Paulo, Beto" required autocomplete="nickname" maxlength="40">
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label for="cad-nascimento">Data de nascimento</label>
-            <input type="date" id="cad-nascimento" required autocomplete="bday">
-          </div>
-          <div class="form-group">
-            <label for="cad-telefone">Telefone</label>
-            <input type="tel" id="cad-telefone" placeholder="(00) 00000-0000" required autocomplete="tel" inputmode="numeric" maxlength="15">
-          </div>
-        </div>
-        <div class="form-group">
-          <label for="cad-email">E-mail</label>
-          <input type="email" id="cad-email" placeholder="voce@exemplo.com" required autocomplete="email">
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label for="cad-senha">Senha</label>
-            <input type="password" id="cad-senha" placeholder="Mínimo 8 caracteres" required autocomplete="new-password" minlength="8">
-          </div>
-          <div class="form-group">
-            <label for="cad-senha2">Confirmar senha</label>
-            <input type="password" id="cad-senha2" placeholder="Repita a senha" required autocomplete="new-password" minlength="8">
-          </div>
-        </div>
-        <button type="submit" class="btn btn-primary" id="cadastro-btn">Enviar solicitação</button>
-        <div class="form-msg" id="cadastro-msg" role="alert"></div>
-      </form>
-
-      <p class="login-switch">Já tem acesso liberado? <button type="button" data-goto="entrar">Entrar</button></p>
-    </section>
 
     <div class="login-note">
-      Seus dados são usados apenas para identificar você na equipe, conforme a
-      <a href="privacidade.html">política de privacidade</a>.
+      Acesso criado por um gestor da SertCode. Seus dados são usados apenas para
+      identificar você na equipe, conforme a <a href="privacidade.html">política de privacidade</a>.
     </div>
 
     <a href="cliente.html" class="login-back">← Área do Cliente</a>
@@ -112,21 +58,6 @@
 import { supabase } from './js/supabase.js'
 
 const $ = id => document.getElementById(id);
-
-/* ── ALTERNAR ENTRE ENTRAR / CADASTRO ── */
-function showView(view) {
-  document.querySelectorAll('.login-tab').forEach(t => {
-    const on = t.dataset.view === view;
-    t.classList.toggle('active', on);
-    t.setAttribute('aria-selected', on);
-  });
-  $('view-entrar').hidden   = view !== 'entrar';
-  $('view-cadastro').hidden = view !== 'cadastro';
-  $('login-card').classList.toggle('login-card-wide', view === 'cadastro');
-}
-document.querySelectorAll('[data-view]').forEach(b => b.addEventListener('click', () => showView(b.dataset.view)));
-document.querySelectorAll('[data-goto]').forEach(b => b.addEventListener('click', () => showView(b.dataset.goto)));
-if (location.hash === '#cadastro') showView('cadastro');
 
 /* ── MOSTRAR / OCULTAR SENHA ── */
 const EYE     = '<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
@@ -157,18 +88,6 @@ function setMsg(el, text, type = 'error') {
   el.className = 'form-msg show ' + type;
 }
 function clearMsg(el) { el.className = 'form-msg'; el.textContent = ''; }
-
-/* ── MÁSCARA DE TELEFONE ── */
-$('cad-telefone').addEventListener('input', e => {
-  const d = e.target.value.replace(/\D/g, '').slice(0, 11);
-  let v = d;
-  if (d.length > 2)  v = `(${d.slice(0,2)}) ${d.slice(2)}`;
-  if (d.length > 7)  v = `(${d.slice(0,2)}) ${d.slice(2, d.length === 11 ? 7 : 6)}-${d.slice(d.length === 11 ? 7 : 6)}`;
-  e.target.value = v;
-});
-
-// Data máxima = hoje
-$('cad-nascimento').max = new Date().toISOString().slice(0, 10);
 
 /* ── ENTRAR ── */
 $('login-form').addEventListener('submit', async e => {
@@ -203,57 +122,6 @@ $('login-form').addEventListener('submit', async e => {
   setMsg(msg, 'Seu acesso está desativado. Fale com um gestor da SertCode.');
 });
 
-/* ── SOLICITAR ACESSO ── */
-$('cadastro-form').addEventListener('submit', async e => {
-  e.preventDefault();
-  const msg = $('cadastro-msg'), btn = $('cadastro-btn'), orig = btn.innerHTML;
-  clearMsg(msg);
-
-  const name     = $('cad-nome').value.trim().replace(/\s+/g, ' ');
-  const nickname = $('cad-apelido').value.trim();
-  const birth    = $('cad-nascimento').value;
-  const phone    = $('cad-telefone').value.trim();
-  const email    = $('cad-email').value.trim();
-  const pass     = $('cad-senha').value;
-  const pass2    = $('cad-senha2').value;
-
-  if (name.split(' ').length < 2)                return setMsg(msg, 'Informe seu nome completo (nome e sobrenome).');
-  if (!nickname)                                 return setMsg(msg, 'Diga como gostaria de ser chamado.');
-  if (!birth || birth > $('cad-nascimento').max || birth < '1900-01-01')
-                                                 return setMsg(msg, 'Informe uma data de nascimento válida.');
-  if (phone.replace(/\D/g, '').length < 10)      return setMsg(msg, 'Informe um telefone com DDD.');
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return setMsg(msg, 'Informe um e-mail válido.');
-  if (pass.length < 8)                           return setMsg(msg, 'A senha precisa ter pelo menos 8 caracteres.');
-  if (pass !== pass2)                            return setMsg(msg, 'As senhas não conferem.');
-
-  btn.innerHTML = 'Enviando...'; btn.disabled = true;
-
-  const { data, error } = await supabase.auth.signUp({
-    email,
-    password: pass,
-    options: {
-      emailRedirectTo: new URL('gestor.html', location.href).href,
-      data: { signup_type: 'colaborador', name, nickname, birth_date: birth, phone },
-    },
-  });
-
-  btn.innerHTML = orig; btn.disabled = false;
-
-  const alreadyExists = !error && data.user && data.user.identities?.length === 0;
-  if (error || alreadyExists) {
-    return setMsg(msg, alreadyExists || /registered|already/i.test(error.message)
-      ? 'Este e-mail já tem cadastro. Use a aba Entrar.'
-      : 'Não foi possível enviar agora. Tente novamente em instantes.');
-  }
-
-  // Sem sessão = o Supabase exige confirmação de e-mail antes do primeiro login.
-  if (data.session) await supabase.auth.signOut();
-  e.target.reset();
-  setMsg(msg,
-    (data.session ? '' : 'Enviamos um link de confirmação para o seu e-mail. ') +
-    `Obrigado, ${nickname}! Sua solicitação foi enviada e será revisada por um gestor da SertCode.`,
-    'success');
-});
 </script>
 
 </body>

@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/portal.css?v=6">
+  <link rel="stylesheet" href="css/portal.css?v=7">
   <style>
     .admin-badge {
       font-size: 9px; font-weight: 800;
@@ -736,24 +736,21 @@
 
       <!-- ════════════ EQUIPE ════════════ -->
       <section class="tab-section" id="tab-equipe">
-        <div class="section-title">Equipe</div>
-        <div class="section-sub">Libere, recuse ou desative o acesso dos colaboradores da SertCode</div>
-
-        <div class="card" style="margin-bottom:18px">
-          <div class="card-title" style="margin-bottom:14px">Solicitações pendentes</div>
-          <div class="table-scroll">
-            <table class="data-table">
-              <thead><tr><th>Colaborador</th><th>Nascimento</th><th>Telefone</th><th>Solicitado em</th><th>Ações</th></tr></thead>
-              <tbody id="equipe-pendentes"></tbody>
-            </table>
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:14px;margin-bottom:20px">
+          <div>
+            <div class="section-title">Equipe</div>
+            <div class="section-sub" style="margin-bottom:0">Cadastre, desative ou reative o acesso dos colaboradores da SertCode</div>
           </div>
+          <button class="btn btn-primary" onclick="window._novoColaborador()">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Novo colaborador
+          </button>
         </div>
 
         <div class="card">
-          <div class="card-title" style="margin-bottom:14px">Membros da equipe</div>
           <div class="table-scroll">
             <table class="data-table">
-              <thead><tr><th>Colaborador</th><th>Papel</th><th>Telefone</th><th>Status</th><th>Ações</th></tr></thead>
+              <thead><tr><th>Colaborador</th><th>Papel</th><th>Nascimento</th><th>Telefone</th><th>Status</th><th>Ações</th></tr></thead>
               <tbody id="equipe-membros"></tbody>
             </table>
           </div>
@@ -873,6 +870,63 @@
       <button class="btn btn-outline" onclick="closeModal('modal-cliente')">Cancelar</button>
     </div>
     <div class="form-msg" id="nc-msg" role="alert"></div>
+  </div>
+</div>
+
+<!-- ══ MODAL: Novo Colaborador ══ -->
+<div class="modal-overlay" id="modal-colaborador">
+  <div class="modal-box" style="max-width:480px">
+    <button class="modal-close" onclick="closeModal('modal-colaborador')">&times;</button>
+    <div class="modal-title">Novo colaborador</div>
+    <div class="modal-sub">Cria o acesso ao painel da equipe SertCode</div>
+
+    <div class="form-group">
+      <label>Nome completo</label>
+      <input type="text" id="co-nome" placeholder="Ex.: Ana Souza" maxlength="120">
+    </div>
+    <div class="form-row-2">
+      <div class="form-group">
+        <label>Como gostaria de ser chamado</label>
+        <input type="text" id="co-apelido" placeholder="Ex.: Ana" maxlength="40">
+      </div>
+      <div class="form-group">
+        <label>Papel</label>
+        <select id="co-papel">
+          <option value="colaborador">Colaborador</option>
+          <option value="gestor">Gestor</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row-2">
+      <div class="form-group">
+        <label>Data de nascimento</label>
+        <input type="date" id="co-nascimento">
+      </div>
+      <div class="form-group">
+        <label>Telefone</label>
+        <input type="tel" id="co-telefone" placeholder="(00) 00000-0000" maxlength="15" inputmode="numeric">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>E-mail de acesso</label>
+      <input type="email" id="co-email" placeholder="colaborador@sertcode.com.br" autocomplete="off">
+    </div>
+    <div class="form-group">
+      <label>Senha provisória</label>
+      <div class="pass-wrap">
+        <input type="text" id="co-senha" placeholder="Mínimo 8 caracteres" autocomplete="off">
+        <button type="button" class="pass-toggle" title="Gerar senha" onclick="window._gerarSenhaColab()">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M23 4v6h-6"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
+        </button>
+      </div>
+      <div style="font-size:11px;color:var(--text-dim);margin-top:6px">Entregue por um canal privado e peça que a pessoa troque no primeiro acesso.</div>
+    </div>
+
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-primary" style="flex:1;justify-content:center" id="co-btn" onclick="window._salvarColaborador()">Cadastrar colaborador</button>
+      <button class="btn btn-outline" onclick="closeModal('modal-colaborador')">Cancelar</button>
+    </div>
+    <div class="form-msg" id="co-msg" role="alert"></div>
   </div>
 </div>
 
@@ -1148,36 +1202,86 @@ const teamBtn = (id, status, label, cls = '') =>
   `<button class="team-btn ${cls}" data-team-id="${esc(id)}" data-team-status="${status}">${label}</button>`;
 
 function renderEquipe() {
-  const pend = allTeam.filter(m => m.status === 'pendente');
-  const memb = allTeam.filter(m => m.status !== 'pendente');
-
   const badge = document.getElementById('equipe-badge');
-  badge.textContent = pend.length;
-  badge.style.display = pend.length ? '' : 'none';
+  if (badge) badge.style.display = 'none';
 
-  document.getElementById('equipe-pendentes').innerHTML = pend.length ? pend.map(m => `<tr>
-      <td>${teamPerson(m)}</td>
-      <td>${fmtBirth(m.birth_date)}</td>
-      <td>${esc(m.phone || '—')}</td>
-      <td style="color:var(--text-dim)">${fmtDate(m.created_at)}</td>
-      <td><div class="team-actions">${teamBtn(m.id, 'ativo', 'Aprovar', 'approve')}${teamBtn(m.id, 'recusado', 'Recusar', 'danger')}</div></td>
-    </tr>`).join('')
-    : '<tr><td colspan="5" class="team-empty">Nenhuma solicitação aguardando aprovação.</td></tr>';
-
-  document.getElementById('equipe-membros').innerHTML = memb.length ? memb.map(m => {
+  document.getElementById('equipe-membros').innerHTML = allTeam.length ? allTeam.map(m => {
     const acao = m.id === session.user.id ? '<span style="font-size:11.5px;color:var(--text-dim)">Você</span>'
       : m.status === 'ativo' ? teamBtn(m.id, 'inativo', 'Desativar', 'danger')
       : teamBtn(m.id, 'ativo', 'Reativar', 'approve');
     return `<tr>
       <td>${teamPerson(m)}</td>
       <td>${m.role === 'gestor' ? 'Gestor' : 'Colaborador'}</td>
+      <td>${fmtBirth(m.birth_date)}</td>
       <td>${esc(m.phone || '—')}</td>
       <td>${teamStatus[m.status] || esc(m.status)}</td>
       <td><div class="team-actions">${acao}</div></td>
     </tr>`;
   }).join('')
-    : '<tr><td colspan="5" class="team-empty">Nenhum membro cadastrado.</td></tr>';
+    : '<tr><td colspan="6" class="team-empty">Nenhum colaborador cadastrado.</td></tr>';
 }
+
+/* ── NOVO COLABORADOR ── */
+const coSet = (t, tipo = 'error') => {
+  const m = document.getElementById('co-msg'); m.textContent = t; m.className = 'form-msg show ' + tipo;
+};
+
+window._gerarSenhaColab = () => {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789';
+  const bytes = crypto.getRandomValues(new Uint32Array(12));
+  document.getElementById('co-senha').value = [...bytes].map(n => chars[n % chars.length]).join('');
+};
+
+window._novoColaborador = () => {
+  ['co-nome','co-apelido','co-nascimento','co-telefone','co-email'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('co-papel').value = 'colaborador';
+  document.getElementById('co-nascimento').max = new Date().toISOString().slice(0, 10);
+  document.getElementById('co-msg').className = 'form-msg';
+  window._gerarSenhaColab();
+  openModal('modal-colaborador');
+};
+
+window._salvarColaborador = async () => {
+  const btn = document.getElementById('co-btn'), orig = btn.textContent;
+  const nome     = document.getElementById('co-nome').value.trim().replace(/\s+/g, ' ');
+  const apelido  = document.getElementById('co-apelido').value.trim();
+  const papel    = document.getElementById('co-papel').value;
+  const nasc     = document.getElementById('co-nascimento').value;
+  const phone    = document.getElementById('co-telefone').value.trim();
+  const email    = document.getElementById('co-email').value.trim();
+  const senha    = document.getElementById('co-senha').value;
+
+  if (nome.split(' ').length < 2)                 return coSet('Informe o nome completo (nome e sobrenome).');
+  if (!apelido)                                   return coSet('Informe como a pessoa gostaria de ser chamada.');
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return coSet('Informe um e-mail válido.');
+  if (senha.length < 8)                           return coSet('A senha precisa ter pelo menos 8 caracteres.');
+
+  btn.textContent = 'Cadastrando...'; btn.disabled = true;
+  const fim = () => { btn.textContent = orig; btn.disabled = false; };
+
+  // Conta criada por um cliente isolado, para não trocar a sessão do gestor
+  const { data, error } = await createSignupClient().auth.signUp({
+    email, password: senha,
+    options: { data: { signup_type: 'equipe', name: nome, nickname: apelido, phone } },
+  });
+
+  if (error || data.user?.identities?.length === 0) {
+    fim();
+    return coSet(data?.user?.identities?.length === 0 || /registered|already/i.test(error?.message || '')
+      ? 'Este e-mail já tem acesso cadastrado.'
+      : 'Não foi possível criar o acesso. ' + (error?.message || ''));
+  }
+
+  const { error: perfilErro } = await supabase.from('profiles').upsert({
+    id: data.user.id, email, name: nome, nickname: apelido, phone,
+    birth_date: nasc || null, role: papel, status: 'ativo',
+  }, { onConflict: 'id' });
+  if (perfilErro) { fim(); return coSet('Acesso criado, mas o perfil falhou: ' + perfilErro.message); }
+
+  await loadEquipe();
+  fim();
+  coSet(`${apelido} cadastrado com acesso liberado. ${data.session ? '' : 'A pessoa precisa confirmar o e-mail antes do primeiro acesso. '}Envie a senha provisória por um canal privado.`, 'success');
+};
 
 document.getElementById('tab-equipe')?.addEventListener('click', async e => {
   const btn = e.target.closest('[data-team-id]');
@@ -1185,7 +1289,7 @@ document.getElementById('tab-equipe')?.addEventListener('click', async e => {
   const id = btn.dataset.teamId, status = btn.dataset.teamStatus;
   const m = allTeam.find(x => x.id === id);
   const quem = m?.nickname || m?.name || 'este colaborador';
-  const pergunta = { ativo: `Liberar o acesso de ${quem} ao painel?`, recusado: `Recusar a solicitação de ${quem}?`, inativo: `Desativar o acesso de ${quem}?` }[status];
+  const pergunta = { ativo: `Reativar o acesso de ${quem} ao painel?`, inativo: `Desativar o acesso de ${quem}?` }[status];
   if (!confirm(pergunta)) return;
 
   btn.disabled = true;
@@ -1277,7 +1381,7 @@ function mascaraTelefone(e) {
   if (d.length > 7) v = `(${d.slice(0,2)}) ${d.slice(2, d.length === 11 ? 7 : 6)}-${d.slice(d.length === 11 ? 7 : 6)}`;
   e.target.value = v;
 }
-['nc-telefone','nc-telefone2','ed-telefone','ed-telefone2'].forEach(id =>
+['nc-telefone','nc-telefone2','ed-telefone','ed-telefone2','co-telefone'].forEach(id =>
   document.getElementById(id).addEventListener('input', mascaraTelefone));
 
 window._salvarCliente = async () => {
