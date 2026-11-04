@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/portal.css?v=10">
+  <link rel="stylesheet" href="css/portal.css?v=11">
   <style>
     .admin-badge {
       font-size: 9px; font-weight: 800;
@@ -754,6 +754,7 @@
           <button class="rh-aba" data-rh="documentos">Documentos e Contratos</button>
           <button class="rh-aba" data-rh="pagamentos">Histórico de Pagamentos</button>
           <button class="rh-aba" data-rh="relatorios">Relatórios de RH</button>
+          <button class="rh-aba" data-rh="config">Configurações</button>
         </nav>
 
         <!-- Visão geral -->
@@ -814,6 +815,65 @@
               </table>
             </div>
           </div>
+        </div>
+
+
+        <!-- Configurações -->
+        <div class="rh-painel" id="rh-config">
+          <div class="rh-aviso" id="rh-config-aviso">
+            Tabelas preenchidas com os valores de 2026 (INSS: salário mínimo R$ 1.621,00 e teto R$ 8.475,55; IRRF com isenção até R$ 5.000 e redução até R$ 7.350). Confira com a contabilidade da SertCode antes de aprovar a primeira folha.
+          </div>
+
+          <div class="card" style="margin-bottom:18px">
+            <div class="card-title" style="margin-bottom:12px">INSS do empregado (progressivo)</div>
+            <div class="rh-faixas" id="cfg-inss"></div>
+          </div>
+
+          <div class="card" style="margin-bottom:18px">
+            <div class="card-title" style="margin-bottom:12px">IRRF (tabela mensal)</div>
+            <div class="rh-faixas" id="cfg-irrf"></div>
+            <div class="rh-faixas" style="margin-top:14px">
+              <div class="form-group" style="margin:0"><label>Dedução por dependente (R$)</label><input type="number" id="cfg-dependente" step="0.01" min="0"></div>
+              <div class="form-group" style="margin:0"><label>Desconto simplificado (R$)</label><input type="number" id="cfg-simplificado" step="0.01" min="0"></div>
+              <div class="form-group" style="margin:0"><label>Isenção até (R$)</label><input type="number" id="cfg-isencao" step="0.01" min="0"></div>
+              <div class="form-group" style="margin:0"><label>Redução até (R$)</label><input type="number" id="cfg-reducao" step="0.01" min="0"></div>
+            </div>
+          </div>
+
+          <div class="card" style="margin-bottom:18px">
+            <div class="card-title" style="margin-bottom:12px">Encargos e provisões</div>
+            <div class="rh-faixas">
+              <div class="form-group" style="margin:0"><label>FGTS (%)</label><input type="number" id="cfg-fgts" step="0.01" min="0"></div>
+              <div class="form-group" style="margin:0">
+                <label>Patronal sobre a folha CLT (%)</label>
+                <input type="number" id="cfg-patronal" step="0.01" min="0">
+                <div class="rh-dica">Simples Nacional: em geral 0. Lucro Presumido/Real: cerca de 27,8.</div>
+              </div>
+              <div class="form-group" style="margin:0">
+                <label>Patronal sobre autônomos (%)</label>
+                <input type="number" id="cfg-patronal-aut" step="0.01" min="0">
+                <div class="rh-dica">Contribuição sobre o RPA.</div>
+              </div>
+              <div class="form-group" style="margin:0">
+                <label>INSS do autônomo (%)</label>
+                <input type="number" id="cfg-inss-aut" step="0.01" min="0">
+                <div class="rh-dica">Limitado ao teto.</div>
+              </div>
+            </div>
+            <div class="rh-faixas" style="margin-top:14px;grid-template-columns:1fr 1fr">
+              <div class="form-group" style="margin:0">
+                <label>Dia de vencimento de INSS, IRRF e FGTS</label>
+                <input type="number" id="cfg-dia" min="1" max="31">
+                <div class="rh-dica">No mês seguinte à competência.</div>
+              </div>
+              <label class="rh-check" style="align-self:center">
+                <input type="checkbox" id="cfg-provisoes"> Provisionar 13º e férias + 1/3
+              </label>
+            </div>
+          </div>
+
+          <button class="btn btn-primary" id="cfg-btn" onclick="window._salvarConfig()">Salvar configurações</button>
+          <div class="form-msg" id="cfg-msg" role="alert"></div>
         </div>
 
         <div class="rh-painel" id="rh-folha"><div class="card rh-embreve">Folha de pagamento — em construção.</div></div>
@@ -1742,6 +1802,7 @@ async function loadRh() {
   renderRhAfastamentos();
   renderRhBeneficios();
   await loadRhLeitura();
+  await loadRhConfig();
 }
 
 function montarSelectsRh() {
@@ -2160,6 +2221,126 @@ async function carregarHistorico(id) {
       </div>`).join('')
     : 'Nenhum registro.';
 }
+
+/* ── parâmetros de cálculo da folha ── */
+// Valores de 2026. Ficam editáveis porque mudam todo ano, e a conta da folha
+// sai daqui: INSS e IRRF errados contaminam todos os holerites.
+const CONFIG_PADRAO = {
+  inss: [
+    { ate: 1621.00, aliquota: 7.5 },
+    { ate: 2902.84, aliquota: 9 },
+    { ate: 4354.27, aliquota: 12 },
+    { ate: 8475.55, aliquota: 14 },
+  ],
+  irrf: [
+    { ate: 2428.80, aliquota: 0,    deducao: 0 },
+    { ate: 2826.65, aliquota: 7.5,  deducao: 182.16 },
+    { ate: 3751.05, aliquota: 15,   deducao: 394.16 },
+    { ate: 4664.68, aliquota: 22.5, deducao: 675.49 },
+    { ate: null,    aliquota: 27.5, deducao: 908.73 },
+  ],
+  deducaoDependente: 189.59,
+  descontoSimplificado: 607.20,
+  isencaoAte: 5000,
+  reducaoAte: 7350,
+  fgts: 8,
+  patronal: 0,
+  patronalAutonomo: 20,
+  inssAutonomo: 11,
+  provisoes: true,
+  diaEncargos: 20,
+};
+let rhConfig = { ...CONFIG_PADRAO };
+const cfgSet = (t, tipo = 'error') => { const m = el('cfg-msg'); m.textContent = t; m.className = 'form-msg show ' + tipo; };
+const numero = id => { const v = el(id).value.trim(); return v === '' ? null : Number(v); };
+
+async function loadRhConfig() {
+  if (!isGestor) return;
+  const { data } = await supabase.from('rh_config').select('parametros').eq('id', 1).maybeSingle();
+  const salvo = data?.parametros;
+  rhConfig = salvo && Object.keys(salvo).length ? { ...CONFIG_PADRAO, ...salvo } : { ...CONFIG_PADRAO };
+  renderRhConfig();
+}
+
+function renderRhConfig() {
+  // A última faixa não tem teto: é "acima de", e por isso o campo fica travado.
+  el('cfg-inss').innerHTML = rhConfig.inss.map((f, i) => `
+    <div class="rh-faixa">
+      <div class="form-group" style="margin:0"><label>Até (R$)</label>
+        <input type="number" step="0.01" min="0" data-inss="${i}" data-campo="ate" value="${f.ate ?? ''}"></div>
+      <div class="form-group" style="margin:0"><label>Alíquota (%)</label>
+        <input type="number" step="0.01" min="0" data-inss="${i}" data-campo="aliquota" value="${f.aliquota}"></div>
+    </div>`).join('');
+
+  el('cfg-irrf').innerHTML = rhConfig.irrf.map((f, i) => `
+    <div class="rh-faixa">
+      <div class="form-group" style="margin:0"><label>Até (R$)</label>
+        <input type="number" step="0.01" min="0" data-irrf="${i}" data-campo="ate" value="${f.ate ?? ''}"
+          placeholder="${f.ate === null ? 'acima' : ''}" ${f.ate === null ? 'disabled' : ''}></div>
+      <div class="form-group" style="margin:0"><label>Alíquota (%)</label>
+        <input type="number" step="0.01" min="0" data-irrf="${i}" data-campo="aliquota" value="${f.aliquota}"></div>
+      <div class="form-group" style="margin:0"><label>Dedução (R$)</label>
+        <input type="number" step="0.01" min="0" data-irrf="${i}" data-campo="deducao" value="${f.deducao}"></div>
+    </div>`).join('');
+
+  el('cfg-dependente').value   = rhConfig.deducaoDependente;
+  el('cfg-simplificado').value = rhConfig.descontoSimplificado;
+  el('cfg-isencao').value      = rhConfig.isencaoAte;
+  el('cfg-reducao').value      = rhConfig.reducaoAte;
+  el('cfg-fgts').value         = rhConfig.fgts;
+  el('cfg-patronal').value     = rhConfig.patronal;
+  el('cfg-patronal-aut').value = rhConfig.patronalAutonomo;
+  el('cfg-inss-aut').value     = rhConfig.inssAutonomo;
+  el('cfg-dia').value          = rhConfig.diaEncargos;
+  el('cfg-provisoes').checked  = rhConfig.provisoes !== false;
+}
+
+window._salvarConfig = async () => {
+  const btn = el('cfg-btn'), orig = btn.textContent;
+
+  const inss = rhConfig.inss.map((_, i) => ({
+    ate: Number(document.querySelector(`[data-inss="${i}"][data-campo="ate"]`).value) || 0,
+    aliquota: Number(document.querySelector(`[data-inss="${i}"][data-campo="aliquota"]`).value) || 0,
+  }));
+  const irrf = rhConfig.irrf.map((f, i) => ({
+    ate: f.ate === null ? null : (Number(document.querySelector(`[data-irrf="${i}"][data-campo="ate"]`).value) || 0),
+    aliquota: Number(document.querySelector(`[data-irrf="${i}"][data-campo="aliquota"]`).value) || 0,
+    deducao: Number(document.querySelector(`[data-irrf="${i}"][data-campo="deducao"]`).value) || 0,
+  }));
+
+  // Faixa fora de ordem faz o cálculo progressivo somar errado sem avisar.
+  const crescente = faixas => faixas.every((f, i) =>
+    i === 0 || f.ate === null || f.ate > faixas[i - 1].ate);
+  if (!crescente(inss)) return cfgSet('As faixas do INSS precisam estar em ordem crescente.');
+  if (!crescente(irrf)) return cfgSet('As faixas do IRRF precisam estar em ordem crescente.');
+
+  const dia = numero('cfg-dia');
+  if (dia === null || dia < 1 || dia > 31) return cfgSet('O dia de vencimento precisa ficar entre 1 e 31.');
+
+  const parametros = {
+    inss, irrf,
+    deducaoDependente: numero('cfg-dependente') ?? 0,
+    descontoSimplificado: numero('cfg-simplificado') ?? 0,
+    isencaoAte: numero('cfg-isencao') ?? 0,
+    reducaoAte: numero('cfg-reducao') ?? 0,
+    fgts: numero('cfg-fgts') ?? 0,
+    patronal: numero('cfg-patronal') ?? 0,
+    patronalAutonomo: numero('cfg-patronal-aut') ?? 0,
+    inssAutonomo: numero('cfg-inss-aut') ?? 0,
+    provisoes: el('cfg-provisoes').checked,
+    diaEncargos: dia,
+  };
+
+  btn.textContent = 'Salvando...'; btn.disabled = true;
+  const { error } = await supabase.from('rh_config')
+    .upsert({ id: 1, parametros, updated_at: new Date().toISOString() }, { onConflict: 'id' });
+  btn.textContent = orig; btn.disabled = false;
+  if (error) return cfgSet('Não foi possível salvar: ' + error.message);
+
+  rhConfig = { ...CONFIG_PADRAO, ...parametros };
+  await registrarRh('ALTEROU', 'Parâmetros da folha', 'INSS, IRRF e encargos');
+  cfgSet('Configurações salvas. Valem para as próximas folhas.', 'success');
+};
 
 /* ── documentos, pagamentos e relatórios ── */
 // Estas três telas só leem o que foi registrado em outros pontos do RH.
