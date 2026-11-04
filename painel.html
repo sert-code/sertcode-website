@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/portal.css?v=7">
+  <link rel="stylesheet" href="css/portal.css?v=8">
   <style>
     .admin-badge {
       font-size: 9px; font-weight: 800;
@@ -158,6 +158,10 @@
       <a href="#" data-tab="feedbacks" data-only="gestor">
         <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
         Feedbacks
+      </a>
+      <a href="#" data-tab="pessoas" data-only="gestor">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+        Gestão de Pessoas
       </a>
       <a href="#" data-tab="equipe" data-only="gestor">
         <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
@@ -735,6 +739,88 @@
       </section>
 
       <!-- ════════════ EQUIPE ════════════ -->
+      <!-- ════════════ GESTÃO DE PESSOAS ════════════ -->
+      <section class="tab-section" id="tab-pessoas">
+        <div class="section-title">Gestão de Pessoas</div>
+        <div class="section-sub">Colaboradores, cargos, folha de pagamento e custos da equipe da SertCode — separado do financeiro dos clientes</div>
+
+        <nav class="rh-abas" id="rh-abas">
+          <button class="rh-aba active" data-rh="visao">Visão geral</button>
+          <button class="rh-aba" data-rh="colaboradores">Colaboradores</button>
+          <button class="rh-aba" data-rh="cargos">Cargos e Salários</button>
+          <button class="rh-aba" data-rh="folha">Folha de Pagamento</button>
+          <button class="rh-aba" data-rh="afastamentos">Férias e Afastamentos</button>
+          <button class="rh-aba" data-rh="beneficios">Benefícios</button>
+          <button class="rh-aba" data-rh="documentos">Documentos e Contratos</button>
+        </nav>
+
+        <!-- Visão geral -->
+        <div class="rh-painel active" id="rh-visao">
+          <div class="sertlink-resumo" id="rh-resumo" style="margin-bottom:18px"></div>
+          <div class="card">
+            <div class="card-title" style="margin-bottom:10px">Próximas férias e afastamentos</div>
+            <div id="rh-proximos" style="font-size:13px;color:var(--text-dim)">Nada programado.</div>
+          </div>
+        </div>
+
+        <!-- Colaboradores -->
+        <div class="rh-painel" id="rh-colaboradores">
+          <div class="card" style="margin-bottom:18px">
+            <div class="proj-filtros" style="grid-template-columns:1.6fr 1fr 1fr auto">
+              <div class="form-group" style="margin:0">
+                <label>Buscar</label>
+                <input type="text" id="rh-busca" placeholder="Nome, cargo ou setor">
+              </div>
+              <div class="form-group" style="margin:0">
+                <label>Situação</label>
+                <select id="rh-f-situacao">
+                  <option value="">Ativos (sem desligados)</option>
+                  <option value="TODOS">Todos</option>
+                  <option value="ATIVO">Ativo</option>
+                  <option value="FERIAS">Férias</option>
+                  <option value="AFASTADO">Afastado</option>
+                  <option value="DESLIGADO">Desligado</option>
+                </select>
+              </div>
+              <div class="form-group" style="margin:0">
+                <label>Vínculo</label>
+                <select id="rh-f-vinculo"><option value="">Todos os vínculos</option></select>
+              </div>
+              <button class="btn btn-primary" style="height:42px" onclick="window._novoColab()">+ Novo colaborador</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="table-scroll">
+              <table class="data-table">
+                <thead><tr><th>Colaborador</th><th>Cargo</th><th>Vínculo</th><th>Admissão</th><th>Salário-base</th><th>Situação</th><th>Ações</th></tr></thead>
+                <tbody id="rh-colab-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cargos -->
+        <div class="rh-painel" id="rh-cargos">
+          <div style="display:flex;justify-content:flex-end;margin-bottom:14px">
+            <button class="btn btn-primary" onclick="window._novoCargo()">+ Novo cargo</button>
+          </div>
+          <div class="card">
+            <div class="table-scroll">
+              <table class="data-table">
+                <thead><tr><th>Cargo</th><th>Setor</th><th>CBO</th><th>Faixa salarial</th><th>Colaboradores</th><th>Ações</th></tr></thead>
+                <tbody id="rh-cargos-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="rh-painel" id="rh-folha"><div class="card rh-embreve">Folha de pagamento — em construção.</div></div>
+        <div class="rh-painel" id="rh-afastamentos"><div class="card rh-embreve">Férias e afastamentos — em construção.</div></div>
+        <div class="rh-painel" id="rh-beneficios"><div class="card rh-embreve">Benefícios — em construção.</div></div>
+        <div class="rh-painel" id="rh-documentos"><div class="card rh-embreve">Documentos e contratos — em construção.</div></div>
+      </section>
+
+      <!-- ════════════ EQUIPE ════════════ -->
       <section class="tab-section" id="tab-equipe">
         <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:14px;margin-bottom:20px">
           <div>
@@ -870,6 +956,106 @@
       <button class="btn btn-outline" onclick="closeModal('modal-cliente')">Cancelar</button>
     </div>
     <div class="form-msg" id="nc-msg" role="alert"></div>
+  </div>
+</div>
+
+<!-- ══ MODAL: Colaborador (RH) ══ -->
+<div class="modal-overlay" id="modal-rh-colab">
+  <div class="modal-box" style="max-width:560px">
+    <button class="modal-close" onclick="closeModal('modal-rh-colab')">&times;</button>
+    <div class="modal-title" id="rc-titulo">Novo colaborador</div>
+    <div class="modal-sub">Cadastro de pessoal da SertCode</div>
+
+    <div class="form-group">
+      <label>Nome completo</label>
+      <input type="text" id="rc-nome" maxlength="120">
+    </div>
+    <div class="form-row-2">
+      <div class="form-group"><label>Como gostaria de ser chamado</label><input type="text" id="rc-apelido" maxlength="40"></div>
+      <div class="form-group"><label>Data de nascimento</label><input type="date" id="rc-nascimento"></div>
+    </div>
+    <div class="form-row-2">
+      <div class="form-group"><label>CPF</label><input type="text" id="rc-cpf" maxlength="14" inputmode="numeric"></div>
+      <div class="form-group"><label>RG</label><input type="text" id="rc-rg" maxlength="20"></div>
+    </div>
+    <div class="form-row-2">
+      <div class="form-group"><label>E-mail</label><input type="email" id="rc-email"></div>
+      <div class="form-group"><label>Telefone</label><input type="tel" id="rc-telefone" maxlength="15" inputmode="numeric"></div>
+    </div>
+
+    <div class="rh-sep">Vínculo</div>
+    <div class="form-row-2">
+      <div class="form-group"><label>Cargo</label><select id="rc-cargo"></select></div>
+      <div class="form-group"><label>Setor</label><input type="text" id="rc-setor" maxlength="60"></div>
+    </div>
+    <div class="form-row-2">
+      <div class="form-group">
+        <label>Tipo de vínculo</label>
+        <select id="rc-vinculo"></select>
+      </div>
+      <div class="form-group"><label>Data de admissão</label><input type="date" id="rc-admissao"></div>
+    </div>
+    <div class="form-row-2">
+      <div class="form-group">
+        <label>Situação</label>
+        <select id="rc-situacao">
+          <option value="ATIVO">Ativo</option>
+          <option value="FERIAS">Férias</option>
+          <option value="AFASTADO">Afastado</option>
+          <option value="DESLIGADO">Desligado</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Dependentes</label><input type="number" id="rc-dependentes" min="0" value="0"></div>
+    </div>
+
+    <div class="rh-sep">Remuneração</div>
+    <div class="form-row-2">
+      <div class="form-group"><label>Salário-base (R$)</label><input type="number" id="rc-salario" min="0" step="0.01" value="0"></div>
+      <div class="form-group">
+        <label>Periodicidade</label>
+        <select id="rc-periodicidade">
+          <option value="MENSAL">Mensal</option>
+          <option value="QUINZENAL">Quinzenal</option>
+          <option value="SEMANAL">Semanal</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row-2">
+      <div class="form-group"><label>Dia do pagamento</label><input type="number" id="rc-dia" min="1" max="31"></div>
+      <div class="form-group"><label>Chave PIX</label><input type="text" id="rc-pix" maxlength="80"></div>
+    </div>
+
+    <div style="display:flex;gap:10px;margin-top:4px">
+      <button class="btn btn-primary" style="flex:1;justify-content:center" id="rc-btn" onclick="window._salvarColab()">Cadastrar</button>
+      <button class="btn btn-outline" onclick="closeModal('modal-rh-colab')">Cancelar</button>
+    </div>
+    <div class="form-msg" id="rc-msg" role="alert"></div>
+  </div>
+</div>
+
+<!-- ══ MODAL: Cargo (RH) ══ -->
+<div class="modal-overlay" id="modal-rh-cargo">
+  <div class="modal-box" style="max-width:460px">
+    <button class="modal-close" onclick="closeModal('modal-rh-cargo')">&times;</button>
+    <div class="modal-title" id="rg-titulo">Novo cargo</div>
+    <div class="modal-sub">Usado no cadastro dos colaboradores</div>
+
+    <div class="form-group"><label>Nome do cargo</label><input type="text" id="rg-nome" maxlength="80"></div>
+    <div class="form-row-2">
+      <div class="form-group"><label>Setor</label><input type="text" id="rg-setor" maxlength="60"></div>
+      <div class="form-group"><label>CBO (opcional)</label><input type="text" id="rg-cbo" maxlength="10" placeholder="0000-00"></div>
+    </div>
+    <div class="form-row-2">
+      <div class="form-group"><label>Salário mínimo (R$)</label><input type="number" id="rg-min" min="0" step="0.01"></div>
+      <div class="form-group"><label>Salário máximo (R$)</label><input type="number" id="rg-max" min="0" step="0.01"></div>
+    </div>
+    <div class="form-group"><label>Descrição</label><textarea id="rg-descricao" placeholder="Atribuições do cargo"></textarea></div>
+
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-primary" style="flex:1;justify-content:center" id="rg-btn" onclick="window._salvarCargo()">Cadastrar</button>
+      <button class="btn btn-outline" onclick="closeModal('modal-rh-cargo')">Cancelar</button>
+    </div>
+    <div class="form-msg" id="rg-msg" role="alert"></div>
   </div>
 </div>
 
@@ -1170,6 +1356,272 @@ async function loadAll() {
   renderDepoimentos();
   renderFeedbacks();
   loadEquipe();
+  loadRh();
+}
+
+/* ══ GESTÃO DE PESSOAS ══ */
+const VINCULOS = { CLT:'CLT', PJ:'PJ', ESTAGIO:'Estágio', AUTONOMO:'Autônomo (RPA)', TEMPORARIO:'Temporário' };
+const RH_SITUACAO = {
+  ATIVO:     { label: 'Ativo',     cls: 'status-done' },
+  FERIAS:    { label: 'Férias',    cls: 'status-analysis' },
+  AFASTADO:  { label: 'Afastado',  cls: 'status-pending' },
+  DESLIGADO: { label: 'Desligado', cls: 'status-cancelado' },
+};
+let rhCargos = [], rhColabs = [], rhAfastamentos = [], rcEditId = null, rgEditId = null;
+
+const moeda = v => 'R$ ' + Number(v || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+
+/* ── sub-abas ── */
+document.querySelectorAll('.rh-aba').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('.rh-aba').forEach(x => x.classList.remove('active'));
+  b.classList.add('active');
+  document.querySelectorAll('.rh-painel').forEach(p => p.classList.remove('active'));
+  document.getElementById('rh-' + b.dataset.rh).classList.add('active');
+}));
+
+async function loadRh() {
+  if (!isGestor) return;
+  const [cg, co, af] = await Promise.all([
+    supabase.from('rh_cargos').select('*').order('nome'),
+    supabase.from('rh_colaboradores').select('*').order('nome'),
+    supabase.from('rh_afastamentos').select('*').eq('status','PROGRAMADO').order('inicio'),
+  ]);
+  rhCargos = cg.data || [];
+  rhColabs = co.data || [];
+  rhAfastamentos = af.data || [];
+  montarSelectsRh();
+  renderRhVisao();
+  renderRhColabs();
+  renderRhCargos();
+}
+
+function montarSelectsRh() {
+  const vinculos = Object.entries(VINCULOS).map(([v, l]) => `<option value="${v}">${l}</option>`).join('');
+  document.getElementById('rc-vinculo').innerHTML = vinculos;
+  document.getElementById('rh-f-vinculo').innerHTML = '<option value="">Todos os vínculos</option>' + vinculos;
+  document.getElementById('rc-cargo').innerHTML = '<option value="">Sem cargo definido</option>' +
+    rhCargos.filter(c => c.ativo).map(c => `<option value="${c.id}">${esc(c.nome)}</option>`).join('');
+}
+
+/* ── visão geral ── */
+function renderRhVisao() {
+  const ativos = rhColabs.filter(c => c.situacao === 'ATIVO');
+  const folhaBruta = ativos.reduce((t, c) => t + Number(c.salario_base || 0), 0);
+  const cartoes = [
+    { label: 'Colaboradores ativos', valor: ativos.length, cor: 'var(--text)' },
+    { label: 'Em férias',   valor: rhColabs.filter(c => c.situacao === 'FERIAS').length,   cor: 'var(--blue)' },
+    { label: 'Afastados',   valor: rhColabs.filter(c => c.situacao === 'AFASTADO').length, cor: 'var(--orange)' },
+    { label: 'Folha bruta', valor: moeda(folhaBruta), cor: 'var(--green)' },
+  ];
+  document.getElementById('rh-resumo').innerHTML = cartoes.map(c => `
+    <div class="resumo-card">
+      <div class="resumo-valor" style="color:${c.cor};font-size:${typeof c.valor === 'string' ? '17px' : '24px'}">${c.valor}</div>
+      <div class="resumo-label">${c.label}</div>
+    </div>`).join('');
+
+  const nomes = Object.fromEntries(rhColabs.map(c => [c.id, c.nome]));
+  document.getElementById('rh-proximos').innerHTML = rhAfastamentos.length
+    ? rhAfastamentos.slice(0, 5).map(a =>
+        `<div style="padding:6px 0">${esc(nomes[a.colaborador_id] || '—')} · ${esc(a.tipo)} · ${fmtDate(a.inicio)} a ${fmtDate(a.fim)}</div>`).join('')
+    : 'Nada programado.';
+}
+
+/* ── colaboradores ── */
+function renderRhColabs() {
+  const busca = document.getElementById('rh-busca').value.trim().toLowerCase();
+  const sit   = document.getElementById('rh-f-situacao').value;
+  const vinc  = document.getElementById('rh-f-vinculo').value;
+  const cargoNome = id => rhCargos.find(c => c.id === id)?.nome;
+
+  const lista = rhColabs.filter(c => {
+    if (!sit && c.situacao === 'DESLIGADO') return false;   // padrão esconde desligados
+    if (sit && sit !== 'TODOS' && c.situacao !== sit) return false;
+    if (vinc && c.vinculo !== vinc) return false;
+    if (busca && !`${c.nome} ${cargoNome(c.cargo_id) || ''} ${c.setor || ''}`.toLowerCase().includes(busca)) return false;
+    return true;
+  });
+
+  document.getElementById('rh-colab-body').innerHTML = lista.length ? lista.map(c => {
+    const s = RH_SITUACAO[c.situacao] || { label: c.situacao, cls: '' };
+    return `<tr>
+      <td>
+        <div style="font-weight:600">${esc(c.nome)}</div>
+        <div style="font-size:11px;color:var(--text-dim)">${esc(c.email || '—')}</div>
+      </td>
+      <td>
+        <div>${esc(cargoNome(c.cargo_id) || '—')}</div>
+        <div style="font-size:11px;color:var(--text-dim)">${esc(c.setor || '')}</div>
+      </td>
+      <td style="color:var(--text-dim)">${VINCULOS[c.vinculo] || c.vinculo}</td>
+      <td style="color:var(--text-dim);font-size:12px">${c.data_admissao ? fmtDate(c.data_admissao) : '—'}</td>
+      <td>${moeda(c.salario_base)}</td>
+      <td><span class="status ${s.cls}">${s.label}</span></td>
+      <td><div class="team-actions"><button class="team-btn" onclick="window._editarColab('${c.id}')">Editar</button></div></td>
+    </tr>`;
+  }).join('')
+  : `<tr><td colspan="7" class="team-empty">${rhColabs.length ? 'Nenhum colaborador para os filtros escolhidos.' : 'Nenhum colaborador cadastrado.'}</td></tr>`;
+}
+
+['rh-busca','rh-f-situacao','rh-f-vinculo'].forEach(id =>
+  document.getElementById(id).addEventListener('input', renderRhColabs));
+
+const rcSet = (t, tipo = 'error') => {
+  const m = document.getElementById('rc-msg'); m.textContent = t; m.className = 'form-msg show ' + tipo;
+};
+const rcCampos = ['rc-nome','rc-apelido','rc-nascimento','rc-cpf','rc-rg','rc-email','rc-telefone',
+                  'rc-setor','rc-admissao','rc-dia','rc-pix'];
+
+window._novoColab = () => {
+  rcEditId = null;
+  rcCampos.forEach(id => document.getElementById(id).value = '');
+  document.getElementById('rc-salario').value = '0';
+  document.getElementById('rc-dependentes').value = '0';
+  document.getElementById('rc-cargo').value = '';
+  document.getElementById('rc-vinculo').value = 'CLT';
+  document.getElementById('rc-situacao').value = 'ATIVO';
+  document.getElementById('rc-periodicidade').value = 'MENSAL';
+  document.getElementById('rc-titulo').textContent = 'Novo colaborador';
+  document.getElementById('rc-btn').textContent = 'Cadastrar';
+  document.getElementById('rc-msg').className = 'form-msg';
+  openModal('modal-rh-colab');
+};
+
+window._editarColab = (id) => {
+  const c = rhColabs.find(x => x.id === id);
+  if (!c) return;
+  rcEditId = id;
+  const v = (campo, valor) => document.getElementById(campo).value = valor ?? '';
+  v('rc-nome', c.nome); v('rc-apelido', c.apelido); v('rc-nascimento', c.data_nascimento);
+  v('rc-cpf', c.cpf); v('rc-rg', c.rg); v('rc-email', c.email); v('rc-telefone', c.telefone);
+  v('rc-cargo', c.cargo_id || ''); v('rc-setor', c.setor); v('rc-vinculo', c.vinculo || 'CLT');
+  v('rc-admissao', c.data_admissao); v('rc-situacao', c.situacao || 'ATIVO');
+  v('rc-dependentes', c.dependentes ?? 0); v('rc-salario', c.salario_base ?? 0);
+  v('rc-periodicidade', c.periodicidade || 'MENSAL'); v('rc-dia', c.dia_pagamento); v('rc-pix', c.chave_pix);
+  document.getElementById('rc-titulo').textContent = 'Editar colaborador';
+  document.getElementById('rc-btn').textContent = 'Salvar alterações';
+  document.getElementById('rc-msg').className = 'form-msg';
+  openModal('modal-rh-colab');
+};
+
+window._salvarColab = async () => {
+  const btn = document.getElementById('rc-btn'), orig = btn.textContent;
+  const val = id => document.getElementById(id).value.trim();
+  const nome = val('rc-nome').replace(/\s+/g, ' ');
+  if (nome.split(' ').length < 2) return rcSet('Informe o nome completo (nome e sobrenome).');
+
+  const dados = {
+    nome, apelido: val('rc-apelido') || null,
+    data_nascimento: val('rc-nascimento') || null,
+    cpf: val('rc-cpf') || null, rg: val('rc-rg') || null,
+    email: val('rc-email') || null, telefone: val('rc-telefone') || null,
+    cargo_id: val('rc-cargo') || null, setor: val('rc-setor') || null,
+    vinculo: val('rc-vinculo'), data_admissao: val('rc-admissao') || null,
+    situacao: val('rc-situacao'), dependentes: Number(val('rc-dependentes')) || 0,
+    salario_base: Number(val('rc-salario')) || 0,
+    periodicidade: val('rc-periodicidade'),
+    dia_pagamento: val('rc-dia') ? Number(val('rc-dia')) : null,
+    chave_pix: val('rc-pix') || null,
+    updated_at: new Date().toISOString(),
+  };
+
+  btn.textContent = 'Salvando...'; btn.disabled = true;
+  const fim = () => { btn.textContent = orig; btn.disabled = false; };
+
+  // Mudança de salário fica registrada: é o histórico que o RH consulta depois.
+  let erro;
+  if (rcEditId) {
+    const antes = rhColabs.find(x => x.id === rcEditId);
+    ({ error: erro } = await supabase.from('rh_colaboradores').update(dados).eq('id', rcEditId));
+    if (!erro && Number(antes.salario_base) !== dados.salario_base) {
+      await supabase.from('rh_salarios').insert({
+        colaborador_id: rcEditId, salario_antigo: antes.salario_base, salario_novo: dados.salario_base,
+        vigencia: new Date().toISOString().slice(0, 10), motivo: 'Alteração pelo cadastro', autor: myName,
+      });
+    }
+  } else {
+    ({ error: erro } = await supabase.from('rh_colaboradores').insert(dados));
+  }
+  if (erro) { fim(); return rcSet('Não foi possível salvar: ' + erro.message); }
+
+  await registrarRh(rcEditId ? 'ALTEROU' : 'CRIOU', 'Colaborador', nome);
+  await loadRh();
+  fim();
+  rcSet('Colaborador salvo.', 'success');
+};
+
+/* ── cargos ── */
+function renderRhCargos() {
+  const quantos = id => rhColabs.filter(c => c.cargo_id === id && c.situacao !== 'DESLIGADO').length;
+  document.getElementById('rh-cargos-body').innerHTML = rhCargos.length ? rhCargos.map(c => {
+    const faixa = c.salario_min || c.salario_max
+      ? `${moeda(c.salario_min)} a ${moeda(c.salario_max)}` : '—';
+    return `<tr>
+      <td style="font-weight:600">${esc(c.nome)}</td>
+      <td style="color:var(--text-dim)">${esc(c.setor || '—')}</td>
+      <td style="color:var(--text-dim)">${esc(c.cbo || '—')}</td>
+      <td>${faixa}</td>
+      <td>${quantos(c.id)}</td>
+      <td><div class="team-actions"><button class="team-btn" onclick="window._editarCargo('${c.id}')">Editar</button></div></td>
+    </tr>`;
+  }).join('')
+  : '<tr><td colspan="6" class="team-empty">Nenhum cargo cadastrado.</td></tr>';
+}
+
+const rgSet = (t, tipo = 'error') => {
+  const m = document.getElementById('rg-msg'); m.textContent = t; m.className = 'form-msg show ' + tipo;
+};
+
+window._novoCargo = () => {
+  rgEditId = null;
+  ['rg-nome','rg-setor','rg-cbo','rg-min','rg-max','rg-descricao'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('rg-titulo').textContent = 'Novo cargo';
+  document.getElementById('rg-btn').textContent = 'Cadastrar';
+  document.getElementById('rg-msg').className = 'form-msg';
+  openModal('modal-rh-cargo');
+};
+
+window._editarCargo = (id) => {
+  const c = rhCargos.find(x => x.id === id);
+  if (!c) return;
+  rgEditId = id;
+  const v = (campo, valor) => document.getElementById(campo).value = valor ?? '';
+  v('rg-nome', c.nome); v('rg-setor', c.setor); v('rg-cbo', c.cbo);
+  v('rg-min', c.salario_min); v('rg-max', c.salario_max); v('rg-descricao', c.descricao);
+  document.getElementById('rg-titulo').textContent = 'Editar cargo';
+  document.getElementById('rg-btn').textContent = 'Salvar alterações';
+  document.getElementById('rg-msg').className = 'form-msg';
+  openModal('modal-rh-cargo');
+};
+
+window._salvarCargo = async () => {
+  const btn = document.getElementById('rg-btn'), orig = btn.textContent;
+  const val = id => document.getElementById(id).value.trim();
+  if (!val('rg-nome')) return rgSet('Informe o nome do cargo.');
+
+  const dados = {
+    nome: val('rg-nome'), setor: val('rg-setor') || null, cbo: val('rg-cbo') || null,
+    salario_min: val('rg-min') ? Number(val('rg-min')) : null,
+    salario_max: val('rg-max') ? Number(val('rg-max')) : null,
+    descricao: val('rg-descricao') || null,
+  };
+
+  btn.textContent = 'Salvando...'; btn.disabled = true;
+  const { error } = rgEditId
+    ? await supabase.from('rh_cargos').update(dados).eq('id', rgEditId)
+    : await supabase.from('rh_cargos').insert(dados);
+  btn.textContent = orig; btn.disabled = false;
+  if (error) return rgSet('Não foi possível salvar: ' + error.message);
+
+  await loadRh();
+  rgSet('Cargo salvo.', 'success');
+};
+
+/* ── auditoria ── */
+// Salário e folha são dados sensíveis: fica registrado quem mexeu e quando.
+async function registrarRh(acao, alvo, detalhe) {
+  await supabase.from('rh_auditoria').insert({
+    autor_id: session.user.id, autor_nome: myName, acao, alvo, detalhe,
+  });
 }
 
 /* ── EQUIPE (somente gestor) ── */
@@ -1381,7 +1833,7 @@ function mascaraTelefone(e) {
   if (d.length > 7) v = `(${d.slice(0,2)}) ${d.slice(2, d.length === 11 ? 7 : 6)}-${d.slice(d.length === 11 ? 7 : 6)}`;
   e.target.value = v;
 }
-['nc-telefone','nc-telefone2','ed-telefone','ed-telefone2','co-telefone'].forEach(id =>
+['nc-telefone','nc-telefone2','ed-telefone','ed-telefone2','co-telefone','rc-telefone'].forEach(id =>
   document.getElementById(id).addEventListener('input', mascaraTelefone));
 
 window._salvarCliente = async () => {
@@ -2126,7 +2578,7 @@ document.getElementById('prog-slider').addEventListener('input', function() {
   document.getElementById('prog-display').textContent = this.value+'%';
 });
 
-const tabTitles = {dashboard:'Dashboard',clientes:'Clientes',projetos:'Projetos',chamados:'Chamados',arquivos:'Arquivos',financeiro:'Financeiro',depoimentos:'Depoimentos',feedbacks:'Feedbacks',equipe:'Equipe'};
+const tabTitles = {dashboard:'Dashboard',clientes:'Clientes',projetos:'Projetos',chamados:'Chamados',arquivos:'Arquivos',financeiro:'Financeiro',depoimentos:'Depoimentos',feedbacks:'Feedbacks',pessoas:'Gestão de Pessoas',equipe:'Equipe'};
 document.querySelectorAll('.sidebar-nav a[data-tab]').forEach(link => {
   link.addEventListener('click', e => {
     e.preventDefault();
