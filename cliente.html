@@ -8,7 +8,21 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/portal.css?v=6">
+  <link rel="stylesheet" href="css/portal.css?v=16">
+<script>
+  // Lido antes da tela aparecer, para não piscar o tema errado ao abrir.
+  try { if (localStorage.getItem('sertcode_theme') === 'light') document.documentElement.setAttribute('data-theme', 'light'); } catch (e) {}
+  addEventListener('DOMContentLoaded', () => {
+    const b = document.getElementById('tema-toggle');
+    if (!b) return;
+    b.addEventListener('click', () => {
+      const claro = document.documentElement.getAttribute('data-theme') !== 'light';
+      if (claro) document.documentElement.setAttribute('data-theme', 'light');
+      else document.documentElement.removeAttribute('data-theme');
+      try { localStorage.setItem('sertcode_theme', claro ? 'light' : 'dark'); } catch (e) {}
+    });
+  });
+</script>
 </head>
 <body>
 
@@ -22,6 +36,11 @@
   </div>
 
   <div class="login-card">
+
+    <div style="display:flex;justify-content:flex-end;margin-bottom:-10px"><button class="tema-toggle" id="tema-toggle" aria-label="Alternar tema" title="Modo claro / escuro">
+          <svg class="icone-sol" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          <svg class="icone-lua" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+        </button></div>
 
     <!-- Brand -->
     <div class="login-brand">
@@ -110,6 +129,30 @@ const msgSet = (id, texto, tipo = 'error') => {
   const el = $(id); el.textContent = texto; el.className = 'form-msg show ' + tipo;
 };
 
+/* ── MOSTRAR / OCULTAR SENHA ── */
+const OLHO = '<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
+const OLHO_OFF = '<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
+document.querySelectorAll('.login-form input[type="password"]').forEach(campo => {
+  const caixa = document.createElement('div');
+  caixa.className = 'pass-wrap';
+  campo.replaceWith(caixa);
+  caixa.appendChild(campo);
+
+  const botao = document.createElement('button');
+  botao.type = 'button';
+  botao.className = 'pass-toggle';
+  botao.innerHTML = OLHO;
+  botao.setAttribute('aria-label', 'Mostrar senha');
+  botao.addEventListener('click', () => {
+    const mostrar = campo.type === 'password';
+    campo.type = mostrar ? 'text' : 'password';
+    botao.innerHTML = mostrar ? OLHO_OFF : OLHO;
+    botao.setAttribute('aria-label', mostrar ? 'Ocultar senha' : 'Mostrar senha');
+    campo.focus();
+  });
+  caixa.appendChild(botao);
+});
+
 /* ── ALTERNAR ENTRE LOGIN, RECUPERAÇÃO E NOVA SENHA ── */
 function mostrarTela(tela) {
   $('login-form').hidden       = tela !== 'login';
@@ -190,7 +233,11 @@ document.getElementById('login-form').addEventListener('submit', async function(
   const { data, error } = await supabase.auth.signInWithPassword({ email, password: pass });
 
   if (error) {
-    err.textContent = 'Credenciais inválidas. Verifique seu e-mail e senha.';
+    // "Email not confirmed" vira "senha errada" se não for separado, e o
+    // cliente fica tentando a senha certa sem entender o que falta.
+    err.textContent = /confirm/i.test(error.message)
+      ? 'Seu e-mail ainda não foi confirmado. Procure a mensagem de confirmação na caixa de entrada e no spam, ou peça à SertCode para liberar o acesso.'
+      : 'Credenciais inválidas. Verifique seu e-mail e senha.';
     err.style.display = 'block';
     btn.innerHTML = orig;
     btn.disabled  = false;
