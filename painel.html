@@ -1822,7 +1822,7 @@ import { calcularItem, somarFolha, porExtenso } from './js/folha.js'
 
 /* ── VERIFICAR SESSÃO E PAPEL ── */
 const { data: { session } } = await supabase.auth.getSession();
-if (!session) { window.location.href = 'gestor.html'; }
+if (!session) { window.location.replace('gestor.html'); await new Promise(() => {}); }
 
 const { data: myProfile } = await supabase
   .from('profiles').select('*').eq('id', session.user.id).single();

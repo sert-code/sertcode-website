@@ -681,7 +681,7 @@ import { supabase } from './js/supabase.js'
 
 /* ── VERIFICAR SESSÃO ── */
 const { data: { session } } = await supabase.auth.getSession();
-if (!session) { window.location.href = 'cliente.html'; }
+if (!session) { window.location.replace('cliente.html'); await new Promise(() => {}); }
 
 const userId = session.user.id;
 
