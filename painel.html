@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/portal.css?v=14">
+  <link rel="stylesheet" href="css/portal.css?v=15">
   <style>
     .admin-badge {
       font-size: 9px; font-weight: 800;
@@ -3033,7 +3033,9 @@ function abrirImpressao(conteudo, titulo) {
   const janela = window.open('', '_blank');
   if (!janela) return alert('Libere as janelas pop-up para gerar o PDF.');
   janela.document.write(`<!DOCTYPE html><html lang="pt-BR"><head><meta charset="utf-8">
-<title>${titulo}</title><style>${ESTILO_HOLERITE}</style></head><body>${conteudo}</body></html>`);
+<title>${titulo}</title><style>${ESTILO_HOLERITE}</style></head><body>${conteudo}<div id="avisos" class="avisos" aria-live="polite"></div>
+
+</body></html>`);
   janela.document.close();
   janela.focus();
   setTimeout(() => janela.print(), 400);
@@ -4810,7 +4812,8 @@ window._salvarCliente = async () => {
 
   await loadAll();
   fim();
-  set(`${nome} cadastrado. ${data.session ? 'O acesso já está liberado.' : 'O cliente precisa confirmar o e-mail antes do primeiro acesso.'} Envie a senha provisória por um canal privado e abra o projeto na aba Projetos.`, 'success');
+  closeModal('modal-cliente');
+  window._aviso(`${nome} cadastrado. ${data.session ? 'O acesso já está liberado.' : 'O cliente precisa confirmar o e-mail antes do primeiro acesso.'} Envie a senha provisória (${senha}) por um canal privado e abra o projeto na aba Projetos.`);
 };
 
 /* ── PROJETOS ── */
@@ -5135,6 +5138,18 @@ window._baixarPdf = () => {
   janela.document.close();
   janela.focus();
   setTimeout(() => janela.print(), 400);
+};
+
+/* ── AVISO FLUTUANTE ── */
+// Fica até ser fechado: a mensagem de cadastro traz a senha provisória, e
+// sumir sozinha faria o gestor perder o que precisa repassar ao cliente.
+window._aviso = (texto, tipo = 'success') => {
+  const caixa = document.createElement('div');
+  caixa.className = 'aviso-item aviso-' + tipo;
+  caixa.innerHTML = `<div>${esc(texto)}</div>
+    <button class="aviso-fechar" aria-label="Fechar">&times;</button>`;
+  caixa.querySelector('.aviso-fechar').addEventListener('click', () => caixa.remove());
+  el('avisos').appendChild(caixa);
 };
 
 /* ── EDITAR CLIENTE SOB MEDIDA ── */

@@ -1007,6 +1007,29 @@ button { font-family: var(--font); }
 .meurh-linha:last-child { border-bottom: 0; }
 .meurh-linha strong { color: var(--text); font-weight: 600; text-align: right; }
 
+/* ── Aviso flutuante ── */
+.avisos {
+  position: fixed; right: 22px; bottom: 22px; z-index: 9999;
+  display: flex; flex-direction: column; gap: 10px;
+  width: min(380px, calc(100vw - 32px)); pointer-events: none;
+}
+.aviso-item {
+  display: flex; align-items: flex-start; gap: 12px; pointer-events: auto;
+  padding: 14px 16px; border-radius: 12px;
+  background: var(--surface); border: 1px solid var(--border);
+  box-shadow: 0 10px 34px rgba(0,0,0,0.45);
+  font-size: 13px; line-height: 1.65; color: var(--text);
+  animation: avisoEntra .25s ease both;
+}
+.aviso-success { border-color: rgba(34,197,94,0.3); background: rgba(34,197,94,0.08); }
+.aviso-error   { border-color: rgba(239,68,68,0.3); background: rgba(239,68,68,0.08); }
+.aviso-fechar {
+  border: 0; background: none; color: var(--text-dim); cursor: pointer;
+  font-size: 19px; line-height: 1; padding: 0 2px; flex-shrink: 0;
+}
+.aviso-fechar:hover { color: var(--text); }
+@keyframes avisoEntra { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
 /* ── Meu RH: portal do colaborador ── */
 .meurh-ola { display: flex; align-items: center; gap: 14px; }
 .meurh-avatar {
