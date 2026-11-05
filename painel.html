@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/portal.css?v=12">
+  <link rel="stylesheet" href="css/portal.css?v=13">
   <style>
     .admin-badge {
       font-size: 9px; font-weight: 800;
@@ -794,6 +794,7 @@
           <button class="rh-aba" data-rh="afastamentos">Férias e Afastamentos</button>
           <button class="rh-aba" data-rh="beneficios">Benefícios</button>
           <button class="rh-aba" data-rh="documentos">Documentos e Contratos</button>
+          <button class="rh-aba" data-rh="solicitacoes">Solicitações<span class="sidebar-badge" id="solic-badge" style="display:none;margin-left:6px"></span></button>
           <button class="rh-aba" data-rh="pagamentos">Histórico de Pagamentos</button>
           <button class="rh-aba" data-rh="relatorios">Relatórios de RH</button>
           <button class="rh-aba" data-rh="config">Configurações</button>
@@ -859,6 +860,28 @@
           </div>
         </div>
 
+
+
+        <!-- Solicitações da equipe -->
+        <div class="rh-painel" id="rh-solicitacoes">
+          <div class="form-group"><select id="gs-filtro">
+            <option value="ABERTAS">Em andamento</option>
+            <option value="">Todas</option>
+            <option value="ABERTA">Abertas</option>
+            <option value="EM_ANALISE">Em análise</option>
+            <option value="AGUARDANDO_COLABORADOR">Aguardando colaborador</option>
+            <option value="CONCLUIDA">Concluídas</option>
+            <option value="RECUSADA">Recusadas</option>
+          </select></div>
+          <div class="card">
+            <div class="table-scroll">
+              <table class="data-table">
+                <thead><tr><th>Colaborador</th><th>Tipo</th><th>Assunto</th><th>Aberta em</th><th>Situação</th></tr></thead>
+                <tbody id="gs-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
 
         <!-- Configurações -->
         <div class="rh-painel" id="rh-config">
@@ -1577,6 +1600,98 @@
   </div>
 </div>
 
+<!-- ══ MODAL: Nova solicitação ══ -->
+<div class="modal-overlay" id="modal-solicitacao">
+  <div class="modal-box" style="max-width:460px">
+    <button class="modal-close" onclick="closeModal('modal-solicitacao')">&times;</button>
+    <div class="modal-title">Nova solicitação</div>
+    <div class="modal-sub">A Gestão de Pessoas responde por aqui mesmo</div>
+
+    <div class="form-group"><label>Tipo</label><select id="sol-tipo"></select></div>
+    <div class="form-group"><label>Assunto</label><input type="text" id="sol-assunto" maxlength="120" placeholder="Ex.: Alteração de telefone"></div>
+    <div class="form-group"><label>Descrição</label><textarea id="sol-descricao" placeholder="Explique o que precisa."></textarea></div>
+    <div class="form-group"><label>Anexo (opcional)</label><input type="file" id="sol-anexo"></div>
+
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-primary" style="flex:1;justify-content:center" id="sol-btn" onclick="window._salvarSolicitacao()">Enviar solicitação</button>
+      <button class="btn btn-outline" onclick="closeModal('modal-solicitacao')">Cancelar</button>
+    </div>
+    <div class="form-msg" id="sol-msg" role="alert"></div>
+  </div>
+</div>
+
+<!-- ══ MODAL: Acompanhar solicitação ══ -->
+<div class="modal-overlay" id="modal-ver-solicitacao">
+  <div class="modal-box" style="max-width:500px">
+    <button class="modal-close" onclick="closeModal('modal-ver-solicitacao')">&times;</button>
+    <div class="modal-title" id="vs-titulo">Solicitação</div>
+    <div class="modal-sub" id="vs-sub"></div>
+    <div id="vs-conversa" class="hist-lista" style="margin-top:14px"></div>
+    <div id="vs-responder" style="margin-top:14px">
+      <div class="form-group"><label>Responder</label><textarea id="vs-resposta" placeholder="Complemente a informação."></textarea></div>
+      <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="window._responderSolicitacao()">Enviar resposta</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: Solicitação (gestão) ══ -->
+<div class="modal-overlay" id="modal-gs">
+  <div class="modal-box" style="max-width:520px">
+    <button class="modal-close" onclick="closeModal('modal-gs')">&times;</button>
+    <div class="modal-title" id="gs-titulo">Solicitação</div>
+    <div class="modal-sub" id="gs-sub"></div>
+    <div id="gs-conversa" class="hist-lista" style="margin-top:14px"></div>
+
+    <div class="form-row-2" style="margin-top:16px">
+      <div class="form-group"><label>Situação</label>
+        <select id="gs-status">
+          <option value="ABERTA">Aberta</option>
+          <option value="EM_ANALISE">Em análise</option>
+          <option value="AGUARDANDO_COLABORADOR">Aguardando colaborador</option>
+          <option value="APROVADA">Aprovada</option>
+          <option value="RECUSADA">Recusada</option>
+          <option value="CONCLUIDA">Concluída</option>
+        </select></div>
+      <div class="form-group"><label>Responsável</label><input type="text" id="gs-responsavel" maxlength="60"></div>
+    </div>
+    <div class="form-group"><label>Resposta ao colaborador</label><textarea id="gs-resposta" placeholder="O que foi feito ou o que falta."></textarea></div>
+
+    <button class="btn btn-primary" style="width:100%;justify-content:center" id="gs-btn" onclick="window._responderGestao()">Salvar e responder</button>
+    <div class="form-msg" id="gs-msg" role="alert"></div>
+  </div>
+</div>
+
+<!-- ══ MODAL: Editar acesso da equipe ══ -->
+<div class="modal-overlay" id="modal-acesso">
+  <div class="modal-box" style="max-width:440px">
+    <button class="modal-close" onclick="closeModal('modal-acesso')">&times;</button>
+    <div class="modal-title" id="ac-titulo">Acesso ao painel</div>
+    <div class="modal-sub" id="ac-sub"></div>
+
+    <div class="form-row-2">
+      <div class="form-group"><label>Nome</label><input type="text" id="ac-nome" maxlength="120"></div>
+      <div class="form-group"><label>Como é chamado</label><input type="text" id="ac-apelido" maxlength="40"></div>
+    </div>
+    <div class="form-row-2">
+      <div class="form-group"><label>Papel</label>
+        <select id="ac-papel"><option value="colaborador">Colaborador</option><option value="gestor">Gestor</option></select></div>
+      <div class="form-group"><label>Telefone</label><input type="tel" id="ac-telefone" maxlength="15" inputmode="numeric"></div>
+    </div>
+
+    <div style="display:flex;gap:10px;margin-bottom:14px">
+      <button class="btn btn-primary" style="flex:1;justify-content:center" id="ac-btn" onclick="window._salvarAcesso()">Salvar</button>
+      <button class="btn btn-outline" onclick="closeModal('modal-acesso')">Cancelar</button>
+    </div>
+
+    <div style="border-top:1px solid var(--border);padding-top:14px">
+      <div class="rh-bloco-titulo">Senha</div>
+      <div class="rh-bloco-texto">Envia um link para a pessoa criar a própria senha. A atual continua valendo até o link ser usado.</div>
+      <button class="btn btn-outline" style="width:100%;justify-content:center" id="ac-reset" onclick="window._resetarSenhaEquipe()">Enviar link de nova senha</button>
+    </div>
+    <div class="form-msg" id="ac-msg" role="alert"></div>
+  </div>
+</div>
+
 <!-- ══ MODAL: Novo Colaborador ══ -->
 <div class="modal-overlay" id="modal-colaborador">
   <div class="modal-box" style="max-width:480px">
@@ -1949,6 +2064,7 @@ async function loadRh() {
   renderFolhas();
   await loadRhLeitura();
   await loadFinPessoal();
+  await loadSolicitacoes();
 }
 
 function montarSelectsRh() {
@@ -3056,67 +3172,477 @@ window._pagarCusto = async (id) => {
   await loadRhLeitura();
 };
 
-/* ── Meu RH ── */
+/* ── solicitações da equipe (gestão) ── */
+let gsSolicitacoes = [], gsAberta = null;
+
+async function loadSolicitacoes() {
+  if (!isGestor) return;
+  const { data } = await supabase.from('rh_solicitacoes').select('*').order('created_at', { ascending: false });
+  gsSolicitacoes = data || [];
+
+  // O menu conta só o que ainda espera alguém: concluída e recusada saem.
+  const pendentes = gsSolicitacoes.filter(s => !['CONCLUIDA', 'RECUSADA'].includes(s.status)).length;
+  const badge = el('solic-badge');
+  if (badge) { badge.textContent = pendentes; badge.style.display = pendentes ? '' : 'none'; }
+  renderSolicitacoes();
+}
+
+function renderSolicitacoes() {
+  const filtro = val('gs-filtro');
+  const nomes = Object.fromEntries(rhColabs.map(c => [c.id, c.nome]));
+  const lista = gsSolicitacoes.filter(s => {
+    if (filtro === 'ABERTAS') return !['CONCLUIDA', 'RECUSADA'].includes(s.status);
+    return !filtro || s.status === filtro;
+  });
+
+  el('gs-body').innerHTML = lista.length ? lista.map(s => {
+    const st = STATUS_SOLIC[s.status] || { label: s.status, cls: '' };
+    return `<tr class="rh-linha" onclick="window._abrirSolicitacaoGestao('${s.id}')">
+      <td style="font-weight:600">${esc(nomes[s.colaborador_id] || '—')}</td>
+      <td style="color:var(--text-dim)">${TIPO_SOLIC[s.tipo] || s.tipo}</td>
+      <td>${esc(s.assunto)}</td>
+      <td style="color:var(--text-dim);font-size:12px">${fmtDate(s.created_at)}</td>
+      <td><span class="status ${st.cls}">${st.label}</span></td>
+    </tr>`;
+  }).join('')
+  : `<tr><td colspan="5" class="team-empty">${gsSolicitacoes.length ? 'Nada neste filtro.' : 'Nenhuma solicitação.'}</td></tr>`;
+}
+
+window._abrirSolicitacaoGestao = async (id) => {
+  gsAberta = gsSolicitacoes.find(s => s.id === id);
+  if (!gsAberta) return;
+  const nome = rhColabs.find(c => c.id === gsAberta.colaborador_id)?.nome || '—';
+
+  el('gs-titulo').textContent = gsAberta.assunto;
+  el('gs-sub').textContent = `${nome} · ${TIPO_SOLIC[gsAberta.tipo] || gsAberta.tipo} · aberta em ${fmtDate(gsAberta.created_at)}`;
+  el('gs-status').value = gsAberta.status;
+  el('gs-responsavel').value = gsAberta.responsavel || myName;
+  el('gs-resposta').value = '';
+  el('gs-msg').className = 'form-msg';
+  el('gs-conversa').innerHTML = '<div class="rh-item-sub">Carregando...</div>';
+  openModal('modal-gs');
+
+  const { data } = await supabase.from('rh_solicitacao_mensagens').select('*')
+    .eq('solicitacao_id', id).order('created_at');
+  const linhas = [
+    { autor_nome: nome, autor_tipo: 'COLABORADOR', mensagem: gsAberta.descricao || '(sem descrição)', created_at: gsAberta.created_at },
+    ...(data || []),
+  ];
+  el('gs-conversa').innerHTML = linhas.map(m => `<div class="hist-item">
+      <div class="hist-topo">
+        <span style="font-size:12.5px;font-weight:600">${m.autor_tipo === 'GESTAO' ? 'Gestão de Pessoas' : esc(m.autor_nome || nome)}</span>
+        <span class="hist-data">${fmtDateTime(m.created_at)}</span>
+      </div>
+      <div class="hist-nota">${esc(m.mensagem)}</div>
+    </div>`).join('')
+    + (gsAberta.anexo ? `<button class="cbo-link" onclick="window._baixarDocLista('${gsAberta.anexo}','${gsAberta.colaborador_id}')">Ver anexo enviado</button>` : '');
+};
+
+window._responderGestao = async () => {
+  const btn = el('gs-btn'), orig = btn.textContent;
+  const set = (t, tipo = 'error') => { const m = el('gs-msg'); m.textContent = t; m.className = 'form-msg show ' + tipo; };
+  const status = val('gs-status'), resposta = val('gs-resposta');
+
+  // Recusar sem explicar deixa o colaborador sem saber o que fazer.
+  if (status === 'RECUSADA' && !resposta) return set('Explique o motivo da recusa.');
+
+  btn.textContent = 'Salvando...'; btn.disabled = true;
+  const { error } = await supabase.from('rh_solicitacoes').update({
+    status, responsavel: val('gs-responsavel') || myName, updated_at: new Date().toISOString(),
+  }).eq('id', gsAberta.id);
+  if (error) { btn.textContent = orig; btn.disabled = false; return set('Não foi possível salvar: ' + error.message); }
+
+  if (resposta) {
+    await supabase.from('rh_solicitacao_mensagens').insert({
+      solicitacao_id: gsAberta.id, autor_nome: myName, autor_tipo: 'GESTAO', mensagem: resposta,
+    });
+  }
+  await registrarRh('ALTEROU', 'Solicitação',
+    `${gsAberta.assunto} · ${STATUS_SOLIC[status].label}`, gsAberta.colaborador_id);
+
+  btn.textContent = orig; btn.disabled = false;
+  closeModal('modal-gs');
+  await loadSolicitacoes();
+};
+
+el('gs-filtro').addEventListener('change', renderSolicitacoes);
+
+/* ── acesso ao painel, a partir da Equipe ── */
+let acEditId = null;
+const acSet = (t, tipo = 'error') => { const m = el('ac-msg'); m.textContent = t; m.className = 'form-msg show ' + tipo; };
+
+window._editarAcesso = (id) => {
+  const m = allTeam.find(x => x.id === id);
+  if (!m) return;
+  acEditId = id;
+  el('ac-titulo').textContent = m.nickname || m.name || 'Acesso ao painel';
+  el('ac-sub').textContent = m.email || '';
+  el('ac-nome').value = m.name || '';
+  el('ac-apelido').value = m.nickname || '';
+  el('ac-papel').value = m.role || 'colaborador';
+  el('ac-telefone').value = m.phone || '';
+  el('ac-msg').className = 'form-msg';
+  // Ninguém tira o próprio acesso de gestor por engano.
+  el('ac-papel').disabled = m.id === session.user.id;
+  openModal('modal-acesso');
+};
+
+window._salvarAcesso = async () => {
+  const btn = el('ac-btn'), orig = btn.textContent;
+  if (!val('ac-nome')) return acSet('Informe o nome.');
+
+  btn.textContent = 'Salvando...'; btn.disabled = true;
+  const { error } = await supabase.from('profiles').update({
+    name: val('ac-nome'), nickname: val('ac-apelido') || null,
+    phone: val('ac-telefone') || null, role: el('ac-papel').value,
+  }).eq('id', acEditId);
+  btn.textContent = orig; btn.disabled = false;
+  if (error) return acSet('Não foi possível salvar: ' + error.message);
+
+  await loadEquipe();
+  acSet('Acesso atualizado.', 'success');
+};
+
+window._resetarSenhaEquipe = async () => {
+  const m = allTeam.find(x => x.id === acEditId);
+  if (!m?.email) return acSet('Esta conta não tem e-mail cadastrado.');
+  if (!confirm(`Enviar link de nova senha para ${m.email}?`)) return;
+
+  const btn = el('ac-reset'), orig = btn.textContent;
+  btn.textContent = 'Enviando...'; btn.disabled = true;
+  const { error } = await supabase.auth.resetPasswordForEmail(m.email, {
+    redirectTo: new URL('gestor.html', location.href).href,
+  });
+  btn.textContent = orig; btn.disabled = false;
+  acSet(error ? 'Não foi possível enviar: ' + error.message : `Link enviado para ${m.email}.`,
+        error ? 'error' : 'success');
+};
+
+/* ── Meu RH: portal do colaborador ── */
+// A Gestão de Pessoas administra; aqui a pessoa consulta os próprios dados e
+// pede mudanças. Nada de outro colaborador aparece, e alteração de cargo,
+// salário ou vínculo continua sendo da Gestão.
+const TIPO_SOLIC = {
+  CADASTRO:'Atualização cadastral', FERIAS:'Férias ou folga', AFASTAMENTO:'Afastamento',
+  BENEFICIO:'Benefícios', DEPENDENTE:'Dependentes', DOCUMENTO:'Documentos',
+  FINANCEIRO:'Correção financeira',
+};
+const STATUS_SOLIC = {
+  ABERTA:                 { label: 'Aberta',                 cls: 'status-pending' },
+  EM_ANALISE:             { label: 'Em análise',             cls: 'status-analysis' },
+  AGUARDANDO_COLABORADOR: { label: 'Aguardando você',        cls: 'status-analysis' },
+  APROVADA:               { label: 'Aprovada',               cls: 'status-done' },
+  RECUSADA:               { label: 'Recusada',               cls: 'status-expirado' },
+  CONCLUIDA:              { label: 'Concluída',              cls: 'status-done' },
+};
+let meuCadastro = null, meusHolerites = [], meusDocs = [], meusDependentes = [],
+    minhasSolicitacoes = [], meusBeneficios = [], meuHistorico = [], meusAfastamentos = [];
+
+// CPF aparece parcialmente coberto: confirma a identidade sem expor o número.
+const cpfMascarado = cpf => {
+  const d = String(cpf || '').replace(/\D/g, '');
+  return d.length === 11 ? `***.${d.slice(3, 6)}.${d.slice(6, 9)}-**` : (cpf || '—');
+};
+
 async function loadMeuRh() {
   const alvo = el('meurh-conteudo');
+
   const { data: eu } = await supabase.from('rh_colaboradores').select('*')
     .eq('profile_id', session.user.id).maybeSingle();
+  meuCadastro = eu;
 
   if (!eu) {
-    alvo.innerHTML = '<div class="card rh-embreve">Seu cadastro de colaborador ainda não foi criado pela Gestão de Pessoas.</div>';
+    alvo.innerHTML = `<div class="card" style="text-align:center;padding:32px 20px">
+      <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:6px">Cadastro ainda não criado</div>
+      <div class="rh-bloco-texto" style="margin:0">
+        Seu cadastro de colaborador ainda não foi criado pela Gestão de Pessoas.
+        Assim que isso acontecer, seus dados, documentos e demonstrativos aparecem aqui.
+      </div>
+    </div>`;
     return;
   }
 
-  const { data: holerites } = await supabase.from('rh_folha_itens').select('*')
-    .eq('colaborador_id', eu.id).order('id', { ascending: false });
-  const { data: folhas } = await supabase.from('rh_folhas').select('id, competencia, status');
-  const porId = Object.fromEntries((folhas || []).map(f => [f.id, f]));
-  meusHolerites = (holerites || []).map(h => ({ ...h, folha: porId[h.folha_id] }))
+  const [hol, folhas, docs, deps, solic, bens, hist, afast] = await Promise.all([
+    supabase.from('rh_folha_itens').select('*').eq('colaborador_id', eu.id),
+    supabase.from('rh_folhas').select('id, competencia, status, vencimento'),
+    supabase.from('rh_documentos').select('*').eq('colaborador_id', eu.id).order('created_at', { ascending: false }),
+    supabase.from('rh_dependentes').select('*').eq('colaborador_id', eu.id).order('nome'),
+    supabase.from('rh_solicitacoes').select('*').eq('colaborador_id', eu.id).order('created_at', { ascending: false }),
+    supabase.from('rh_colaborador_beneficios').select('*').eq('colaborador_id', eu.id),
+    supabase.from('rh_auditoria').select('*').eq('colaborador_id', eu.id).order('created_at', { ascending: false }).limit(50),
+    supabase.from('rh_afastamentos').select('*').eq('colaborador_id', eu.id).order('inicio', { ascending: false }),
+  ]);
+
+  const porId = Object.fromEntries((folhas.data || []).map(f => [f.id, f]));
+  meusHolerites = (hol.data || []).map(h => ({ ...h, folha: porId[h.folha_id] }))
     .filter(h => h.folha)
     .sort((a, b) => b.folha.competencia.localeCompare(a.folha.competencia));
+  meusDocs = docs.data || [];
+  meusDependentes = deps.data || [];
+  minhasSolicitacoes = solic.data || [];
+  meusBeneficios = bens.data || [];
+  meuHistorico = hist.data || [];
+  meusAfastamentos = afast.data || [];
 
-  const cargo = rhCargos.find(c => c.id === eu.cargo_id)?.nome;
-  const linha = (r, v) => `<div class="meurh-linha"><span>${r}</span><strong>${v}</strong></div>`;
+  renderMeuRh();
+}
 
-  alvo.innerHTML = `
-    <div class="grid-2" style="margin-bottom:22px">
-      <div class="card">
-        <div class="card-title" style="margin-bottom:12px">Dados funcionais</div>
-        ${linha('Nome', esc(eu.nome))}
-        ${linha('Cargo', esc(cargo || '—'))}
-        ${linha('Setor', esc(eu.setor || '—'))}
-        ${linha('Vínculo', VINCULOS[eu.vinculo] || eu.vinculo)}
-        ${linha('Admissão', eu.data_admissao ? fmtDate(eu.data_admissao) : '—')}
-        ${linha('Situação', (RH_SITUACAO[eu.situacao] || { label: eu.situacao }).label)}
+function renderMeuRh() {
+  el('meurh-conteudo').innerHTML = `
+    <nav class="rh-abas" id="meurh-abas">
+      <button class="rh-aba active" data-meu="inicio">Início</button>
+      <button class="rh-aba" data-meu="perfil">Meu Perfil</button>
+      <button class="rh-aba" data-meu="documentos">Meus Documentos</button>
+      <button class="rh-aba" data-meu="remuneracao">Minha Remuneração</button>
+      <button class="rh-aba" data-meu="dependentes">Meus Dependentes</button>
+      <button class="rh-aba" data-meu="solicitacoes">Minhas Solicitações</button>
+      <button class="rh-aba" data-meu="historico">Meu Histórico</button>
+    </nav>
+    <div class="rh-painel active" id="meu-inicio">${telaInicio()}</div>
+    <div class="rh-painel" id="meu-perfil">${telaPerfil()}</div>
+    <div class="rh-painel" id="meu-documentos">${telaDocumentos()}</div>
+    <div class="rh-painel" id="meu-remuneracao">${telaRemuneracao()}</div>
+    <div class="rh-painel" id="meu-dependentes">${telaDependentes()}</div>
+    <div class="rh-painel" id="meu-solicitacoes">${telaSolicitacoes()}</div>
+    <div class="rh-painel" id="meu-historico">${telaHistorico()}</div>`;
+
+  document.querySelectorAll('#meurh-abas .rh-aba').forEach(b => b.addEventListener('click', () => {
+    document.querySelectorAll('#meurh-abas .rh-aba').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    document.querySelectorAll('#meurh-conteudo .rh-painel').forEach(p => p.classList.remove('active'));
+    el('meu-' + b.dataset.meu).classList.add('active');
+  }));
+}
+
+window._meuRhAba = (nome) => {
+  const botao = document.querySelector(`#meurh-abas [data-meu="${nome}"]`);
+  if (botao) botao.click();
+};
+
+/* ── início ── */
+function telaInicio() {
+  const ultimo = meusHolerites.find(h => h.status_pagamento === 'PAGO');
+  const emAnalise = minhasSolicitacoes.filter(s => !['CONCLUIDA', 'RECUSADA'].includes(s.status)).length;
+  const cargo = rhCargos.find(c => c.id === meuCadastro.cargo_id)?.nome;
+  const apelido = meuCadastro.apelido || meuCadastro.nome.split(' ')[0];
+
+  const cartao = (icone, rotulo, valor, aba) => `
+    <button class="meurh-card" onclick="window._meuRhAba('${aba}')">
+      <div class="meurh-card-icone">${icone}</div>
+      <div>
+        <div class="meurh-card-rotulo">${rotulo}</div>
+        <div class="meurh-card-valor">${valor}</div>
       </div>
-      <div class="card">
-        <div class="card-title" style="margin-bottom:12px">Remuneração</div>
-        ${linha('Salário-base', moeda(eu.salario_base))}
-        ${linha('Pagamento', `${({ MENSAL:'Mensal', QUINZENAL:'Quinzenal', SEMANAL:'Semanal' })[eu.periodicidade] || eu.periodicidade}${eu.dia_pagamento ? ', dia ' + eu.dia_pagamento : ''}`)}
-        ${linha('Pix', esc(eu.chave_pix || '—'))}
-        ${linha('Conta', esc([eu.banco, eu.banco_agencia, eu.banco_conta].filter(Boolean).join(' · ') || '—'))}
+    </button>`;
+
+  return `
+    <div class="card meurh-ola">
+      <div class="meurh-avatar">${esc(ini(meuCadastro.nome))}</div>
+      <div>
+        <div class="meurh-saudacao">Olá, ${esc(apelido)}!</div>
+        <div class="rh-item-sub">${esc(cargo || 'Colaborador')} · SertCode</div>
       </div>
     </div>
 
-    <div class="card-title" style="margin-bottom:10px">Demonstrativos de pagamento</div>
+    <div class="meurh-cards">
+      ${cartao('💰', 'Último pagamento', ultimo ? moeda(ultimo.salario_liquido) : '—', 'remuneracao')}
+      ${cartao('📄', 'Documentos', `${meusDocs.length} disponível(is)`, 'documentos')}
+      ${cartao('📋', 'Solicitações', emAnalise ? `${emAnalise} em andamento` : 'Nenhuma aberta', 'solicitacoes')}
+      ${cartao('👥', 'Dependentes', `${meusDependentes.length} cadastrado(s)`, 'dependentes')}
+    </div>
+
+    <div class="card" style="margin-top:18px">
+      <div class="card-title" style="margin-bottom:10px">Acesso rápido</div>
+      ${['documentos:Meus documentos', 'remuneracao:Minha remuneração', 'solicitacoes:Minhas solicitações']
+        .map(x => { const [aba, texto] = x.split(':');
+          return `<button class="meurh-atalho" onclick="window._meuRhAba('${aba}')">${texto}<span>›</span></button>`; }).join('')}
+    </div>`;
+}
+
+/* ── perfil ── */
+function telaPerfil() {
+  const c = meuCadastro;
+  const cargo = rhCargos.find(x => x.id === c.cargo_id)?.nome;
+  const endereco = [c.endereco, c.numero, c.complemento, c.bairro, c.cidade, c.estado]
+    .filter(Boolean).join(', ');
+  const linha = (r, v) => `<div class="meurh-linha"><span>${r}</span><strong>${v}</strong></div>`;
+
+  return `
+    <div class="grid-2" style="margin-bottom:18px">
+      <div class="card">
+        <div class="card-title" style="margin-bottom:12px">Dados pessoais</div>
+        ${linha('Nome', esc(c.nome))}
+        ${linha('CPF', cpfMascarado(c.cpf))}
+        ${linha('Nascimento', c.data_nascimento ? fmtDate(c.data_nascimento) : '—')}
+        ${linha('E-mail', esc(c.email || '—'))}
+        ${linha('Telefone', esc(c.telefone || '—'))}
+        ${linha('Endereço', esc(endereco || '—'))}
+      </div>
+      <div class="card">
+        <div class="card-title" style="margin-bottom:12px">Dados profissionais</div>
+        ${linha('Cargo', esc(cargo || '—'))}
+        ${linha('Setor', esc(c.setor || '—'))}
+        ${linha('Vínculo', VINCULOS[c.vinculo] || c.vinculo)}
+        ${linha('Admissão', c.data_admissao ? fmtDate(c.data_admissao) : '—')}
+        ${linha('Situação', (RH_SITUACAO[c.situacao] || { label: c.situacao }).label)}
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:18px">
+      <div class="card-title" style="margin-bottom:4px">Senha de acesso</div>
+      <div class="rh-bloco-texto">Trocar aqui vale para o painel inteiro. Mínimo de 8 caracteres.</div>
+      <div class="form-row-2">
+        <div class="form-group"><label>Nova senha</label>
+          <div class="pass-wrap"><input type="password" id="ms-senha" placeholder="Mínimo 8 caracteres"></div></div>
+        <div class="form-group"><label>Confirmar senha</label>
+          <div class="pass-wrap"><input type="password" id="ms-senha2" placeholder="Repita a senha"></div></div>
+      </div>
+      <button class="btn btn-primary" id="ms-btn" onclick="window._trocarMinhaSenha()">Salvar nova senha</button>
+      <div class="form-msg" id="ms-msg" role="alert"></div>
+    </div>
+
+    <div class="rh-bloco-texto">
+      Para corrigir qualquer dado, abra uma solicitação de <strong>atualização cadastral</strong>.
+      Cargo, salário e vínculo são alterados pela Gestão de Pessoas.
+    </div>
+    <button class="btn btn-outline" onclick="window._novaSolicitacao('CADASTRO')">Solicitar correção de dados</button>`;
+}
+
+window._trocarMinhaSenha = async () => {
+  const btn = el('ms-btn'), orig = btn.textContent;
+  const msg = el('ms-msg');
+  const set = (t, tipo = 'error') => { msg.textContent = t; msg.className = 'form-msg show ' + tipo; };
+  const senha = val('ms-senha'), senha2 = val('ms-senha2');
+
+  if (senha.length < 8) return set('A senha precisa ter pelo menos 8 caracteres.');
+  if (senha !== senha2) return set('As senhas não conferem.');
+
+  btn.textContent = 'Salvando...'; btn.disabled = true;
+  const { error } = await supabase.auth.updateUser({ password: senha });
+  btn.textContent = orig; btn.disabled = false;
+  if (error) return set('Não foi possível trocar: ' + error.message);
+
+  el('ms-senha').value = ''; el('ms-senha2').value = '';
+  set('Senha alterada. Use a nova no próximo acesso.', 'success');
+};
+
+/* ── documentos ── */
+function telaDocumentos() {
+  const lista = [
+    ...meusDocs.map(d => ({
+      nome: d.nome, tipo: TIPO_DOC[d.tipo] || d.tipo, data: d.created_at,
+      acao: `window._baixarMeuDoc('${d.caminho}')`,
+    })),
+    ...meusHolerites.map((h, i) => ({
+      nome: `Demonstrativo de ${competenciaLabel(h.folha.competencia)}`,
+      tipo: 'Demonstrativo de pagamento', data: h.folha.vencimento,
+      acao: `window._meuDemonstrativo(${i})`,
+    })),
+  ].sort((a, b) => new Date(b.data || 0) - new Date(a.data || 0));
+
+  return `
+    <div class="rh-bloco-texto">Contratos, termos, comprovantes e demonstrativos disponibilizados pela SertCode.</div>
     <div class="card">
       <div class="table-scroll">
         <table class="data-table">
-          <thead><tr><th>Competência</th><th>Bruto</th><th>Líquido</th><th>Situação</th><th></th></tr></thead>
-          <tbody>${meusHolerites.length ? meusHolerites.map((h, i) => `<tr>
-            <td style="font-weight:600">${competenciaLabel(h.folha.competencia)}</td>
-            <td style="color:var(--text-dim)">${moeda(h.salario_bruto)}</td>
-            <td>${moeda(h.salario_liquido)}</td>
-            <td><span class="status ${h.status_pagamento === 'PAGO' ? 'status-done' : 'status-pending'}">${
-              h.status_pagamento === 'PAGO' ? 'Pago em ' + fmtDate(h.pago_em) : 'A pagar'}</span></td>
-            <td><button class="team-btn" onclick="window._meuDemonstrativo(${i})">PDF</button></td>
+          <thead><tr><th>Documento</th><th>Tipo</th><th>Data</th><th>Ações</th></tr></thead>
+          <tbody>${lista.length ? lista.map(d => `<tr>
+            <td style="font-weight:600">${esc(d.nome)}</td>
+            <td style="color:var(--text-dim)">${esc(d.tipo)}</td>
+            <td style="color:var(--text-dim);font-size:12px">${d.data ? fmtDate(d.data) : '—'}</td>
+            <td><div class="team-actions"><button class="team-btn" onclick="${d.acao}">Abrir</button></div></td>
           </tr>`).join('')
-          : '<tr><td colspan="5" class="team-empty">Nenhum demonstrativo disponível ainda.</td></tr>'}</tbody>
+          : '<tr><td colspan="4" class="team-empty">Nenhum documento disponível.</td></tr>'}</tbody>
         </table>
       </div>
-    </div>`;
+    </div>
+    <button class="btn btn-outline" style="margin-top:14px" onclick="window._novaSolicitacao('DOCUMENTO')">Solicitar documento ou declaração</button>`;
 }
-let meusHolerites = [];
+
+window._baixarMeuDoc = async (caminho) => {
+  const { data, error } = await supabase.storage.from('rh-documentos').createSignedUrl(caminho, 60);
+  if (error) return alert('Não foi possível abrir: ' + error.message);
+  window.open(data.signedUrl, '_blank');
+};
+
+/* ── remuneração ── */
+function telaRemuneracao() {
+  const c = meuCadastro;
+  const ultimo = meusHolerites[0];
+  const descontos = ultimo
+    ? Number(ultimo.inss) + Number(ultimo.irrf) + Number(ultimo.desconto_beneficios) + Number(ultimo.outros_descontos)
+    : 0;
+
+  const destaque = ultimo ? `
+    <div class="card meurh-remuneracao">
+      <div class="meurh-remu-topo">
+        <div>
+          <div class="card-title" style="margin:0">Último demonstrativo</div>
+          <div class="rh-item-sub">Competência: ${competenciaLabel(ultimo.folha.competencia)}</div>
+        </div>
+        <span class="status ${ultimo.status_pagamento === 'PAGO' ? 'status-done' : 'status-pending'}">${
+          ultimo.status_pagamento === 'PAGO' ? 'Pago' : 'A pagar'}</span>
+      </div>
+      <div class="meurh-liquido">
+        <div class="rh-item-sub">Valor líquido recebido</div>
+        <div class="meurh-liquido-valor">${moeda(ultimo.salario_liquido)}</div>
+      </div>
+      <div class="meurh-linha"><span>Remuneração bruta</span><strong>${moeda(ultimo.salario_bruto)}</strong></div>
+      <div class="meurh-linha"><span>Descontos</span><strong style="color:var(--red)">− ${moeda(descontos)}</strong></div>
+      <div class="meurh-linha"><span>Pagamento</span><strong>${ultimo.status_pagamento === 'PAGO' ? fmtDate(ultimo.pago_em) : fmtDate(ultimo.folha.vencimento)}</strong></div>
+      <div class="meurh-linha"><span>Comprovante</span>
+        <button class="cbo-link" onclick="window._meuDemonstrativo(0)">Visualizar recibo</button></div>
+    </div>` : '';
+
+  const beneficios = meusBeneficios.length ? `
+    <div class="card" style="margin-top:18px">
+      <div class="card-title" style="margin-bottom:10px">Benefícios</div>
+      ${meusBeneficios.map(b => {
+        const nome = rhBenefTodos.find(x => x.id === b.beneficio_id)?.nome || 'Benefício';
+        return `<div class="meurh-linha"><span>${esc(nome)}</span><strong>${
+          Number(b.desconto) ? '− ' + moeda(b.desconto) : 'sem desconto'}</strong></div>`;
+      }).join('')}
+    </div>` : '';
+
+  return `
+    ${destaque}
+    <div class="card" style="margin-top:${ultimo ? '18px' : '0'}">
+      <div class="card-title" style="margin-bottom:10px">Remuneração acordada</div>
+      <div class="meurh-linha"><span>Salário-base</span><strong>${moeda(c.salario_base)}</strong></div>
+      <div class="meurh-linha"><span>Periodicidade</span><strong>${
+        ({ MENSAL:'Mensal', QUINZENAL:'Quinzenal', SEMANAL:'Semanal' })[c.periodicidade] || c.periodicidade}${
+        c.dia_pagamento ? ', dia ' + c.dia_pagamento : ''}</strong></div>
+      <div class="meurh-linha"><span>Chave Pix</span><strong>${esc(c.chave_pix || '—')}</strong></div>
+      <div class="meurh-linha"><span>Conta</span><strong>${esc([c.banco, c.banco_agencia, c.banco_conta].filter(Boolean).join(' · ') || '—')}</strong></div>
+    </div>
+    ${beneficios}
+
+    <div class="card-title" style="margin:22px 0 10px">Histórico de pagamentos</div>
+    <div class="card">
+      <div class="table-scroll">
+        <table class="data-table">
+          <thead><tr><th>Competência</th><th>Bruto</th><th>Descontos</th><th>Líquido</th><th>Situação</th><th></th></tr></thead>
+          <tbody>${meusHolerites.length ? meusHolerites.map((h, i) => {
+            const d = Number(h.inss) + Number(h.irrf) + Number(h.desconto_beneficios) + Number(h.outros_descontos);
+            return `<tr>
+              <td style="font-weight:600">${competenciaLabel(h.folha.competencia)}</td>
+              <td style="color:var(--text-dim)">${moeda(h.salario_bruto)}</td>
+              <td style="color:var(--text-dim)">${moeda(d)}</td>
+              <td>${moeda(h.salario_liquido)}</td>
+              <td><span class="status ${h.status_pagamento === 'PAGO' ? 'status-done' : 'status-pending'}">${
+                h.status_pagamento === 'PAGO' ? 'Pago em ' + fmtDate(h.pago_em) : 'A pagar'}</span></td>
+              <td><button class="team-btn" onclick="window._meuDemonstrativo(${i})">PDF</button></td>
+            </tr>`;
+          }).join('')
+          : '<tr><td colspan="6" class="team-empty">Nenhum demonstrativo disponível ainda.</td></tr>'}</tbody>
+        </table>
+      </div>
+    </div>
+    <div class="rh-bloco-texto" style="margin-top:14px">
+      Acompanhamento interno da SertCode. Não substitui o contracheque oficial nem a folha do contador.
+    </div>
+    <button class="btn btn-outline" onclick="window._novaSolicitacao('FINANCEIRO')">Questionar remuneração ou desconto</button>`;
+}
 
 // O demonstrativo usa a competência da folha do próprio holerite.
 window._meuDemonstrativo = (i) => {
@@ -3127,6 +3653,165 @@ window._meuDemonstrativo = (i) => {
   abrirImpressao(htmlDemonstrativo(h), `demonstrativo-${h.folha.competencia}`);
   folhaAberta = anterior;
 };
+
+/* ── dependentes ── */
+function telaDependentes() {
+  return `
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px">
+        <div>
+          <div class="card-title">Meus dependentes</div>
+          <div class="rh-item-sub">Cadastro mantido pela Gestão de Pessoas</div>
+        </div>
+        <span class="origem-badge">${meusDependentes.length} cadastrado(s)</span>
+      </div>
+      <div class="rh-lista">${meusDependentes.length ? meusDependentes.map(d => {
+        const marcas = [d.auxilio_creche && 'Creche', d.salario_familia && 'Salário-família', d.dependente_irrf && 'IRRF'].filter(Boolean);
+        return `<div class="rh-item">
+          <div><strong>${esc(d.nome)}</strong>
+            <div class="rh-item-sub">${esc(d.parentesco || '—')}${d.data_nascimento ? ' · ' + fmtDate(d.data_nascimento) : ''}${marcas.length ? ' · ' + marcas.join(', ') : ''}</div></div>
+        </div>`;
+      }).join('') : 'Nenhum dependente cadastrado.'}</div>
+    </div>
+    <div class="rh-bloco-texto" style="margin-top:14px">
+      Para incluir ou corrigir um dependente, abra uma solicitação. A Gestão de Pessoas confere os documentos antes de registrar.
+    </div>
+    <button class="btn btn-outline" onclick="window._novaSolicitacao('DEPENDENTE')">Solicitar inclusão ou alteração</button>`;
+}
+
+/* ── solicitações ── */
+function telaSolicitacoes() {
+  return `
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:16px">
+      <div class="rh-bloco-texto" style="margin:0">Peça atualização de cadastro, férias, documentos, benefícios ou revisão de valores.</div>
+      <button class="btn btn-primary" onclick="window._novaSolicitacao()">+ Nova solicitação</button>
+    </div>
+    <div class="rh-lista">${minhasSolicitacoes.length ? minhasSolicitacoes.map(s => {
+      const st = STATUS_SOLIC[s.status] || { label: s.status, cls: '' };
+      return `<button class="rh-item meurh-solic" onclick="window._verSolicitacao('${s.id}')">
+        <div style="text-align:left">
+          <strong>${esc(s.assunto)}</strong>
+          <div class="rh-item-sub">${TIPO_SOLIC[s.tipo] || s.tipo} · aberta em ${fmtDate(s.created_at)}</div>
+        </div>
+        <span class="status ${st.cls}">${st.label}</span>
+      </button>`;
+    }).join('') : 'Nenhuma solicitação aberta.'}</div>`;
+}
+
+/* ── histórico ── */
+function telaHistorico() {
+  const acao = { CRIOU:'Cadastrou', ALTEROU:'Alterou', EXCLUIU:'Removeu', VISUALIZOU:'Consultou' };
+  const eventos = [
+    ...meuHistorico.map(h => ({
+      data: h.created_at,
+      texto: `${acao[h.acao] || h.acao} ${String(h.alvo).toLowerCase()}`,
+      detalhe: h.detalhe, autor: h.autor_nome,
+    })),
+    ...meusAfastamentos.map(a => ({
+      data: a.created_at,
+      texto: `${TIPO_AFAST[a.tipo] || a.tipo} programado`,
+      detalhe: `${fmtDate(a.inicio)} a ${fmtDate(a.fim)}`, autor: a.autor,
+    })),
+  ].sort((a, b) => new Date(b.data || 0) - new Date(a.data || 0));
+
+  return `
+    <div class="rh-bloco-texto">Alterações de cargo e remuneração, afastamentos, documentos e benefícios. Registro apenas de leitura.</div>
+    <div class="hist-lista">${eventos.length ? eventos.map(e => `<div class="hist-item">
+        <div class="hist-topo">
+          <span style="font-size:12.5px;font-weight:600">${esc(e.texto)}</span>
+          <span class="hist-data">${fmtDateTime(e.data)}</span>
+        </div>
+        ${e.detalhe ? `<div class="hist-nota">${esc(e.detalhe)}</div>` : ''}
+        <div class="hist-autor">por ${esc(e.autor || 'SertCode')}</div>
+      </div>`).join('')
+      : '<div class="team-empty">Nenhum registro ainda.</div>'}</div>`;
+}
+
+/* ── abrir e acompanhar solicitação ── */
+window._novaSolicitacao = (tipo) => {
+  if (!meuCadastro) return;
+  el('sol-tipo').innerHTML = Object.entries(TIPO_SOLIC)
+    .map(([v, l]) => `<option value="${v}"${v === tipo ? ' selected' : ''}>${l}</option>`).join('');
+  el('sol-assunto').value = '';
+  el('sol-descricao').value = '';
+  el('sol-anexo').value = '';
+  el('sol-msg').className = 'form-msg';
+  openModal('modal-solicitacao');
+};
+
+window._salvarSolicitacao = async () => {
+  const btn = el('sol-btn'), orig = btn.textContent;
+  const set = (t, tipo = 'error') => { const m = el('sol-msg'); m.textContent = t; m.className = 'form-msg show ' + tipo; };
+  if (!val('sol-assunto')) return set('Informe o assunto.');
+
+  btn.textContent = 'Enviando...'; btn.disabled = true;
+  const fim = () => { btn.textContent = orig; btn.disabled = false; };
+
+  let anexo = null;
+  const arquivo = el('sol-anexo').files[0];
+  if (arquivo) {
+    if (arquivo.size > 10 * 1024 * 1024) { fim(); return set('O anexo precisa ter no máximo 10 MB.'); }
+    const caminho = `solicitacoes/${meuCadastro.id}/${Date.now()}-${arquivo.name.replace(/[^\w.\-]/g, '_')}`;
+    const { error } = await supabase.storage.from('rh-documentos').upload(caminho, arquivo);
+    if (error) { fim(); return set('Não foi possível enviar o anexo: ' + error.message); }
+    anexo = caminho;
+  }
+
+  const { error } = await supabase.from('rh_solicitacoes').insert({
+    colaborador_id: meuCadastro.id, tipo: val('sol-tipo'), assunto: val('sol-assunto'),
+    descricao: val('sol-descricao') || null, anexo, status: 'ABERTA',
+  });
+  fim();
+  if (error) return set('Não foi possível abrir: ' + error.message);
+
+  closeModal('modal-solicitacao');
+  await loadMeuRh();
+  window._meuRhAba('solicitacoes');
+};
+
+window._verSolicitacao = async (id) => {
+  const s = minhasSolicitacoes.find(x => x.id === id);
+  if (!s) return;
+  const st = STATUS_SOLIC[s.status] || { label: s.status, cls: '' };
+
+  el('vs-titulo').textContent = s.assunto;
+  el('vs-sub').innerHTML = `${TIPO_SOLIC[s.tipo] || s.tipo} · aberta em ${fmtDate(s.created_at)} · <span class="status ${st.cls}">${st.label}</span>`;
+  el('vs-conversa').innerHTML = '<div class="rh-item-sub">Carregando...</div>';
+  openModal('modal-ver-solicitacao');
+
+  const { data } = await supabase.from('rh_solicitacao_mensagens').select('*')
+    .eq('solicitacao_id', id).order('created_at');
+
+  const linhas = [
+    { autor_nome: 'Você', autor_tipo: 'COLABORADOR', mensagem: s.descricao || '(sem descrição)', created_at: s.created_at },
+    ...(data || []),
+  ];
+  el('vs-conversa').innerHTML = linhas.map(m => `<div class="hist-item">
+      <div class="hist-topo">
+        <span style="font-size:12.5px;font-weight:600">${m.autor_tipo === 'GESTAO' ? 'Gestão de Pessoas' : esc(m.autor_nome || 'Você')}</span>
+        <span class="hist-data">${fmtDateTime(m.created_at)}</span>
+      </div>
+      <div class="hist-nota">${esc(m.mensagem)}</div>
+    </div>`).join('')
+    + (s.anexo ? `<button class="cbo-link" onclick="window._baixarMeuDoc('${s.anexo}')">Ver anexo enviado</button>` : '');
+
+  el('vs-resposta').value = '';
+  el('vs-responder').hidden = ['CONCLUIDA', 'RECUSADA'].includes(s.status);
+  el('vs-responder').dataset.solicitacao = id;
+};
+
+window._responderSolicitacao = async () => {
+  const id = el('vs-responder').dataset.solicitacao;
+  const texto = val('vs-resposta');
+  if (!texto) return;
+  const { error } = await supabase.from('rh_solicitacao_mensagens').insert({
+    solicitacao_id: id, autor_nome: myName, autor_tipo: 'COLABORADOR', mensagem: texto,
+  });
+  if (error) return alert('Não foi possível enviar: ' + error.message);
+  await window._verSolicitacao(id);
+};
+
+/* ── parâmetros de cálculo da folha ── */
 
 /* ── parâmetros de cálculo da folha ── */
 // Valores de 2026. Ficam editáveis porque mudam todo ano, e a conta da folha
@@ -3802,7 +4487,7 @@ function teamPerson(m) {
   </div>`;
 }
 const teamBtn = (id, status, label, cls = '') =>
-  `<button class="team-btn ${cls}" data-team-id="${esc(id)}" data-team-status="${status}">${label}</button>`;
+  `<button class="team-btn ${cls}" data-team-id="${esc(id)}" data-team-status="${status}" onclick="event.stopPropagation()">${label}</button>`;
 
 function renderEquipe() {
   const badge = document.getElementById('equipe-badge');
@@ -3812,7 +4497,7 @@ function renderEquipe() {
     const acao = m.id === session.user.id ? '<span style="font-size:11.5px;color:var(--text-dim)">Você</span>'
       : m.status === 'ativo' ? teamBtn(m.id, 'inativo', 'Desativar', 'danger')
       : teamBtn(m.id, 'ativo', 'Reativar', 'approve');
-    return `<tr>
+    return `<tr class="rh-linha" onclick="window._editarAcesso('${m.id}')">
       <td>${teamPerson(m)}</td>
       <td>${m.role === 'gestor' ? 'Gestor' : 'Colaborador'}</td>
       <td>${fmtBirth(m.birth_date)}</td>
