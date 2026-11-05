@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/portal.css?v=13">
+  <link rel="stylesheet" href="css/portal.css?v=14">
   <style>
     .admin-badge {
       font-size: 9px; font-weight: 800;
@@ -1084,7 +1084,7 @@
         <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:14px;margin-bottom:20px">
           <div>
             <div class="section-title">Equipe</div>
-            <div class="section-sub" style="margin-bottom:0">Cadastre, desative ou reative o acesso dos colaboradores da SertCode</div>
+            <div class="section-sub" style="margin-bottom:0">Cadastre, desative ou reative o acesso. Clique na linha para editar os dados e a senha.</div>
           </div>
           <button class="btn btn-primary" onclick="window._novoColaborador()">
             <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -1681,6 +1681,12 @@
     <div style="display:flex;gap:10px;margin-bottom:14px">
       <button class="btn btn-primary" style="flex:1;justify-content:center" id="ac-btn" onclick="window._salvarAcesso()">Salvar</button>
       <button class="btn btn-outline" onclick="closeModal('modal-acesso')">Cancelar</button>
+    </div>
+
+    <div style="border-top:1px solid var(--border);padding-top:14px;margin-bottom:14px">
+      <div class="rh-bloco-titulo">Cadastro na Gestão de Pessoas</div>
+      <div class="rh-bloco-texto" id="ac-rh-texto"></div>
+      <button class="btn btn-outline" style="width:100%;justify-content:center" id="ac-rh-btn" onclick="window._cadastroRh()"></button>
     </div>
 
     <div style="border-top:1px solid var(--border);padding-top:14px">
@@ -3284,7 +3290,54 @@ window._editarAcesso = (id) => {
   el('ac-msg').className = 'form-msg';
   // Ninguém tira o próprio acesso de gestor por engano.
   el('ac-papel').disabled = m.id === session.user.id;
+  mostrarCadastroRh(m);
   openModal('modal-acesso');
+};
+
+// Quem tem acesso ao painel nem sempre tem ficha de RH: o gestor costuma
+// cadastrar a si mesmo por último, e sem ficha o Meu RH dele fica vazio.
+function mostrarCadastroRh(m) {
+  const ficha = rhColabs.find(c => c.profile_id === m.id);
+  el('ac-rh-texto').textContent = ficha
+    ? 'Esta pessoa já tem ficha de colaborador, com cargo, remuneração e documentos.'
+    : 'Sem ficha de colaborador. Sem ela, esta pessoa não entra na folha e o Meu RH dela fica vazio.';
+  el('ac-rh-btn').textContent = ficha ? 'Abrir ficha na Gestão de Pessoas' : 'Criar ficha de colaborador';
+  el('ac-rh-btn').dataset.ficha = ficha?.id || '';
+}
+
+window._cadastroRh = async () => {
+  const fichaId = el('ac-rh-btn').dataset.ficha;
+  if (fichaId) {
+    closeModal('modal-acesso');
+    document.querySelector('.sidebar-nav a[data-tab="pessoas"]').click();
+    document.querySelector('#rh-abas [data-rh="colaboradores"]').click();
+    window._editarColab(fichaId);
+    return;
+  }
+
+  const m = allTeam.find(x => x.id === acEditId);
+  if (!m) return;
+  const btn = el('ac-rh-btn'), orig = btn.textContent;
+  btn.textContent = 'Criando...'; btn.disabled = true;
+
+  // Aproveita o que já existe no acesso; o resto se completa na ficha.
+  const { data: criada, error } = await supabase.from('rh_colaboradores').insert({
+    nome: m.name || m.nickname || 'Colaborador', apelido: m.nickname || null,
+    email: m.email || null, telefone: m.phone || null,
+    data_nascimento: m.birth_date || null, profile_id: m.id,
+    situacao: 'ATIVO', vinculo: 'CLT', salario_base: 0,
+  }).select('id').single();
+
+  btn.textContent = orig; btn.disabled = false;
+  if (error) return acSet('Não foi possível criar: ' + error.message);
+
+  await registrarRh('CRIOU', 'Colaborador', m.name || m.nickname, criada.id);
+  await loadRh();
+  if (m.id === session.user.id) await loadMeuRh();
+  closeModal('modal-acesso');
+  document.querySelector('.sidebar-nav a[data-tab="pessoas"]').click();
+  document.querySelector('#rh-abas [data-rh="colaboradores"]').click();
+  window._editarColab(criada.id);
 };
 
 window._salvarAcesso = async () => {
@@ -3354,10 +3407,12 @@ async function loadMeuRh() {
   if (!eu) {
     alvo.innerHTML = `<div class="card" style="text-align:center;padding:32px 20px">
       <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:6px">Cadastro ainda não criado</div>
-      <div class="rh-bloco-texto" style="margin:0">
-        Seu cadastro de colaborador ainda não foi criado pela Gestão de Pessoas.
-        Assim que isso acontecer, seus dados, documentos e demonstrativos aparecem aqui.
+      <div class="rh-bloco-texto" style="margin:0 0 ${isGestor ? '16px' : '0'}">
+        ${isGestor
+          ? 'Você tem acesso ao painel, mas ainda não tem ficha de colaborador. Crie a sua para entrar na folha e acompanhar seus dados por aqui.'
+          : 'Seu cadastro de colaborador ainda não foi criado pela Gestão de Pessoas. Assim que isso acontecer, seus dados, documentos e demonstrativos aparecem aqui.'}
       </div>
+      ${isGestor ? '<button class="btn btn-primary" onclick="window._criarMinhaFicha()">Criar minha ficha de colaborador</button>' : ''}
     </div>`;
     return;
   }
@@ -3372,6 +3427,20 @@ async function loadMeuRh() {
     supabase.from('rh_auditoria').select('*').eq('colaborador_id', eu.id).order('created_at', { ascending: false }).limit(50),
     supabase.from('rh_afastamentos').select('*').eq('colaborador_id', eu.id).order('inicio', { ascending: false }),
   ]);
+
+  // Cargos e benefícios só são carregados para o gestor; sem eles o portal
+  // mostraria traço no lugar do cargo e do nome do benefício.
+  if (!rhCargos.length) {
+    const { data } = await supabase.from('rh_cargos').select('id, nome');
+    rhCargos = data || [];
+  }
+  if (!rhBenefTodos.length) {
+    const { data } = await supabase.from('rh_beneficios').select('id, nome');
+    rhBenefTodos = data || [];
+  }
+  // O demonstrativo busca o colaborador na lista da gestão, que o
+  // colaborador comum não tem.
+  if (!rhColabs.some(c => c.id === eu.id)) rhColabs = [...rhColabs, eu];
 
   const porId = Object.fromEntries((folhas.data || []).map(f => [f.id, f]));
   meusHolerites = (hol.data || []).map(h => ({ ...h, folha: porId[h.folha_id] }))
@@ -3413,6 +3482,21 @@ function renderMeuRh() {
     el('meu-' + b.dataset.meu).classList.add('active');
   }));
 }
+
+window._criarMinhaFicha = async () => {
+  const { data: perfil } = await supabase.from('profiles').select('*').eq('id', session.user.id).single();
+  const { data: criada, error } = await supabase.from('rh_colaboradores').insert({
+    nome: perfil?.name || myName, apelido: perfil?.nickname || null,
+    email: perfil?.email || null, telefone: perfil?.phone || null,
+    data_nascimento: perfil?.birth_date || null, profile_id: session.user.id,
+    situacao: 'ATIVO', vinculo: 'CLT', salario_base: 0,
+  }).select('id').single();
+  if (error) return alert('Não foi possível criar: ' + error.message);
+
+  await registrarRh('CRIOU', 'Colaborador', perfil?.name || myName, criada.id);
+  await loadRh();
+  await loadMeuRh();
+};
 
 window._meuRhAba = (nome) => {
   const botao = document.querySelector(`#meurh-abas [data-meu="${nome}"]`);
