@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/portal.css?v=11">
+  <link rel="stylesheet" href="css/portal.css?v=12">
   <style>
     .admin-badge {
       font-size: 9px; font-weight: 800;
@@ -158,6 +158,10 @@
       <a href="#" data-tab="feedbacks" data-only="gestor">
         <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
         Feedbacks
+      </a>
+      <a href="#" data-tab="meu-rh">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><circle cx="8.5" cy="11" r="2.5"/><path d="M4.5 17a4 4 0 018 0"/><line x1="15" y1="10" x2="19" y2="10"/><line x1="15" y1="14" x2="19" y2="14"/></svg>
+        Meu RH
       </a>
       <a href="#" data-tab="pessoas" data-only="gestor">
         <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
@@ -597,6 +601,33 @@
 
       <!-- ════════════ FINANCEIRO ════════════ -->
       <section class="tab-section" id="tab-financeiro">
+        <nav class="rh-abas" id="fin-abas" style="margin-bottom:20px">
+          <button class="rh-aba active" data-fin="clientes">Clientes</button>
+          <button class="rh-aba" data-fin="pessoal">Pessoal (SertCode)</button>
+        </nav>
+
+        <div class="rh-painel" id="fin-pessoal">
+          <div class="rh-aviso">
+            Custos da equipe interna da SertCode, vindos das folhas aprovadas em Gestão de Pessoas — separados do financeiro dos clientes. <strong>Provisionado</strong> é despesa reconhecida (ex.: 13º e férias); <strong>a pagar</strong> é obrigação pendente; <strong>pago</strong> é saída de dinheiro.
+          </div>
+          <div class="rh-abas" id="fin-sub" style="margin-bottom:18px">
+            <button class="rh-aba active" data-finsub="tudo">Despesas com pessoal</button>
+            <button class="rh-aba" data-finsub="salarios">Salários a pagar</button>
+            <button class="rh-aba" data-finsub="encargos">Encargos e provisões</button>
+          </div>
+          <div class="form-group"><select id="fin-competencia"><option value="">Todas as competências</option></select></div>
+          <div class="sertlink-resumo" id="fin-resumo" style="grid-template-columns:repeat(3,1fr);margin-bottom:18px"></div>
+          <div class="card">
+            <div class="table-scroll">
+              <table class="data-table">
+                <thead id="fin-cabecalho"></thead>
+                <tbody id="fin-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="rh-painel active" id="fin-clientes">
         <div class="section-title">Financeiro</div>
         <div class="section-sub">Controle de parcelas e recebimentos de todos os clientes</div>
 
@@ -633,6 +664,7 @@
               <tr><td style="font-weight:600">NordLog</td><td style="color:var(--text-dim)">Suporte mensal Mai/Jun</td><td style="font-weight:700">R$ 4.200,00</td><td style="color:var(--text-dim);font-size:12px">01 Jun 2026</td><td id="fin-4"><span class="status status-pending">Pendente</span></td><td><button class="btn btn-outline" style="font-size:11px;padding:4px 10px" onclick="markPaid(this,'fin-4')">Marcar pago</button></td></tr>
             </tbody>
           </table>
+        </div>
         </div>
       </section>
 
@@ -739,6 +771,16 @@
       </section>
 
       <!-- ════════════ EQUIPE ════════════ -->
+      <!-- ════════════ MEU RH ════════════ -->
+      <section class="tab-section" id="tab-meu-rh">
+        <div class="section-title">Meu RH</div>
+        <div class="section-sub">Seus dados como colaborador da SertCode e seus demonstrativos de pagamento</div>
+
+        <div id="meurh-conteudo">
+          <div class="card rh-embreve">Carregando...</div>
+        </div>
+      </section>
+
       <!-- ════════════ GESTÃO DE PESSOAS ════════════ -->
       <section class="tab-section" id="tab-pessoas">
         <div class="section-title">Gestão de Pessoas</div>
@@ -876,7 +918,54 @@
           <div class="form-msg" id="cfg-msg" role="alert"></div>
         </div>
 
-        <div class="rh-painel" id="rh-folha"><div class="card rh-embreve">Folha de pagamento — em construção.</div></div>
+        <div class="rh-painel" id="rh-folha">
+          <!-- lista -->
+          <div id="folha-lista">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:18px">
+              <div class="rh-bloco-texto" style="margin:0">Monte a folha, envie para aprovação e registre os pagamentos. Folha aprovada fica travada: correções só reabrindo, com o motivo registrado.</div>
+              <button class="btn btn-primary" onclick="window._novaFolha()">+ Nova folha</button>
+            </div>
+            <div class="card">
+              <div class="table-scroll">
+                <table class="data-table">
+                  <thead><tr><th>Competência</th><th>Colaboradores</th><th>Folha bruta</th><th>Líquido</th><th>Custo total</th><th>Vencimento</th><th>Pagamentos</th><th>Situação</th></tr></thead>
+                  <tbody id="folhas-body"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- detalhe -->
+          <div id="folha-detalhe" hidden>
+            <button class="cbo-link" style="margin-bottom:12px" onclick="window._voltarFolhas()">← Todas as folhas</button>
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:6px">
+              <div>
+                <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+                  <div class="section-title" style="margin:0" id="fd-titulo">Folha</div>
+                  <span class="status" id="fd-status"></span>
+                </div>
+                <div style="font-size:11.5px;color:var(--text-dim);margin-top:4px" id="fd-sub"></div>
+              </div>
+              <div class="team-actions" id="fd-acoes"></div>
+            </div>
+
+            <div class="sertlink-resumo" id="fd-resumo" style="grid-template-columns:repeat(4,1fr);margin:18px 0"></div>
+
+            <div class="card">
+              <div class="table-scroll">
+                <table class="data-table">
+                  <thead><tr><th>Colaborador</th><th>Cargo</th><th>Salário bruto</th><th>Descontos</th><th>Salário líquido</th><th>Encargos</th><th>Custo total</th><th>Status</th><th>Ações</th></tr></thead>
+                  <tbody id="fd-itens"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="card" style="margin-top:18px" id="fd-lancamentos-card" hidden>
+              <div class="card-title" style="margin-bottom:12px">Lançamentos gerados no Financeiro</div>
+              <div id="fd-lancamentos" class="rh-lista"></div>
+            </div>
+          </div>
+        </div>
         <div class="rh-painel" id="rh-afastamentos">
           <div class="rh-add-linha" style="grid-template-columns:1fr auto;margin-top:0;margin-bottom:18px">
             <div class="form-group" style="margin:0">
@@ -1339,6 +1428,58 @@
   </div>
 </div>
 
+<!-- ══ MODAL: Ajuste da folha ══ -->
+<div class="modal-overlay" id="modal-rh-ajuste">
+  <div class="modal-box" style="max-width:500px">
+    <button class="modal-close" onclick="closeModal('modal-rh-ajuste')">&times;</button>
+    <div class="modal-title" id="aj-titulo">Ajustar</div>
+
+    <div class="rh-bloco" style="margin-top:14px">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+        <div class="rh-bloco-titulo" style="margin:0">Proventos extras</div>
+        <span style="font-size:12.5px;font-weight:700;color:var(--green)" id="aj-total-prov">+ R$ 0,00</span>
+      </div>
+      <div id="aj-proventos" class="rh-lancamentos"></div>
+      <button type="button" class="cbo-link" onclick="window._addLancamento('provento')">+ Adicionar provento</button>
+    </div>
+
+    <div class="rh-bloco">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+        <div class="rh-bloco-titulo" style="margin:0">Descontos</div>
+        <span style="font-size:12.5px;font-weight:700;color:var(--red)" id="aj-total-desc">− R$ 0,00</span>
+      </div>
+      <div id="aj-descontos" class="rh-lancamentos"></div>
+      <button type="button" class="cbo-link" onclick="window._addLancamento('desconto')">+ Adicionar desconto</button>
+    </div>
+
+    <div class="form-group" style="margin-top:16px"><label>Observação</label><input type="text" id="aj-obs" maxlength="200"></div>
+    <div class="rh-bloco-texto">INSS, IRRF, benefícios, FGTS e o custo total são automáticos e recalculados ao salvar. Cada linha aparece no demonstrativo.</div>
+
+    <button class="btn btn-primary" style="width:100%;justify-content:center" id="aj-btn" onclick="window._salvarAjuste()">Salvar e recalcular</button>
+    <div class="form-msg" id="aj-msg" role="alert"></div>
+  </div>
+</div>
+
+<!-- ══ MODAL: Nova folha ══ -->
+<div class="modal-overlay" id="modal-rh-nova-folha">
+  <div class="modal-box" style="max-width:420px">
+    <button class="modal-close" onclick="closeModal('modal-rh-nova-folha')">&times;</button>
+    <div class="modal-title">Nova folha</div>
+    <div class="modal-sub">Entram os colaboradores ativos, com o salário do cadastro</div>
+
+    <div class="form-row-2">
+      <div class="form-group"><label>Competência</label><input type="month" id="nf-competencia"></div>
+      <div class="form-group"><label>Vencimento</label><input type="date" id="nf-vencimento"></div>
+    </div>
+
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-primary" style="flex:1;justify-content:center" id="nf-btn" onclick="window._criarFolha()">Criar folha</button>
+      <button class="btn btn-outline" onclick="closeModal('modal-rh-nova-folha')">Cancelar</button>
+    </div>
+    <div class="form-msg" id="nf-msg" role="alert"></div>
+  </div>
+</div>
+
 <!-- ══ MODAL: Benefício (RH) ══ -->
 <div class="modal-overlay" id="modal-rh-benef">
   <div class="modal-box" style="max-width:460px">
@@ -1677,6 +1818,7 @@
 
 <script type="module">
 import { supabase, createSignupClient } from './js/supabase.js'
+import { calcularItem, somarFolha, porExtenso } from './js/folha.js'
 
 /* ── VERIFICAR SESSÃO E PAPEL ── */
 const { data: { session } } = await supabase.auth.getSession();
@@ -1734,6 +1876,7 @@ async function loadAll() {
   renderFeedbacks();
   loadEquipe();
   loadRh();
+  loadMeuRh();
 }
 
 /* ══ GESTÃO DE PESSOAS ══ */
@@ -1801,8 +1944,11 @@ async function loadRh() {
   renderRhCargos();
   renderRhAfastamentos();
   renderRhBeneficios();
-  await loadRhLeitura();
   await loadRhConfig();
+  await carregarTotaisFolhas();
+  renderFolhas();
+  await loadRhLeitura();
+  await loadFinPessoal();
 }
 
 function montarSelectsRh() {
@@ -2221,6 +2367,766 @@ async function carregarHistorico(id) {
       </div>`).join('')
     : 'Nenhum registro.';
 }
+
+/* ── folha de pagamento ── */
+const FOLHA_STATUS = {
+  RASCUNHO:             { label: 'Rascunho',              cls: 'status-pending' },
+  AGUARDANDO_APROVACAO: { label: 'Aguardando aprovação',  cls: 'status-analysis' },
+  APROVADA:             { label: 'Aguardando pagamento',  cls: 'status-analysis' },
+  PAGA:                 { label: 'Paga',                  cls: 'status-done' },
+  CANCELADA:            { label: 'Cancelada',             cls: 'status-cancelado' },
+};
+const PROVENTOS = {
+  HORAS_EXTRAS:'Horas extras', ADICIONAL_NOTURNO:'Adicional noturno', COMISSAO:'Comissão',
+  BONUS:'Bônus / premiação', OUTROS:'Outros proventos',
+};
+const DESCONTOS = {
+  ADIANTAMENTO:'Adiantamento salarial', FALTAS:'Faltas não justificadas', ATRASOS:'Atrasos',
+  PENSAO:'Pensão alimentícia', CONSIGNADO:'Empréstimo consignado',
+  SINDICAL:'Contribuição sindical (autorizada)', COPARTICIPACAO:'Coparticipação do plano de saúde',
+  OUTRAS:'Outras deduções',
+};
+let folhaAberta = null, folhaItens = [], ajusteItem = null, ajusteLinhas = [];
+
+const fSet = (campo, t, tipo = 'error') => { const m = el(campo); m.textContent = t; m.className = 'form-msg show ' + tipo; };
+
+/* ── lista ── */
+function renderFolhas() {
+  el('folhas-body').innerHTML = rhFolhas.length ? rhFolhas.map(f => {
+    const st = FOLHA_STATUS[f.status] || { label: f.status, cls: '' };
+    const t = f.totais || {};
+    return `<tr class="rh-linha" onclick="window._abrirFolha('${f.id}')">
+      <td style="font-weight:600">${competenciaLabel(f.competencia)}</td>
+      <td>${t.colaboradores ?? 0}</td>
+      <td>${moeda(t.bruto)}</td>
+      <td>${moeda(t.liquido)}</td>
+      <td style="color:var(--text-dim)">${moeda(t.custo)}</td>
+      <td style="color:var(--text-dim);font-size:12px">${fmtDate(f.vencimento)}</td>
+      <td style="color:var(--text-dim)">${t.pagos ?? 0} de ${t.colaboradores ?? 0}</td>
+      <td><span class="status ${st.cls}">${st.label}</span></td>
+    </tr>`;
+  }).join('')
+  : '<tr><td colspan="8" class="team-empty">Nenhuma folha criada.</td></tr>';
+}
+
+// Os totais de cada folha vêm dos itens; buscar tudo de uma vez evita uma
+// consulta por linha da lista.
+async function carregarTotaisFolhas() {
+  if (!rhFolhas.length) return;
+  const { data } = await supabase.from('rh_folha_itens')
+    .select('folha_id, salario_bruto, salario_liquido, custo_total, status_pagamento');
+  const porFolha = {};
+  (data || []).forEach(i => {
+    const t = porFolha[i.folha_id] ||= { colaboradores: 0, bruto: 0, liquido: 0, custo: 0, pagos: 0 };
+    t.colaboradores++;
+    t.bruto += Number(i.salario_bruto || 0);
+    t.liquido += Number(i.salario_liquido || 0);
+    t.custo += Number(i.custo_total || 0);
+    if (i.status_pagamento === 'PAGO') t.pagos++;
+  });
+  rhFolhas.forEach(f => f.totais = porFolha[f.id] || { colaboradores: 0, bruto: 0, liquido: 0, custo: 0, pagos: 0 });
+}
+
+/* ── nova folha ── */
+window._novaFolha = () => {
+  const hoje = new Date();
+  el('nf-competencia').value = hoje.toISOString().slice(0, 7);
+  // Vencimento usual: dia 5 do mês seguinte à competência.
+  const venc = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 5);
+  el('nf-vencimento').value = venc.toISOString().slice(0, 10);
+  el('nf-msg').className = 'form-msg';
+  openModal('modal-rh-nova-folha');
+};
+
+window._criarFolha = async () => {
+  const btn = el('nf-btn'), orig = btn.textContent;
+  const competencia = val('nf-competencia'), vencimento = val('nf-vencimento');
+  if (!competencia || !vencimento) return fSet('nf-msg', 'Informe a competência e o vencimento.');
+  if (rhFolhas.some(f => f.competencia === competencia))
+    return fSet('nf-msg', `Já existe folha de ${competenciaLabel(competencia)}.`);
+
+  const ativos = rhColabs.filter(c => c.situacao !== 'DESLIGADO');
+  if (!ativos.length) return fSet('nf-msg', 'Nenhum colaborador ativo para incluir.');
+
+  btn.textContent = 'Criando...'; btn.disabled = true;
+  const fim = () => { btn.textContent = orig; btn.disabled = false; };
+
+  const { data: folha, error } = await supabase.from('rh_folhas')
+    .insert({ competencia, vencimento, status: 'RASCUNHO', criada_por: myName })
+    .select('*').single();
+  if (error) { fim(); return fSet('nf-msg', 'Não foi possível criar: ' + error.message); }
+
+  const itens = await montarItens(folha.id, ativos);
+  const { error: e2 } = await supabase.from('rh_folha_itens').insert(itens);
+  if (e2) { fim(); return fSet('nf-msg', 'Folha criada, mas os itens falharam: ' + e2.message); }
+
+  await registrarRh('CRIOU', 'Folha de pagamento', competenciaLabel(competencia));
+  await loadRh();
+  fim();
+  closeModal('modal-rh-nova-folha');
+  window._abrirFolha(folha.id);
+};
+
+// Monta a linha de cada colaborador a partir do cadastro, dos benefícios e
+// dos lançamentos já existentes (quando é um recálculo).
+async function montarItens(folhaId, colaboradores, lancamentosPorColab = {}) {
+  const { data: vinculos } = await supabase.from('rh_colaborador_beneficios').select('*');
+  const cargo = id => rhCargos.find(c => c.id === id)?.nome || null;
+
+  return colaboradores.map(c => {
+    const beneficios = (vinculos || []).filter(v => v.colaborador_id === c.id);
+    const lancamentos = lancamentosPorColab[c.id] || [];
+    const calc = calcularItem({ colaborador: c, lancamentos, beneficios, config: rhConfig });
+    return {
+      folha_id: folhaId, colaborador_id: c.id, colaborador_nome: c.nome,
+      cargo_nome: cargo(c.cargo_id), vinculo: c.vinculo,
+      ...calc,
+      observacoes: lancamentos.length ? JSON.stringify(lancamentos) : null,
+    };
+  });
+}
+
+/* ── detalhe ── */
+window._voltarFolhas = () => {
+  folhaAberta = null;
+  el('folha-detalhe').hidden = true;
+  el('folha-lista').hidden = false;
+};
+
+window._abrirFolha = async (id) => {
+  folhaAberta = rhFolhas.find(f => f.id === id);
+  if (!folhaAberta) return;
+  el('folha-lista').hidden = true;
+  el('folha-detalhe').hidden = false;
+  el('fd-itens').innerHTML = '<tr><td colspan="9" class="team-empty">Carregando...</td></tr>';
+
+  const { data } = await supabase.from('rh_folha_itens').select('*')
+    .eq('folha_id', id).order('colaborador_nome');
+  folhaItens = data || [];
+  renderFolhaDetalhe();
+  await carregarLancamentosFolha();
+};
+
+function renderFolhaDetalhe() {
+  const f = folhaAberta;
+  const st = FOLHA_STATUS[f.status] || { label: f.status, cls: '' };
+  const t = somarFolha(folhaItens);
+  const pagos = folhaItens.filter(i => i.status_pagamento === 'PAGO').length;
+
+  el('fd-titulo').textContent = 'Folha de ' + competenciaLabel(f.competencia);
+  el('fd-status').className = 'status ' + st.cls;
+  el('fd-status').textContent = st.label;
+  el('fd-sub').textContent = [
+    `Criada por ${f.criada_por || '—'}`,
+    `vencimento ${fmtDate(f.vencimento)}`,
+    f.aprovada_por ? `aprovada por ${f.aprovada_por} em ${fmtDateTime(f.aprovada_em)}` : null,
+  ].filter(Boolean).join(' · ');
+
+  // Cada situação permite um conjunto de ações; mostrar o que não cabe só
+  // gera clique que volta com erro.
+  const botoes = [`<button class="team-btn" onclick="window._demonstrativos()">Demonstrativos</button>`];
+  if (f.status === 'RASCUNHO') botoes.push(
+    `<button class="team-btn" onclick="window._recalcularFolha()">Recalcular</button>`,
+    `<button class="team-btn approve" onclick="window._mudarFolha('AGUARDANDO_APROVACAO')">Enviar para aprovação</button>`,
+    `<button class="team-btn danger" onclick="window._cancelarFolha()">Cancelar</button>`);
+  if (f.status === 'AGUARDANDO_APROVACAO') botoes.push(
+    `<button class="team-btn" onclick="window._recalcularFolha()">Recalcular</button>`,
+    `<button class="team-btn approve" onclick="window._aprovarFolha()">✓ Aprovar folha</button>`,
+    `<button class="team-btn danger" onclick="window._mudarFolha('RASCUNHO')">Voltar para rascunho</button>`);
+  if (f.status === 'APROVADA') botoes.push(
+    `<button class="team-btn" onclick="window._reabrirFolha()">Reabrir para ajuste</button>`,
+    `<button class="team-btn danger" onclick="window._cancelarFolha()">Cancelar</button>`);
+  el('fd-acoes').innerHTML = botoes.join('');
+
+  el('fd-resumo').innerHTML = [
+    { label: 'Folha bruta', valor: moeda(t.bruto), nota: `${folhaItens.length} colaborador(es)`, cor: 'var(--text)' },
+    { label: 'Total líquido', valor: moeda(t.liquido), nota: `${pagos} de ${folhaItens.length} pagos`, cor: 'var(--text)' },
+    { label: 'Encargos', valor: moeda(t.encargos), nota: 'FGTS e encargos patronais', cor: 'var(--text)' },
+    { label: 'Custo total estimado', valor: moeda(t.custo), nota: 'Com benefícios e provisões', cor: 'var(--orange)' },
+  ].map(c => `<div class="resumo-card" style="text-align:left">
+      <div class="resumo-label" style="margin:0 0 6px">${c.label}</div>
+      <div class="resumo-valor" style="color:${c.cor};font-size:19px">${c.valor}</div>
+      <div style="font-size:11px;color:var(--text-dim);margin-top:4px">${c.nota}</div>
+    </div>`).join('');
+
+  const podeAjustar = ['RASCUNHO', 'AGUARDANDO_APROVACAO'].includes(f.status);
+  const podePagar = f.status === 'APROVADA';
+
+  el('fd-itens').innerHTML = folhaItens.length ? folhaItens.map(i => {
+    const pago = i.status_pagamento === 'PAGO';
+    const situacao = pago ? { label: 'Pago', cls: 'status-done' }
+      : podePagar ? { label: 'A pagar', cls: 'status-pending' }
+      : { label: 'Em apuração', cls: '' };
+    const descontos = Number(i.inss) + Number(i.irrf) + Number(i.desconto_beneficios) + Number(i.outros_descontos);
+
+    const acoes = [];
+    if (podeAjustar) acoes.push(`<button class="team-btn" title="Ajustar" onclick="window._abrirAjuste('${i.id}')">Ajustar</button>`);
+    acoes.push(`<button class="team-btn" title="Demonstrativo" onclick="window._demonstrativo('${i.id}')">Demonstrativo</button>`);
+    if (podePagar && !pago) acoes.push(`<button class="team-btn approve" onclick="window._pagarItem('${i.id}')">Pagar</button>`);
+
+    return `<tr>
+      <td style="font-weight:600">${esc(i.colaborador_nome)}</td>
+      <td style="color:var(--text-dim)">${esc(i.cargo_nome || '—')}</td>
+      <td>${moeda(i.salario_bruto)}
+        ${Number(i.proventos) ? `<div style="font-size:11px;color:var(--green)">+ ${moeda(i.proventos)} proventos</div>` : ''}</td>
+      <td style="color:var(--text-dim)">${moeda(descontos)}
+        <div style="font-size:11px">INSS ${moeda(i.inss)} · IRRF ${moeda(i.irrf)}</div></td>
+      <td style="font-weight:600">${moeda(i.salario_liquido)}</td>
+      <td style="color:var(--text-dim)">${moeda(i.encargos)}</td>
+      <td>${moeda(i.custo_total)}</td>
+      <td><span class="status ${situacao.cls}">${situacao.label}</span>
+        ${pago && i.pago_em ? `<div style="font-size:11px;color:var(--text-dim);margin-top:3px">${fmtDate(i.pago_em)}</div>` : ''}</td>
+      <td><div class="team-actions">${acoes.join('')}</div></td>
+    </tr>`;
+  }).join('')
+  : '<tr><td colspan="9" class="team-empty">Nenhum colaborador nesta folha.</td></tr>';
+}
+
+async function carregarLancamentosFolha() {
+  const card = el('fd-lancamentos-card');
+  if (!['APROVADA', 'PAGA'].includes(folhaAberta.status)) { card.hidden = true; return; }
+
+  const { data } = await supabase.from('rh_custos').select('*').eq('folha_id', folhaAberta.id).order('tipo');
+  const liquidos = somarFolha(folhaItens).liquido;
+  card.hidden = false;
+  el('fd-lancamentos').innerHTML = [
+    ...(data || []).map(c => `<div class="rh-item">
+      <div><strong>${esc(c.descricao)}</strong>
+        <div class="rh-item-sub">vence ${fmtDate(c.vencimento)}</div></div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span>${moeda(c.valor)}</span>
+        <span class="status ${c.status === 'PAGO' ? 'status-done' : 'status-pending'}">${c.status === 'PAGO' ? 'Pago' : 'A pagar'}</span>
+      </div>
+    </div>`),
+    `<div class="rh-item-sub" style="padding:4px 2px">Salários líquidos a pagar (um lançamento por colaborador) · ${moeda(liquidos)}</div>`,
+  ].join('');
+}
+
+/* ── ajuste de proventos e descontos ── */
+window._abrirAjuste = (itemId) => {
+  ajusteItem = folhaItens.find(i => i.id === itemId);
+  if (!ajusteItem) return;
+  try { ajusteLinhas = ajusteItem.observacoes ? JSON.parse(ajusteItem.observacoes) : []; }
+  catch { ajusteLinhas = []; }
+  el('aj-titulo').textContent = 'Ajustar — ' + ajusteItem.colaborador_nome;
+  el('aj-obs').value = '';
+  el('aj-msg').className = 'form-msg';
+  renderAjuste();
+  openModal('modal-rh-ajuste');
+};
+
+function renderAjuste() {
+  const linha = (l, i) => {
+    const opcoes = l.tipo === 'provento' ? PROVENTOS : DESCONTOS;
+    return `<div class="rh-lancamento">
+      <select data-linha="${i}" data-campo="codigo">
+        ${Object.entries(opcoes).map(([v, t]) => `<option value="${v}"${l.codigo === v ? ' selected' : ''}>${t}</option>`).join('')}
+      </select>
+      <input type="text" data-linha="${i}" data-campo="descricao" placeholder="Descrição" value="${esc(l.descricao || '')}">
+      <input type="number" data-linha="${i}" data-campo="valor" step="0.01" min="0" value="${l.valor ?? ''}" placeholder="0,00">
+      <button type="button" class="cbo-link" onclick="window._removerLancamento(${i})">Remover</button>
+    </div>`;
+  };
+  const porTipo = tipo => ajusteLinhas
+    .map((l, i) => ({ l, i })).filter(x => x.l.tipo === tipo)
+    .map(x => linha(x.l, x.i)).join('');
+
+  el('aj-proventos').innerHTML = porTipo('provento');
+  el('aj-descontos').innerHTML = porTipo('desconto');
+  atualizarTotaisAjuste();
+}
+
+function lerLinhasAjuste() {
+  document.querySelectorAll('#modal-rh-ajuste [data-linha]').forEach(campo => {
+    const l = ajusteLinhas[Number(campo.dataset.linha)];
+    if (!l) return;
+    l[campo.dataset.campo] = campo.dataset.campo === 'valor' ? Number(campo.value) || 0 : campo.value;
+  });
+}
+function atualizarTotaisAjuste() {
+  const soma = tipo => ajusteLinhas.filter(l => l.tipo === tipo).reduce((t, l) => t + (Number(l.valor) || 0), 0);
+  el('aj-total-prov').textContent = '+ ' + moeda(soma('provento'));
+  el('aj-total-desc').textContent = '− ' + moeda(soma('desconto'));
+}
+el('modal-rh-ajuste').addEventListener('input', () => { lerLinhasAjuste(); atualizarTotaisAjuste(); });
+
+window._addLancamento = (tipo) => {
+  lerLinhasAjuste();
+  const codigo = Object.keys(tipo === 'provento' ? PROVENTOS : DESCONTOS)[0];
+  ajusteLinhas.push({ tipo, codigo, descricao: '', valor: 0 });
+  renderAjuste();
+};
+window._removerLancamento = (i) => {
+  lerLinhasAjuste();
+  ajusteLinhas.splice(i, 1);
+  renderAjuste();
+};
+
+window._salvarAjuste = async () => {
+  const btn = el('aj-btn'), orig = btn.textContent;
+  lerLinhasAjuste();
+  const linhas = ajusteLinhas.filter(l => Number(l.valor) > 0);
+
+  const colaborador = rhColabs.find(c => c.id === ajusteItem.colaborador_id);
+  if (!colaborador) return fSet('aj-msg', 'Colaborador não encontrado.');
+
+  btn.textContent = 'Recalculando...'; btn.disabled = true;
+  const { data: vinculos } = await supabase.from('rh_colaborador_beneficios')
+    .select('*').eq('colaborador_id', colaborador.id);
+  const calc = calcularItem({ colaborador, lancamentos: linhas, beneficios: vinculos || [], config: rhConfig });
+
+  const { error } = await supabase.from('rh_folha_itens')
+    .update({ ...calc, observacoes: linhas.length ? JSON.stringify(linhas) : null })
+    .eq('id', ajusteItem.id);
+  btn.textContent = orig; btn.disabled = false;
+  if (error) return fSet('aj-msg', 'Não foi possível salvar: ' + error.message);
+
+  await registrarRh('ALTEROU', 'Folha de pagamento',
+    `Ajuste em ${ajusteItem.colaborador_nome} · ${competenciaLabel(folhaAberta.competencia)}`, colaborador.id);
+  closeModal('modal-rh-ajuste');
+  await window._abrirFolha(folhaAberta.id);
+  await loadRh();
+};
+
+/* ── situação da folha ── */
+window._recalcularFolha = async () => {
+  if (!confirm('Recalcular a folha com os salários e benefícios atuais? Os proventos e descontos lançados são mantidos.')) return;
+
+  const lancamentosPorColab = {};
+  folhaItens.forEach(i => {
+    try { if (i.observacoes) lancamentosPorColab[i.colaborador_id] = JSON.parse(i.observacoes); } catch {}
+  });
+
+  const ativos = rhColabs.filter(c => c.situacao !== 'DESLIGADO');
+  const itens = await montarItens(folhaAberta.id, ativos, lancamentosPorColab);
+
+  // Troca a folha inteira: o quadro de pessoal pode ter mudado desde a criação.
+  await supabase.from('rh_folha_itens').delete().eq('folha_id', folhaAberta.id);
+  const { error } = await supabase.from('rh_folha_itens').insert(itens);
+  if (error) return alert('Não foi possível recalcular: ' + error.message);
+
+  await registrarRh('ALTEROU', 'Folha de pagamento', 'Recalculada · ' + competenciaLabel(folhaAberta.competencia));
+  await window._abrirFolha(folhaAberta.id);
+  await loadRh();
+};
+
+window._mudarFolha = async (status) => {
+  const { error } = await supabase.from('rh_folhas')
+    .update({ status, updated_at: new Date().toISOString() }).eq('id', folhaAberta.id);
+  if (error) return alert('Não foi possível mudar a situação: ' + error.message);
+  folhaAberta.status = status;
+  await registrarRh('ALTEROU', 'Folha de pagamento',
+    `${FOLHA_STATUS[status].label} · ${competenciaLabel(folhaAberta.competencia)}`);
+  renderFolhaDetalhe();
+  await carregarLancamentosFolha();
+  await loadRh();
+};
+
+window._aprovarFolha = async () => {
+  if (!confirm('Aprovar a folha? Ela fica travada e os lançamentos vão para o Financeiro.')) return;
+
+  const t = somarFolha(folhaItens);
+  const venc = new Date(folhaAberta.vencimento);
+  // Encargos vencem no mês seguinte ao da folha, no dia configurado.
+  const vencEncargos = new Date(venc.getFullYear(), venc.getMonth() + 1, rhConfig.diaEncargos)
+    .toISOString().slice(0, 10);
+
+  const lancamentos = [];
+  if (t.encargos > 0) lancamentos.push({
+    folha_id: folhaAberta.id, competencia: folhaAberta.competencia, tipo: 'FGTS',
+    descricao: 'Encargos patronais', valor: t.encargos, status: 'A_PAGAR', vencimento: vencEncargos,
+  });
+  const retido = r2soma(t.inss);
+  if (retido > 0) lancamentos.push({
+    folha_id: folhaAberta.id, competencia: folhaAberta.competencia, tipo: 'INSS',
+    descricao: 'INSS retido dos colaboradores', valor: retido, status: 'A_PAGAR', vencimento: vencEncargos,
+  });
+  if (t.irrf > 0) lancamentos.push({
+    folha_id: folhaAberta.id, competencia: folhaAberta.competencia, tipo: 'IRRF',
+    descricao: 'IRRF retido dos colaboradores', valor: t.irrf, status: 'A_PAGAR', vencimento: vencEncargos,
+  });
+  if (t.beneficios > 0) lancamentos.push({
+    folha_id: folhaAberta.id, competencia: folhaAberta.competencia, tipo: 'BENEFICIO',
+    descricao: 'Benefícios da equipe', valor: t.beneficios, status: 'A_PAGAR', vencimento: folhaAberta.vencimento,
+  });
+  // Provisão é despesa reconhecida sem saída de dinheiro: entra como
+  // provisionada, não como obrigação a pagar.
+  if (t.provisoes > 0) lancamentos.push({
+    folha_id: folhaAberta.id, competencia: folhaAberta.competencia, tipo: 'PROVISAO',
+    descricao: '13º e férias + 1/3 (provisão)', valor: t.provisoes, status: 'PROVISIONADO',
+  });
+
+  if (lancamentos.length) {
+    const { error } = await supabase.from('rh_custos').insert(lancamentos);
+    if (error) return alert('Não foi possível gerar os lançamentos: ' + error.message);
+  }
+
+  const { error } = await supabase.from('rh_folhas').update({
+    status: 'APROVADA', aprovada_por: myName, aprovada_em: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  }).eq('id', folhaAberta.id);
+  if (error) return alert('Não foi possível aprovar: ' + error.message);
+
+  Object.assign(folhaAberta, { status: 'APROVADA', aprovada_por: myName, aprovada_em: new Date().toISOString() });
+  await registrarRh('ALTEROU', 'Folha de pagamento', 'Aprovada · ' + competenciaLabel(folhaAberta.competencia));
+  renderFolhaDetalhe();
+  await carregarLancamentosFolha();
+  await loadRh();
+};
+const r2soma = v => Math.round((Number(v) || 0) * 100) / 100;
+
+window._reabrirFolha = async () => {
+  const motivo = prompt('Por que a folha está sendo reaberta? O motivo fica registrado.');
+  if (motivo === null) return;
+  if (!motivo.trim()) return alert('O motivo é obrigatório para reabrir.');
+
+  // Os lançamentos da aprovação anterior saem: a nova aprovação gera os
+  // valores corrigidos, e manter os dois cobraria em dobro.
+  await supabase.from('rh_custos').delete().eq('folha_id', folhaAberta.id).neq('status', 'PAGO');
+  const { error } = await supabase.from('rh_folhas').update({
+    status: 'RASCUNHO', motivo_reabertura: motivo.trim(), updated_at: new Date().toISOString(),
+  }).eq('id', folhaAberta.id);
+  if (error) return alert('Não foi possível reabrir: ' + error.message);
+
+  folhaAberta.status = 'RASCUNHO';
+  await supabase.from('rh_folha_ajustes').insert({
+    folha_id: folhaAberta.id, descricao: 'Folha reaberta: ' + motivo.trim(), autor: myName,
+  });
+  await registrarRh('ALTEROU', 'Folha de pagamento', 'Reaberta: ' + motivo.trim());
+  renderFolhaDetalhe();
+  await carregarLancamentosFolha();
+  await loadRh();
+};
+
+window._cancelarFolha = async () => {
+  if (!confirm('Cancelar esta folha? Os lançamentos ainda não pagos saem do Financeiro.')) return;
+  await supabase.from('rh_custos').delete().eq('folha_id', folhaAberta.id).neq('status', 'PAGO');
+  await window._mudarFolha('CANCELADA');
+};
+
+window._pagarItem = async (itemId) => {
+  const item = folhaItens.find(i => i.id === itemId);
+  if (!item) return;
+  if (!confirm(`Registrar o pagamento de ${moeda(item.salario_liquido)} para ${item.colaborador_nome}?`)) return;
+
+  const agora = new Date().toISOString();
+  const { error } = await supabase.from('rh_folha_itens')
+    .update({ status_pagamento: 'PAGO', pago_em: agora, pago_por: myName }).eq('id', itemId);
+  if (error) return alert('Não foi possível registrar: ' + error.message);
+
+  item.status_pagamento = 'PAGO';
+  item.pago_em = agora;
+  await registrarRh('ALTEROU', 'Pagamento',
+    `${item.colaborador_nome} · ${moeda(item.salario_liquido)}`, item.colaborador_id);
+
+  // Folha paga quando o último colaborador recebe.
+  if (folhaItens.every(i => i.status_pagamento === 'PAGO')) {
+    await supabase.from('rh_folhas').update({ status: 'PAGA', paga_em: agora }).eq('id', folhaAberta.id);
+    folhaAberta.status = 'PAGA';
+  }
+  renderFolhaDetalhe();
+  await carregarLancamentosFolha();
+  await loadRh();
+};
+
+/* ── demonstrativo de pagamento ── */
+function htmlDemonstrativo(item) {
+  const c = rhColabs.find(x => x.id === item.colaborador_id) || {};
+  let linhas = [];
+  try { linhas = item.observacoes ? JSON.parse(item.observacoes) : []; } catch {}
+
+  const proventos = [
+    ['Salário-base', Number(item.salario_base)],
+    ...linhas.filter(l => l.tipo === 'provento').map(l => [l.descricao || PROVENTOS[l.codigo] || 'Provento', Number(l.valor)]),
+  ];
+  const descontos = [
+    ...(Number(item.inss) ? [['INSS', Number(item.inss)]] : []),
+    ...(Number(item.irrf) ? [['IRRF', Number(item.irrf)]] : []),
+    ...(Number(item.desconto_beneficios) ? [['Benefícios', Number(item.desconto_beneficios)]] : []),
+    ...linhas.filter(l => l.tipo === 'desconto').map(l => [l.descricao || DESCONTOS[l.codigo] || 'Desconto', Number(l.valor)]),
+  ];
+  const totalDesc = descontos.reduce((t, [, v]) => t + v, 0);
+  const numero = item.id.replace(/\D/g, '').slice(-8).toUpperCase().padStart(8, '0');
+  const pago = item.status_pagamento === 'PAGO';
+
+  const tabela = (titulo, linhas2, total, rotulo) => `
+    <table class="bloco">
+      <thead><tr><th colspan="2">${titulo}</th></tr></thead>
+      <tbody>${linhas2.map(([d, v]) => `<tr><td>${esc(d)}</td><td class="v">${moeda(v)}</td></tr>`).join('')}</tbody>
+      <tfoot><tr><td><strong>${rotulo}</strong></td><td class="v"><strong>${moeda(total)}</strong></td></tr></tfoot>
+    </table>`;
+
+  return `<div class="holerite">
+    <div class="topo">
+      <div><strong>SertCode</strong><div class="mini">Gestão de Pessoas</div><div class="mini">sertcode.com.br</div></div>
+      <div class="dir"><strong>Demonstrativo de pagamento</strong>
+        <div class="mini">Nº ${numero} · ${pago ? 'Pago' : 'A pagar'}</div></div>
+    </div>
+    <div class="pessoa">
+      <div><strong>${esc(item.colaborador_nome)}</strong>
+        <div class="mini">${VINCULOS[item.vinculo] || item.vinculo || '—'}${c.cpf ? ' · CPF ' + esc(c.cpf) : ''}${c.data_admissao ? ' · Admissão ' + fmtDate(c.data_admissao) : ''}</div></div>
+      <div class="dir mini">Período de referência<br><strong>${competenciaLabel(folhaAberta.competencia)}</strong></div>
+    </div>
+    <div class="colunas">
+      ${tabela('PROVENTOS', proventos, Number(item.salario_bruto), 'Total bruto')}
+      ${tabela('DESCONTOS', descontos, totalDesc, 'Total de descontos')}
+    </div>
+    <div class="liquido">
+      <div><strong>Valor líquido</strong><div class="mini">${porExtenso(Number(item.salario_liquido))}</div></div>
+      <div class="valor">${moeda(item.salario_liquido)}</div>
+    </div>
+    <div class="mini">FGTS do mês: ${moeda(item.fgts)} &nbsp;&nbsp; Base INSS: ${moeda(item.salario_bruto)}${pago ? ' &nbsp;&nbsp; Pago em ' + fmtDate(item.pago_em) : ''}</div>
+    <div class="recibo">Declaro que recebi da SertCode a importância líquida de ${moeda(item.salario_liquido)}, referente à competência ${competenciaLabel(folhaAberta.competencia)}, já considerados os descontos acima.</div>
+    <div class="assinaturas">
+      <div><div class="linha"></div>SertCode<div class="mini">Gestor</div></div>
+      <div><div class="linha"></div>${esc(item.colaborador_nome)}<div class="mini">Colaborador</div></div>
+    </div>
+  </div>`;
+}
+
+const ESTILO_HOLERITE = `
+  body { font-family: Arial, Helvetica, sans-serif; color:#111; margin:0; padding:22px; }
+  .holerite { border-top:3px solid #FF6A00; padding:16px 0 22px; page-break-inside:avoid; }
+  .holerite + .holerite { margin-top:26px; }
+  .topo, .pessoa { display:flex; justify-content:space-between; align-items:flex-start;
+    padding-bottom:10px; margin-bottom:12px; border-bottom:1px solid #ddd; }
+  .dir { text-align:right; }
+  .mini { font-size:10.5px; color:#666; }
+  .colunas { display:flex; gap:14px; }
+  .bloco { width:100%; border-collapse:collapse; font-size:11.5px; border:1px solid #e0e0e0; }
+  .bloco th { background:#f2f2f2; text-align:left; padding:6px 8px; font-size:10.5px; }
+  .bloco td { padding:5px 8px; border-top:1px solid #eee; }
+  .bloco .v { text-align:right; }
+  .bloco tfoot td { border-top:1px solid #ccc; background:#fafafa; }
+  .liquido { display:flex; justify-content:space-between; align-items:center; margin-top:14px;
+    padding:12px 14px; background:#fff4ec; border:1px solid #ffd9c0; border-radius:6px; }
+  .liquido .valor { font-size:19px; font-weight:700; }
+  .recibo { margin-top:12px; font-size:10.5px; color:#444; line-height:1.6; }
+  .assinaturas { display:flex; gap:40px; margin-top:34px; font-size:11px; text-align:center; }
+  .assinaturas > div { flex:1; }
+  .linha { border-top:1px solid #333; margin-bottom:5px; }
+  @media print { .holerite { page-break-inside:avoid; } }`;
+
+function abrirImpressao(conteudo, titulo) {
+  const janela = window.open('', '_blank');
+  if (!janela) return alert('Libere as janelas pop-up para gerar o PDF.');
+  janela.document.write(`<!DOCTYPE html><html lang="pt-BR"><head><meta charset="utf-8">
+<title>${titulo}</title><style>${ESTILO_HOLERITE}</style></head><body>${conteudo}</body></html>`);
+  janela.document.close();
+  janela.focus();
+  setTimeout(() => janela.print(), 400);
+}
+
+window._demonstrativo = (itemId) => {
+  const item = folhaItens.find(i => i.id === itemId);
+  if (!item) return;
+  abrirImpressao(htmlDemonstrativo(item), `demonstrativo-${folhaAberta.competencia}`);
+  registrarRh('VISUALIZOU', 'Demonstrativo', item.colaborador_nome, item.colaborador_id);
+};
+
+window._demonstrativos = () => {
+  if (!folhaItens.length) return;
+  abrirImpressao(folhaItens.map(htmlDemonstrativo).join(''), `demonstrativos-${folhaAberta.competencia}`);
+  registrarRh('VISUALIZOU', 'Demonstrativos', competenciaLabel(folhaAberta.competencia));
+};
+
+/* ── financeiro: custos de pessoal ── */
+let finCustos = [], finSalarios = [], finAba = 'tudo';
+
+document.querySelectorAll('#fin-abas .rh-aba').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('#fin-abas .rh-aba').forEach(x => x.classList.remove('active'));
+  b.classList.add('active');
+  document.querySelectorAll('#tab-financeiro > .rh-painel').forEach(p => p.classList.remove('active'));
+  el('fin-' + b.dataset.fin).classList.add('active');
+}));
+document.querySelectorAll('#fin-sub .rh-aba').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('#fin-sub .rh-aba').forEach(x => x.classList.remove('active'));
+  b.classList.add('active');
+  finAba = b.dataset.finsub;
+  renderFinPessoal();
+}));
+el('fin-competencia').addEventListener('change', renderFinPessoal);
+
+async function loadFinPessoal() {
+  if (!isGestor) return;
+  const [custos, itens] = await Promise.all([
+    supabase.from('rh_custos').select('*').order('competencia', { ascending: false }),
+    supabase.from('rh_folha_itens').select('*'),
+  ]);
+  finCustos = custos.data || [];
+  const porFolha = Object.fromEntries(rhFolhas.map(f => [f.id, f]));
+  finSalarios = (itens.data || [])
+    .filter(i => ['APROVADA', 'PAGA'].includes(porFolha[i.folha_id]?.status))
+    .map(i => ({ ...i, competencia: porFolha[i.folha_id].competencia, vencimento: porFolha[i.folha_id].vencimento }));
+
+  const competencias = [...new Set([...finCustos, ...finSalarios].map(x => x.competencia))].sort().reverse();
+  el('fin-competencia').innerHTML = '<option value="">Todas as competências</option>' +
+    competencias.map(c => `<option value="${c}">${competenciaLabel(c)}</option>`).join('');
+  renderFinPessoal();
+}
+
+function renderFinPessoal() {
+  const comp = val('fin-competencia');
+  const custos = finCustos.filter(c => !comp || c.competencia === comp);
+  const salarios = finSalarios.filter(s => !comp || s.competencia === comp);
+
+  const provisionado = custos.filter(c => c.status === 'PROVISIONADO').reduce((t, c) => t + Number(c.valor), 0);
+  const aPagar = custos.filter(c => c.status === 'A_PAGAR').reduce((t, c) => t + Number(c.valor), 0)
+    + salarios.filter(s => s.status_pagamento !== 'PAGO').reduce((t, s) => t + Number(s.salario_liquido), 0);
+  const pago = custos.filter(c => c.status === 'PAGO').reduce((t, c) => t + Number(c.valor), 0)
+    + salarios.filter(s => s.status_pagamento === 'PAGO').reduce((t, s) => t + Number(s.salario_liquido), 0);
+
+  el('fin-resumo').innerHTML = [
+    { label: 'Provisionado', valor: provisionado, nota: '13º e férias + 1/3', cor: 'var(--text-dim)' },
+    { label: 'A pagar', valor: aPagar, nota: 'Salários, encargos e benefícios', cor: 'var(--orange)' },
+    { label: 'Pago', valor: pago, nota: 'Saída de dinheiro', cor: 'var(--green)' },
+  ].map(c => `<div class="resumo-card" style="text-align:left">
+      <div class="resumo-label" style="margin:0 0 6px">${c.label}</div>
+      <div class="resumo-valor" style="color:${c.cor};font-size:19px">${moeda(c.valor)}</div>
+      <div style="font-size:11px;color:var(--text-dim);margin-top:4px">${c.nota}</div>
+    </div>`).join('');
+
+  const marca = s => `<span class="status ${s === 'PAGO' ? 'status-done' : s === 'PROVISIONADO' ? '' : 'status-pending'}">${
+    s === 'PAGO' ? 'Pago' : s === 'PROVISIONADO' ? 'Provisionado' : 'A pagar'}</span>`;
+
+  if (finAba === 'tudo') {
+    el('fin-cabecalho').innerHTML = '<tr><th>Categoria</th><th>Provisionado</th><th>A pagar</th><th>Pago</th><th>Total</th></tr>';
+    const grupo = (nome, prov, pagar, pg) => `<tr>
+      <td style="font-weight:600">${nome}</td>
+      <td style="color:var(--text-dim)">${moeda(prov)}</td>
+      <td style="color:var(--orange)">${moeda(pagar)}</td>
+      <td style="color:var(--green)">${moeda(pg)}</td>
+      <td style="font-weight:600">${moeda(prov + pagar + pg)}</td></tr>`;
+    const soma = (lista, st) => lista.filter(c => c.status === st).reduce((t, c) => t + Number(c.valor), 0);
+    const retidos = custos.filter(c => ['INSS', 'IRRF'].includes(c.tipo));
+    const encargos = custos.filter(c => ['FGTS', 'BENEFICIO'].includes(c.tipo));
+    const provisoes = custos.filter(c => c.tipo === 'PROVISAO');
+
+    el('fin-body').innerHTML = [
+      grupo('Salários a pagar', 0,
+        salarios.filter(s => s.status_pagamento !== 'PAGO').reduce((t, s) => t + Number(s.salario_liquido), 0),
+        salarios.filter(s => s.status_pagamento === 'PAGO').reduce((t, s) => t + Number(s.salario_liquido), 0)),
+      grupo('Obrigações trabalhistas (INSS e IRRF retidos)', 0, soma(retidos, 'A_PAGAR'), soma(retidos, 'PAGO')),
+      grupo('Encargos e benefícios', 0, soma(encargos, 'A_PAGAR'), soma(encargos, 'PAGO')),
+      grupo('Provisões', soma(provisoes, 'PROVISIONADO'), 0, 0),
+    ].join('');
+    return;
+  }
+
+  if (finAba === 'salarios') {
+    el('fin-cabecalho').innerHTML = '<tr><th>Competência</th><th>Descrição</th><th>Valor</th><th>Vencimento</th><th>Situação</th></tr>';
+    el('fin-body').innerHTML = salarios.length ? salarios.map(s => `<tr>
+        <td>${competenciaLabel(s.competencia)}</td>
+        <td>Salário líquido — ${esc(s.colaborador_nome)}</td>
+        <td>${moeda(s.salario_liquido)}</td>
+        <td style="color:var(--text-dim);font-size:12px">${fmtDate(s.vencimento)}</td>
+        <td>${marca(s.status_pagamento)}
+          <div style="font-size:11px;color:var(--text-dim);margin-top:3px">${s.status_pagamento === 'PAGO' ? fmtDate(s.pago_em) : 'Pague pela folha'}</div></td>
+      </tr>`).join('')
+    : '<tr><td colspan="5" class="team-empty">Nenhum salário lançado.</td></tr>';
+    return;
+  }
+
+  const lista = custos.filter(c => c.tipo !== 'PROVISAO' || true);
+  el('fin-cabecalho').innerHTML = '<tr><th>Competência</th><th>Descrição</th><th>Valor</th><th>Vencimento</th><th>Situação</th></tr>';
+  el('fin-body').innerHTML = lista.length ? lista.map(c => `<tr>
+      <td>${competenciaLabel(c.competencia)}</td>
+      <td style="font-weight:600">${esc(c.descricao)}</td>
+      <td>${moeda(c.valor)}</td>
+      <td style="color:var(--text-dim);font-size:12px">${c.vencimento ? fmtDate(c.vencimento) : '—'}</td>
+      <td>
+        ${marca(c.status)}
+        ${c.status === 'A_PAGAR' ? `<button class="team-btn approve" style="margin-left:8px" onclick="window._pagarCusto('${c.id}')">Marcar como pago</button>`
+          : c.status === 'PAGO' ? `<div style="font-size:11px;color:var(--text-dim);margin-top:3px">${fmtDate(c.pago_em)} · ${esc(c.pago_por || '')}</div>` : ''}
+      </td>
+    </tr>`).join('')
+  : '<tr><td colspan="5" class="team-empty">Nenhum encargo lançado.</td></tr>';
+}
+
+window._pagarCusto = async (id) => {
+  const c = finCustos.find(x => x.id === id);
+  if (!c || !confirm(`Marcar ${c.descricao} (${moeda(c.valor)}) como pago?`)) return;
+  const agora = new Date().toISOString();
+  const { error } = await supabase.from('rh_custos')
+    .update({ status: 'PAGO', pago_em: agora, pago_por: myName }).eq('id', id);
+  if (error) return alert('Não foi possível registrar: ' + error.message);
+  Object.assign(c, { status: 'PAGO', pago_em: agora, pago_por: myName });
+  await registrarRh('ALTEROU', 'Custo de pessoal', `${c.descricao} · ${moeda(c.valor)}`);
+  renderFinPessoal();
+  await loadRhLeitura();
+};
+
+/* ── Meu RH ── */
+async function loadMeuRh() {
+  const alvo = el('meurh-conteudo');
+  const { data: eu } = await supabase.from('rh_colaboradores').select('*')
+    .eq('profile_id', session.user.id).maybeSingle();
+
+  if (!eu) {
+    alvo.innerHTML = '<div class="card rh-embreve">Seu cadastro de colaborador ainda não foi criado pela Gestão de Pessoas.</div>';
+    return;
+  }
+
+  const { data: holerites } = await supabase.from('rh_folha_itens').select('*')
+    .eq('colaborador_id', eu.id).order('id', { ascending: false });
+  const { data: folhas } = await supabase.from('rh_folhas').select('id, competencia, status');
+  const porId = Object.fromEntries((folhas || []).map(f => [f.id, f]));
+  meusHolerites = (holerites || []).map(h => ({ ...h, folha: porId[h.folha_id] }))
+    .filter(h => h.folha)
+    .sort((a, b) => b.folha.competencia.localeCompare(a.folha.competencia));
+
+  const cargo = rhCargos.find(c => c.id === eu.cargo_id)?.nome;
+  const linha = (r, v) => `<div class="meurh-linha"><span>${r}</span><strong>${v}</strong></div>`;
+
+  alvo.innerHTML = `
+    <div class="grid-2" style="margin-bottom:22px">
+      <div class="card">
+        <div class="card-title" style="margin-bottom:12px">Dados funcionais</div>
+        ${linha('Nome', esc(eu.nome))}
+        ${linha('Cargo', esc(cargo || '—'))}
+        ${linha('Setor', esc(eu.setor || '—'))}
+        ${linha('Vínculo', VINCULOS[eu.vinculo] || eu.vinculo)}
+        ${linha('Admissão', eu.data_admissao ? fmtDate(eu.data_admissao) : '—')}
+        ${linha('Situação', (RH_SITUACAO[eu.situacao] || { label: eu.situacao }).label)}
+      </div>
+      <div class="card">
+        <div class="card-title" style="margin-bottom:12px">Remuneração</div>
+        ${linha('Salário-base', moeda(eu.salario_base))}
+        ${linha('Pagamento', `${({ MENSAL:'Mensal', QUINZENAL:'Quinzenal', SEMANAL:'Semanal' })[eu.periodicidade] || eu.periodicidade}${eu.dia_pagamento ? ', dia ' + eu.dia_pagamento : ''}`)}
+        ${linha('Pix', esc(eu.chave_pix || '—'))}
+        ${linha('Conta', esc([eu.banco, eu.banco_agencia, eu.banco_conta].filter(Boolean).join(' · ') || '—'))}
+      </div>
+    </div>
+
+    <div class="card-title" style="margin-bottom:10px">Demonstrativos de pagamento</div>
+    <div class="card">
+      <div class="table-scroll">
+        <table class="data-table">
+          <thead><tr><th>Competência</th><th>Bruto</th><th>Líquido</th><th>Situação</th><th></th></tr></thead>
+          <tbody>${meusHolerites.length ? meusHolerites.map((h, i) => `<tr>
+            <td style="font-weight:600">${competenciaLabel(h.folha.competencia)}</td>
+            <td style="color:var(--text-dim)">${moeda(h.salario_bruto)}</td>
+            <td>${moeda(h.salario_liquido)}</td>
+            <td><span class="status ${h.status_pagamento === 'PAGO' ? 'status-done' : 'status-pending'}">${
+              h.status_pagamento === 'PAGO' ? 'Pago em ' + fmtDate(h.pago_em) : 'A pagar'}</span></td>
+            <td><button class="team-btn" onclick="window._meuDemonstrativo(${i})">PDF</button></td>
+          </tr>`).join('')
+          : '<tr><td colspan="5" class="team-empty">Nenhum demonstrativo disponível ainda.</td></tr>'}</tbody>
+        </table>
+      </div>
+    </div>`;
+}
+let meusHolerites = [];
+
+// O demonstrativo usa a competência da folha do próprio holerite.
+window._meuDemonstrativo = (i) => {
+  const h = meusHolerites[i];
+  if (!h) return;
+  const anterior = folhaAberta;
+  folhaAberta = h.folha;
+  abrirImpressao(htmlDemonstrativo(h), `demonstrativo-${h.folha.competencia}`);
+  folhaAberta = anterior;
+};
 
 /* ── parâmetros de cálculo da folha ── */
 // Valores de 2026. Ficam editáveis porque mudam todo ano, e a conta da folha
@@ -3837,7 +4743,7 @@ document.querySelector('.sidebar-nav a[data-tab="pessoas"]')?.addEventListener('
   registrarRh('VISUALIZOU', 'Gestão de Pessoas', 'Abriu a Gestão de Pessoas com salários');
 });
 
-const tabTitles = {dashboard:'Dashboard',clientes:'Clientes',projetos:'Projetos',chamados:'Chamados',arquivos:'Arquivos',financeiro:'Financeiro',depoimentos:'Depoimentos',feedbacks:'Feedbacks',pessoas:'Gestão de Pessoas',equipe:'Equipe'};
+const tabTitles = {dashboard:'Dashboard',clientes:'Clientes',projetos:'Projetos',chamados:'Chamados',arquivos:'Arquivos',financeiro:'Financeiro',depoimentos:'Depoimentos',feedbacks:'Feedbacks',"meu-rh":'Meu RH',pessoas:'Gestão de Pessoas',equipe:'Equipe'};
 document.querySelectorAll('.sidebar-nav a[data-tab]').forEach(link => {
   link.addEventListener('click', e => {
     e.preventDefault();

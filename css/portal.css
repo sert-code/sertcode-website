@@ -986,6 +986,27 @@ button { font-family: var(--font); }
 @media (max-width: 1000px) { .rh-faixas { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 560px)  { .rh-faixas { grid-template-columns: 1fr; } }
 
+/* ── Folha: lançamentos do ajuste ── */
+.rh-lancamentos { display: flex; flex-direction: column; gap: 8px; margin: 10px 0; }
+.rh-lancamento {
+  display: grid; grid-template-columns: 1.3fr 1fr 0.8fr auto; gap: 8px; align-items: center;
+}
+.rh-lancamento select, .rh-lancamento input {
+  width: 100%; background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+  border-radius: 8px; padding: 8px 10px; color: var(--text);
+  font-family: var(--font); font-size: 12.5px; outline: none;
+}
+.rh-lancamento .cbo-link { margin: 0; white-space: nowrap; }
+@media (max-width: 520px) { .rh-lancamento { grid-template-columns: 1fr 1fr; } }
+
+/* ── Meu RH ── */
+.meurh-linha {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 9px 0; border-bottom: 1px solid var(--border); font-size: 13px; color: var(--text-dim);
+}
+.meurh-linha:last-child { border-bottom: 0; }
+.meurh-linha strong { color: var(--text); font-weight: 600; text-align: right; }
+
 /* ── Busca de ocupação na CBO ── */
 .cbo-busca { position: relative; display: flex; align-items: center; }
 .cbo-busca svg {
