@@ -1,3 +1,13 @@
+-- ⚠ ESTE ARQUIVO ESTÁ SUPERADO.
+--
+-- O vocabulário de situação dos projetos mudou em
+-- supabase/projetos-gestao.sql (SOLICITACAO, DIAGNOSTICO, ANDAMENTO,
+-- CONCLUIDO...). Rodar este arquivo de novo recria a regra antiga
+-- (cadastrado/andamento/...) e quebra o cadastro de projetos.
+--
+-- Mantido apenas como histórico. Use projetos-gestao.sql.
+-- ──────────────────────────────────────────────────────────
+
 -- ════════════════════════════════════════════════════════════════
 -- Projetos: pedido, tipo e histórico de situação
 -- Rodar no Supabase: SQL Editor → New query → colar → Run.

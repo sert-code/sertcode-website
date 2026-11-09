@@ -59,8 +59,10 @@ with ordenados as (
 update public.projects p set numero = o.n
 from ordenados o where p.id = o.id;
 
+-- O terceiro argumento `false` diz que o valor ainda não foi usado: assim
+-- o próximo projeto recebe max+1, e numa tabela vazia recebe 1.
 select setval('public.projeto_numero_seq',
-  greatest(coalesce((select max(numero) from public.projects), 0), 1));
+  coalesce((select max(numero) from public.projects), 0) + 1, false);
 
 -- Código legível, do tipo SC-2026-001: é o que cliente e equipe citam.
 update public.projects
@@ -71,6 +73,12 @@ where codigo is null;
 create unique index if not exists projects_codigo_idx on public.projects (codigo);
 
 -- 2. Situação do projeto ─────────────────────────────────────────
+-- A regra antiga sai ANTES da conversão. Convertendo primeiro, cada
+-- linha que vira 'SOLICITACAO' bate na regra velha, que só aceitava
+-- cadastrado/andamento/pausado/cancelado/concluido, e o script inteiro
+-- volta atrás.
+alter table public.projects drop constraint if exists projects_status_check;
+
 update public.projects set status = case status
   when 'cadastrado' then 'SOLICITACAO'
   when 'andamento'  then 'ANDAMENTO'
@@ -86,7 +94,6 @@ where status is null or status not in (
   'SOLICITACAO','DIAGNOSTICO','AGUARDANDO_APROVACAO','AGUARDANDO_INICIO','ANDAMENTO',
   'AGUARDANDO_CLIENTE','PAUSADO','HOMOLOGACAO','CONCLUIDO','CANCELADO');
 
-alter table public.projects drop constraint if exists projects_status_check;
 alter table public.projects
   add constraint projects_status_check
   check (status in (
