@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/portal.css?v=16">
+  <link rel="stylesheet" href="css/portal.css?v=17">
   <style>
     .admin-badge {
       font-size: 9px; font-weight: 800;
@@ -1465,6 +1465,15 @@
       <button class="btn btn-primary" style="flex:1;justify-content:center" id="rc-btn" onclick="window._salvarColab()">Cadastrar colaborador</button>
       <button class="btn btn-outline" onclick="closeModal('modal-rh-colab')">Cancelar</button>
     </div>
+
+    <div id="rc-encerrar" hidden style="border-top:1px solid var(--border);margin-top:16px;padding-top:14px">
+      <div class="rh-bloco-titulo">Encerrar vínculo</div>
+      <div class="rh-bloco-texto">Desligar mantém a ficha e o histórico, tira a pessoa da folha e desativa o acesso ao painel. Excluir apaga tudo e só faz sentido para cadastro criado por engano.</div>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-outline" style="flex:1;justify-content:center" onclick="window._desligarColab()">Desligar</button>
+        <button class="team-btn danger" onclick="window._excluirColab()">Excluir ficha</button>
+      </div>
+    </div>
     <div class="form-msg" id="rc-msg" role="alert"></div>
   </div>
 </div>
@@ -2204,6 +2213,7 @@ window._novoColab = () => {
   el('rc-acesso-senha').hidden = true; el('rc-desligamento').hidden = true;
   el('rc-bloco-acesso').hidden = false;
   document.querySelectorAll('#rc-abas .so-edicao').forEach(b => b.hidden = true);
+  el('rc-encerrar').hidden = true;
   el('rc-titulo').textContent = 'Novo colaborador';
   el('rc-btn').textContent = 'Cadastrar colaborador';
   el('rc-msg').className = 'form-msg';
@@ -2233,6 +2243,7 @@ window._editarColab = async (id) => {
   el('rc-bloco-acesso').hidden = true;        // acesso ao painel muda na aba Equipe
   el('rc-acesso-senha').hidden = true;
   document.querySelectorAll('#rc-abas .so-edicao').forEach(b => b.hidden = false);
+  el('rc-encerrar').hidden = false;
   el('rc-titulo').textContent = c.nome;
   el('rc-btn').textContent = 'Salvar alterações';
   el('rc-msg').className = 'form-msg';
@@ -2358,6 +2369,46 @@ window._salvarColab = async () => {
   fim();
   rcSet(rcEditId ? 'Alterações salvas.' : 'Colaborador cadastrado.' + (acesso ? ' Envie a senha provisória por um canal privado.' : ''), 'success');
   if (!rcEditId) setTimeout(() => closeModal('modal-rh-colab'), 1600);
+};
+
+/* ── encerrar vínculo ── */
+window._desligarColab = async () => {
+  const c = rhColabs.find(x => x.id === rcEditId);
+  if (!c) return;
+  const data = prompt('Data do desligamento (AAAA-MM-DD):', new Date().toISOString().slice(0, 10));
+  if (data === null) return;
+  const motivo = prompt('Motivo do desligamento:');
+  if (motivo === null) return;
+
+  const { error } = await supabase.from('rh_colaboradores').update({
+    situacao: 'DESLIGADO', data_desligamento: data || null,
+    motivo_desligamento: motivo || null, updated_at: new Date().toISOString(),
+  }).eq('id', rcEditId);
+  if (error) return rcSet('Não foi possível desligar: ' + error.message);
+
+  // Conta ativa de quem saiu da empresa é porta aberta.
+  if (c.profile_id) await supabase.from('profiles').update({ status: 'inativo' }).eq('id', c.profile_id);
+  await registrarRh('ALTEROU', 'Colaborador', 'Desligado: ' + (motivo || 'sem motivo'), rcEditId);
+
+  closeModal('modal-rh-colab');
+  await loadRh();
+  await loadEquipe();
+  window._aviso(`${c.nome} foi desligado. A ficha e o histórico continuam disponíveis no filtro Todos.`);
+};
+
+window._excluirColab = async () => {
+  const c = rhColabs.find(x => x.id === rcEditId);
+  if (!c) return;
+  if (!confirm(`Excluir a ficha de ${c.nome}? Documentos, dependentes e histórico salarial vão junto. O acesso ao painel permanece.`)) return;
+
+  const { error } = await supabase.from('rh_colaboradores').delete().eq('id', rcEditId);
+  if (error) return rcSet('Não foi possível excluir: ' + error.message);
+
+  await registrarRh('EXCLUIU', 'Colaborador', c.nome);
+  closeModal('modal-rh-colab');
+  await loadRh();
+  if (c.profile_id === session.user.id) await loadMeuRh();
+  window._aviso(`Ficha de ${c.nome} excluída.`);
 };
 
 /* ── benefícios do colaborador ── */
@@ -3340,6 +3391,17 @@ window._cadastroRh = async () => {
   const btn = el('ac-rh-btn'), orig = btn.textContent;
   btn.textContent = 'Criando...'; btn.disabled = true;
 
+  // Confere no banco, e não só na lista em memória: dois cliques seguidos
+  // criavam duas fichas para a mesma pessoa.
+  const { data: jaTem } = await supabase.from('rh_colaboradores')
+    .select('id').eq('profile_id', m.id).maybeSingle();
+  if (jaTem) {
+    btn.textContent = orig; btn.disabled = false;
+    await loadRh();
+    mostrarCadastroRh(m);
+    return acSet('Esta pessoa já tem ficha. Use o botão para abri-la.', 'info');
+  }
+
   // Aproveita o que já existe no acesso; o resto se completa na ficha.
   const { data: criada, error } = await supabase.from('rh_colaboradores').insert({
     nome: m.name || m.nickname || 'Colaborador', apelido: m.nickname || null,
@@ -3369,11 +3431,20 @@ window._salvarAcesso = async () => {
     name: val('ac-nome'), nickname: val('ac-apelido') || null,
     phone: val('ac-telefone') || null, role: el('ac-papel').value,
   }).eq('id', acEditId);
-  btn.textContent = orig; btn.disabled = false;
-  if (error) return acSet('Não foi possível salvar: ' + error.message);
+  if (error) { btn.textContent = orig; btn.disabled = false; return acSet('Não foi possível salvar: ' + error.message); }
 
+  const ficha = rhColabs.find(c => c.profile_id === acEditId);
+  if (ficha) {
+    await supabase.from('rh_colaboradores').update({
+      nome: val('ac-nome'), apelido: val('ac-apelido') || null,
+      telefone: val('ac-telefone') || null, updated_at: new Date().toISOString(),
+    }).eq('id', ficha.id);
+  }
+
+  btn.textContent = orig; btn.disabled = false;
   await loadEquipe();
-  acSet('Acesso atualizado.', 'success');
+  await loadRh();
+  acSet(ficha ? 'Acesso e ficha atualizados.' : 'Acesso atualizado.', 'success');
 };
 
 window._resetarSenhaEquipe = async () => {
@@ -3504,6 +3575,10 @@ function renderMeuRh() {
 }
 
 window._criarMinhaFicha = async () => {
+  const { data: jaTem } = await supabase.from('rh_colaboradores')
+    .select('id').eq('profile_id', session.user.id).maybeSingle();
+  if (jaTem) return loadMeuRh();
+
   const { data: perfil } = await supabase.from('profiles').select('*').eq('id', session.user.id).single();
   const { data: criada, error } = await supabase.from('rh_colaboradores').insert({
     nome: perfil?.name || myName, apelido: perfil?.nickname || null,
