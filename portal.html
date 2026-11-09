@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/portal.css?v=22">
+  <link rel="stylesheet" href="css/portal.css?v=23">
 <script>
   // Lido antes da tela aparecer, para não piscar o tema errado ao abrir.
   try { if (localStorage.getItem('sertcode_theme') === 'light') document.documentElement.setAttribute('data-theme', 'light'); } catch (e) {}
@@ -41,30 +41,44 @@
 
     <div class="sidebar-project">
       <div class="sidebar-project-label">Projeto ativo</div>
-      <div class="sidebar-project-name">Sistema ERP Comercial</div>
+      <div class="sidebar-project-name"></div>
     </div>
 
     <nav class="sidebar-nav">
       <a href="#" class="active" data-tab="dashboard">
         <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
-        Dashboard
+        Início
       </a>
-      <a href="#" data-tab="projeto">
+      <a href="#" data-tab="projetos">
         <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
-        Meu Projeto
+        Meus Projetos
       </a>
-      <a href="#" data-tab="suporte">
-        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-        Suporte / SLA
-        <span class="sidebar-badge" style="display:none"></span>
+      <a href="#" data-tab="aprovacoes">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><polyline points="9 15 11 17 15 13"/></svg>
+        Aprovações
+        <span class="sidebar-badge" id="badge-aprovacoes" style="display:none"></span>
       </a>
       <a href="#" data-tab="arquivos">
         <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
-        Arquivos
+        Documentos
+      </a>
+      <a href="#" data-tab="comunicacao">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
+        Comunicação
+        <span class="sidebar-badge" id="badge-comunicacao" style="display:none"></span>
+      </a>
+      <a href="#" data-tab="suporte">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        Suporte
+        <span class="sidebar-badge" style="display:none"></span>
       </a>
       <a href="#" data-tab="financeiro">
         <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
         Financeiro
+      </a>
+      <a href="#" data-tab="perfil">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Meu Perfil
       </a>
       <a href="#" data-tab="feedback">
         <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
@@ -111,258 +125,177 @@
     <div class="portal-content">
 
       <!-- ════════════════════════
-           TAB: DASHBOARD
+           TAB: INÍCIO
       ════════════════════════ -->
       <section class="tab-section active" id="tab-dashboard">
+        <div class="section-title" id="cl-saudacao">Olá</div>
+        <div class="section-sub">Acompanhe seus projetos e atividades na SertCode.</div>
 
-        <div class="section-title">Visão geral</div>
-        <div class="section-sub">Atualizado em 24 mai 2026 às 14:32</div>
+        <div class="sup-contadores" id="cl-numeros" style="margin:20px 0"></div>
 
-        <!-- Stats -->
-        <div class="stat-row">
-          <div class="stat-card">
-            <div class="stat-card-top">
-              <span class="stat-card-label">Status</span>
-              <div class="stat-icon orange">
-                <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-              </div>
-            </div>
-            <div class="stat-value" style="font-size:16px;color:var(--orange);line-height:1.3">Em<br>desenvolvimento</div>
-            <div class="stat-hint" style="margin-top:6px">Fase 4 de 6</div>
-          </div>
+        <div id="cl-pendencias"></div>
 
-          <div class="stat-card">
-            <div class="stat-card-top">
-              <span class="stat-card-label">Progresso</span>
-              <div class="stat-icon green">
-                <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-              </div>
-            </div>
-            <div class="stat-value">72%</div>
-            <div class="progress-wrap">
-              <div class="progress-bar-track">
-                <div class="progress-bar-fill" style="width:72%"></div>
-              </div>
-            </div>
-            <div class="stat-hint">+8% esta semana</div>
-          </div>
-
-          <div class="stat-card">
-            <div class="stat-card-top">
-              <span class="stat-card-label">Chamados abertos</span>
-              <div class="stat-icon blue">
-                <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-              </div>
-            </div>
-            <div class="stat-value">1</div>
-            <div class="stat-hint">1 em análise</div>
-          </div>
-
-          <div class="stat-card">
-            <div class="stat-card-top">
-              <span class="stat-card-label">Próximo prazo</span>
-              <div class="stat-icon purple">
-                <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-              </div>
-            </div>
-            <div class="stat-value" style="font-size:20px">15 Jun</div>
-            <div class="stat-hint">Fim do desenvolvimento</div>
-          </div>
+        <div class="card" style="margin-top:18px">
+          <div class="card-title" style="margin-bottom:4px">Projeto em destaque</div>
+          <div class="card-sub" id="cl-destaque-sub">—</div>
+          <div id="cl-destaque" style="margin-top:14px"></div>
         </div>
 
-        <!-- Grid: Fases + Atividade -->
-        <div class="grid-2">
-
-          <div class="card">
-            <div class="card-title">Fases do projeto</div>
-            <div class="card-sub">Sistema ERP Comercial</div>
-            <div class="phase-list">
-              <div class="phase-item">
-                <div class="phase-dot done">✓</div>
-                <div style="flex:1">
-                  <div class="phase-name">Diagnóstico</div>
-                  <div class="phase-date">Concluído em 02 Mai</div>
-                </div>
-                <span class="phase-badge done">Concluído</span>
-              </div>
-              <div class="phase-item">
-                <div class="phase-dot done">✓</div>
-                <div style="flex:1">
-                  <div class="phase-name">Planejamento</div>
-                  <div class="phase-date">Concluído em 08 Mai</div>
-                </div>
-                <span class="phase-badge done">Concluído</span>
-              </div>
-              <div class="phase-item">
-                <div class="phase-dot done">✓</div>
-                <div style="flex:1">
-                  <div class="phase-name">Design & UX</div>
-                  <div class="phase-date">Concluído em 18 Mai</div>
-                </div>
-                <span class="phase-badge done">Concluído</span>
-              </div>
-              <div class="phase-item">
-                <div class="phase-dot active">⟳</div>
-                <div style="flex:1">
-                  <div class="phase-name">Desenvolvimento</div>
-                  <div class="phase-date">Estimativa: 15 Jun</div>
-                </div>
-                <span class="phase-badge active">Em andamento</span>
-              </div>
-              <div class="phase-item">
-                <div class="phase-dot pend">○</div>
-                <div style="flex:1">
-                  <div class="phase-name pend">Testes & QA</div>
-                  <div class="phase-date">Estimativa: 28 Jun</div>
-                </div>
-                <span class="phase-badge pend">Aguardando</span>
-              </div>
-              <div class="phase-item">
-                <div class="phase-dot pend">○</div>
-                <div style="flex:1">
-                  <div class="phase-name pend">Entrega e Treinamento</div>
-                  <div class="phase-date">Estimativa: 10 Jul</div>
-                </div>
-                <span class="phase-badge pend">Aguardando</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="card">
-            <div class="card-title">Atualizações recentes</div>
-            <div class="card-sub">Últimas atividades registradas</div>
-            <div class="activity-list">
-              <div class="activity-item">
-                <div class="activity-dot orange"></div>
-                <div class="activity-text">Módulo de relatórios financeiros <strong>concluído</strong></div>
-                <div class="activity-time">Hoje 14:32</div>
-              </div>
-              <div class="activity-item">
-                <div class="activity-dot green"></div>
-                <div class="activity-text">Design das telas de configuração <strong>aprovado</strong></div>
-                <div class="activity-time">Ontem 11:15</div>
-              </div>
-              <div class="activity-item">
-                <div class="activity-dot blue"></div>
-                <div class="activity-text">Integração com API de pagamento <strong>iniciada</strong></div>
-                <div class="activity-time">20 Mai 09:40</div>
-              </div>
-              <div class="activity-item">
-                <div class="activity-dot green"></div>
-                <div class="activity-text">Módulo de usuários e permissões <strong>entregue</strong></div>
-                <div class="activity-time">18 Mai 16:00</div>
-              </div>
-              <div class="activity-item">
-                <div class="activity-dot orange"></div>
-                <div class="activity-text">Dashboard financeiro <strong>em desenvolvimento</strong></div>
-                <div class="activity-time">17 Mai 10:22</div>
-              </div>
-            </div>
-          </div>
-
+        <div class="card" style="margin-top:18px">
+          <div class="card-title" style="margin-bottom:10px">Últimas atualizações</div>
+          <div id="cl-recentes" class="hist-lista"></div>
         </div>
-
-        <!-- Status servidor -->
-        <div class="card">
-          <div class="card-title">Status da infraestrutura</div>
-          <div class="card-sub">Serviços em tempo real</div>
-          <div class="status-row">
-            <div class="status-dot ok"></div>
-            <span class="status-label">Servidor principal</span>
-            <span class="status-val" style="color:var(--green)">ONLINE</span>
-          </div>
-          <div class="status-row">
-            <div class="status-dot ok"></div>
-            <span class="status-label">Banco de dados</span>
-            <span class="status-val" style="color:var(--green)">OPERACIONAL</span>
-          </div>
-          <div class="status-row">
-            <div class="status-dot ok"></div>
-            <span class="status-label">API</span>
-            <span class="status-val" style="color:var(--green)">OPERACIONAL</span>
-          </div>
-          <div class="status-row">
-            <div class="status-dot ok"></div>
-            <span class="status-label">Último backup automático</span>
-            <span class="status-val">Hoje 02:14</span>
-          </div>
-        </div>
-
       </section>
 
       <!-- ════════════════════════
-           TAB: MEU PROJETO
+           TAB: MEUS PROJETOS
       ════════════════════════ -->
-      <section class="tab-section" id="tab-projeto">
+      <section class="tab-section" id="tab-projetos">
+        <div id="cp-lista">
+          <div class="section-title">Meus Projetos</div>
+          <div class="section-sub">Tudo o que você contratou da SertCode, com o andamento de cada fase.</div>
+          <div id="cp-cartoes" style="margin-top:20px"></div>
+        </div>
 
-        <div class="section-title">Meu Projeto</div>
-        <div class="section-sub">Sistema ERP Comercial — Acompanhamento detalhado em tempo real</div>
-
-        <div class="card" style="margin-bottom:16px">
-          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px">
+        <div id="cp-ficha" hidden>
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:18px">
             <div>
-              <div class="card-title">Progresso geral</div>
-              <div class="card-sub" style="margin-bottom:0">72% concluído · Entrega estimada: 10 Jul 2026</div>
+              <div class="section-title" style="margin:0" id="cp-nome">Projeto</div>
+              <div class="section-sub" style="margin:4px 0 0" id="cp-sub"></div>
             </div>
-            <span class="status status-dev">Em desenvolvimento</span>
+            <button class="btn btn-outline" onclick="window._voltarProjetosCliente()">&larr; Voltar</button>
           </div>
-          <div class="progress-bar-track" style="height:10px">
-            <div class="progress-bar-fill" style="width:72%"></div>
-          </div>
-          <div style="display:flex;justify-content:space-between;margin-top:7px;font-size:11px;color:var(--text-dim)">
-            <span>Início</span><span style="color:var(--orange);font-weight:700">72% concluído</span><span>Entrega</span>
-          </div>
-        </div>
 
-        <div class="card-title" style="margin-bottom:10px">Quadro de funcionalidades</div>
+          <div class="card" style="margin-bottom:18px">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap">
+              <div>
+                <div class="resumo-label">Progresso</div>
+                <div class="resumo-valor" style="font-size:30px;text-align:left" id="cp-progresso">0%</div>
+              </div>
+              <div id="cp-situacao"></div>
+            </div>
+            <div class="progress-bar" style="margin-top:12px"><div class="progress-bar-fill" id="cp-barra" style="width:0%"></div></div>
+            <div class="rh-item-sub" id="cp-etapas-feitas"></div>
+          </div>
 
-        <div class="kanban">
-          <div class="kanban-col">
-            <div class="kanban-col-title">Fila <span>2</span></div>
-            <div class="kanban-card">
-              <div class="kanban-card-tag">Integração</div>
-              Integração com marketplace externo
-            </div>
-            <div class="kanban-card">
-              <div class="kanban-card-tag">Relatório</div>
-              Auditoria de acessos por usuário
-            </div>
+          <nav class="rh-abas" id="cp-abas">
+            <button class="rh-aba active" data-cp="etapas">Etapas e progresso</button>
+            <button class="rh-aba" data-cp="informacoes">Informações</button>
+            <button class="rh-aba" data-cp="atualizacoes">Atualizações</button>
+          </nav>
+
+          <div class="rh-painel active" id="cp-p-etapas">
+            <div id="cp-etapas"></div>
+            <div class="sup-aviso" style="margin-top:12px">As atualizações são registradas pela equipe da SertCode.</div>
           </div>
-          <div class="kanban-col">
-            <div class="kanban-col-title" style="color:var(--blue)">Em desenvolvimento <span>2</span></div>
-            <div class="kanban-card">
-              <div class="kanban-card-tag">Pagamentos</div>
-              API de pagamento via PIX
-            </div>
-            <div class="kanban-card">
-              <div class="kanban-card-tag">Dashboard</div>
-              Dashboard financeiro
-            </div>
+
+          <div class="rh-painel" id="cp-p-informacoes">
+            <div class="card"><div id="cp-informacoes"></div></div>
           </div>
-          <div class="kanban-col">
-            <div class="kanban-col-title" style="color:var(--purple)">Testes <span>1</span></div>
-            <div class="kanban-card">
-              <div class="kanban-card-tag">Usuários</div>
-              Módulo de usuários e permissões
-            </div>
-          </div>
-          <div class="kanban-col">
-            <div class="kanban-col-title" style="color:var(--green)">Concluído <span>3</span></div>
-            <div class="kanban-card">
-              <div class="kanban-card-tag">Auth</div>
-              Login e autenticação
-            </div>
-            <div class="kanban-card">
-              <div class="kanban-card-tag">Produtos</div>
-              Cadastro de produtos
-            </div>
-            <div class="kanban-card">
-              <div class="kanban-card-tag">Pedidos</div>
-              Sistema de pedidos
+
+          <div class="rh-painel" id="cp-p-atualizacoes">
+            <div class="card">
+              <div class="card-title" style="margin-bottom:10px">Linha do tempo</div>
+              <div id="cp-atualizacoes" class="hist-lista"></div>
             </div>
           </div>
         </div>
+      </section>
 
+      <!-- ════════════════════════
+           TAB: APROVAÇÕES
+      ════════════════════════ -->
+      <section class="tab-section" id="tab-aprovacoes">
+        <div class="section-title">Aprovações</div>
+        <div class="section-sub">Entregas que dependem da sua avaliação para o projeto seguir.</div>
+        <div id="ca-lista" style="margin-top:20px"></div>
+      </section>
+
+      <!-- ════════════════════════
+           TAB: DOCUMENTOS
+      ════════════════════════ -->
+      <section class="tab-section" id="tab-arquivos">
+        <div class="section-title">Documentos</div>
+        <div class="section-sub">Contratos, propostas, arquivos do projeto e entregas.</div>
+
+        <div class="card" style="margin:20px 0">
+          <div class="card-title" style="margin-bottom:10px">Enviar um arquivo</div>
+          <div class="form-row-2">
+            <div class="form-group"><label>Projeto</label><select id="cd-projeto"></select></div>
+            <div class="form-group"><label>Arquivo</label><input type="file" id="cd-arquivo"></div>
+          </div>
+          <button class="btn btn-primary" id="cd-btn" onclick="window._enviarDocumentoCliente()">Enviar</button>
+          <div class="form-msg" id="cd-msg" role="alert"></div>
+        </div>
+
+        <div class="form-group" style="max-width:320px"><label>Pasta</label>
+          <select id="cd-pasta"><option value="">Todas</option></select></div>
+        <div id="cd-lista"></div>
+      </section>
+
+      <!-- ════════════════════════
+           TAB: COMUNICAÇÃO
+      ════════════════════════ -->
+      <section class="tab-section" id="tab-comunicacao">
+        <div class="section-title">Comunicação</div>
+        <div class="section-sub">Uma conversa por projeto, para não misturar assuntos.</div>
+
+        <div class="form-group" style="max-width:420px;margin-top:20px"><label>Projeto</label>
+          <select id="cc-projeto"></select></div>
+
+        <div class="card">
+          <div id="cc-conversa" class="hist-lista"></div>
+          <div class="form-group" style="margin-top:16px"><textarea id="cc-texto" placeholder="Escreva para a equipe da SertCode."></textarea></div>
+          <div class="form-group"><label>Anexo (opcional)</label><input type="file" id="cc-anexo"></div>
+          <button class="btn btn-primary" id="cc-btn" onclick="window._enviarMensagemCliente()">Enviar</button>
+          <div class="form-msg" id="cc-msg" role="alert"></div>
+        </div>
+      </section>
+
+      <!-- ════════════════════════
+           TAB: MEU PERFIL
+      ════════════════════════ -->
+      <section class="tab-section" id="tab-perfil">
+        <div class="section-title">Meu Perfil</div>
+        <div class="section-sub">Dados cadastrais da sua empresa na SertCode.</div>
+
+        <div class="card" style="margin-top:20px">
+          <div class="card-title" style="margin-bottom:12px">Empresa</div>
+          <div class="form-row-2">
+            <div class="form-group"><label>Razão social ou nome fantasia</label><input type="text" id="cm-empresa" maxlength="120"></div>
+            <div class="form-group"><label>CNPJ</label><input type="text" id="cm-cnpj" maxlength="18" placeholder="00.000.000/0000-00"></div>
+          </div>
+          <div class="card-title" style="margin:18px 0 12px">Contato</div>
+          <div class="form-row-2">
+            <div class="form-group"><label>Responsável</label><input type="text" id="cm-nome" maxlength="120"></div>
+            <div class="form-group"><label>Cargo</label><input type="text" id="cm-cargo" maxlength="60"></div>
+          </div>
+          <div class="form-row-2">
+            <div class="form-group"><label>Telefone</label><input type="tel" id="cm-telefone" maxlength="15"></div>
+            <div class="form-group"><label>WhatsApp</label><input type="tel" id="cm-whatsapp" maxlength="15"></div>
+          </div>
+          <div class="form-group"><label>E-mail de acesso</label>
+            <input type="email" id="cm-email" disabled>
+            <div style="font-size:11px;color:var(--text-dim);margin-top:6px">Para trocar o e-mail de acesso, fale com a SertCode.</div></div>
+
+          <div class="card-title" style="margin:18px 0 12px">Endereço</div>
+          <div class="form-group"><label>CEP</label><input type="text" id="cm-cep" maxlength="9" placeholder="00000-000"></div>
+          <div class="form-group"><label>Endereço</label><input type="text" id="cm-endereco" maxlength="160"></div>
+          <div class="rh-endereco-3">
+            <div class="form-group"><label>Bairro</label><input type="text" id="cm-bairro" maxlength="60"></div>
+            <div class="form-group"><label>Cidade</label><input type="text" id="cm-cidade" maxlength="60"></div>
+            <div class="form-group"><label>UF</label><input type="text" id="cm-uf" maxlength="2"></div>
+          </div>
+
+          <button class="btn btn-primary" id="cm-btn" onclick="window._salvarPerfilCliente()">Salvar dados</button>
+          <div class="form-msg" id="cm-msg" role="alert"></div>
+        </div>
+
+        <div class="card" style="margin-top:18px">
+          <div class="card-title" style="margin-bottom:6px">Segurança</div>
+          <div class="card-sub">Trocar a senha de acesso ao portal.</div>
+          <button class="btn btn-outline" style="margin-top:12px" onclick="window._trocarSenhaCliente()">Enviar link de nova senha</button>
+        </div>
       </section>
 
       <!-- ════════════════════════
@@ -471,79 +404,6 @@
       <!-- ════════════════════════
            TAB: ARQUIVOS
       ════════════════════════ -->
-      <section class="tab-section" id="tab-arquivos">
-
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:14px;margin-bottom:24px">
-          <div>
-            <div class="section-title">Arquivos</div>
-            <div class="section-sub" style="margin-bottom:0">Documentos, contratos, layouts e exportações do projeto</div>
-          </div>
-          <button class="btn btn-outline" onclick="alert('Em breve: solicitação de arquivos diretamente pelo portal.')">
-            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-            Solicitar arquivo
-          </button>
-        </div>
-
-        <div class="card">
-          <div class="file-row">
-            <div class="file-icon pdf">PDF</div>
-            <div>
-              <div class="file-name">Proposta Comercial SertCode.pdf</div>
-              <div class="file-meta">245 KB &middot; Enviado em 02 Mai 2026</div>
-            </div>
-            <a href="#" class="file-dl" onclick="event.preventDefault()">
-              <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              Baixar
-            </a>
-          </div>
-          <div class="file-row">
-            <div class="file-icon pdf">PDF</div>
-            <div>
-              <div class="file-name">Contrato de Desenvolvimento.pdf</div>
-              <div class="file-meta">180 KB &middot; Enviado em 03 Mai 2026</div>
-            </div>
-            <a href="#" class="file-dl" onclick="event.preventDefault()">
-              <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              Baixar
-            </a>
-          </div>
-          <div class="file-row">
-            <div class="file-icon fig">FIG</div>
-            <div>
-              <div class="file-name">Protótipo UI/UX — Figma.fig</div>
-              <div class="file-meta">2.4 MB &middot; Enviado em 18 Mai 2026</div>
-            </div>
-            <a href="#" class="file-dl" onclick="event.preventDefault()">
-              <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              Baixar
-            </a>
-          </div>
-          <div class="file-row">
-            <div class="file-icon doc">PDF</div>
-            <div>
-              <div class="file-name">Manual do Usuário v1.0.pdf</div>
-              <div class="file-meta">890 KB &middot; Enviado em 20 Mai 2026</div>
-            </div>
-            <a href="#" class="file-dl" onclick="event.preventDefault()">
-              <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              Baixar
-            </a>
-          </div>
-          <div class="file-row">
-            <div class="file-icon zip">ZIP</div>
-            <div>
-              <div class="file-name">Logo e Identidade Visual.zip</div>
-              <div class="file-meta">12 MB &middot; Enviado em 19 Mai 2026</div>
-            </div>
-            <a href="#" class="file-dl" onclick="event.preventDefault()">
-              <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              Baixar
-            </a>
-          </div>
-        </div>
-
-      </section>
-
       <!-- ════════════════════════
            TAB: FINANCEIRO
       ════════════════════════ -->
@@ -714,6 +574,10 @@
 <script type="module">
 import { supabase } from './js/supabase.js'
 import { ligarNotificacoes } from './js/notificacoes.js'
+import {
+  FASES, CATEGORIAS, SERVICOS, PROJETO_STATUS, ETAPA_STATUS,
+  TIPOS_APROVACAO, PASTAS_DOC, progressoGeral,
+} from './js/projetos-modelos.js'
 
 /* ── VERIFICAR SESSÃO ── */
 const { data: { session } } = await supabase.auth.getSession();
@@ -725,12 +589,11 @@ const userId = session.user.id;
 async function loadPortalData() {
   // Perfil
   const { data: profile } = await supabase
-    .from('profiles')
-    .select('name, company')
-    .eq('id', userId)
-    .single();
+    .from('profiles').select('*').eq('id', userId).single();
+  clPerfil = profile;
 
   if (profile) {
+    preencherPerfil();
     const initials = (profile.name || 'CL').split(' ').map(n => n[0]).slice(0,2).join('').toUpperCase();
     document.querySelectorAll('.sidebar-avatar, .header-avatar').forEach(el => el.textContent = initials);
     document.querySelector('.sidebar-user-name').textContent = profile.name || 'Cliente';
@@ -738,36 +601,7 @@ async function loadPortalData() {
     document.querySelector('.portal-header-sub').textContent = 'Bem-vindo de volta, ' + (profile.name?.split(' ')[0] || '');
   }
 
-  // Projeto
-  const { data: project } = await supabase
-    .from('projects')
-    .select('*')
-    .eq('client_id', userId)
-    .order('created_at', { ascending: false })
-    .limit(1)
-    .single();
-
-  if (project) {
-    // Sidebar
-    document.querySelector('.sidebar-project-name').textContent = project.name;
-    // Dashboard stats
-    document.querySelector('#tab-dashboard .stat-value[style*="orange"]') && (
-      document.querySelector('#tab-dashboard .stat-value[style*="orange"]').textContent = labelStatus(project.status)
-    );
-    const progEls = document.querySelectorAll('.progress-bar-fill');
-    progEls.forEach(el => el.style.width = project.progress + '%');
-    document.querySelectorAll('.stat-value').forEach(el => {
-      if (el.textContent === '72%') el.textContent = project.progress + '%';
-    });
-    // Aba Projeto
-    document.querySelector('#tab-projeto .card-sub').textContent =
-      project.name + ' — ' + project.progress + '% concluído · Entrega estimada: ' + formatDate(project.end_date);
-    document.querySelector('#tab-projeto .progress-bar-fill').style.width = project.progress + '%';
-    document.querySelector('#tab-projeto [style*="72%"]') &&
-      (document.querySelector('#tab-projeto [style*="72%"]').textContent = project.progress + '%');
-    document.querySelector('.section-sub').textContent =
-      project.name + ' — Acompanhamento detalhado em tempo real';
-  }
+  await carregarProjetos();
 
   await carregarChamados();
 
@@ -804,7 +638,7 @@ async function loadPortalData() {
         </div>
         <div style="flex:1;min-width:0">
           <div class="invoice-title">${inv.description || 'Parcela ' + (i+1)}</div>
-          <div class="invoice-desc">${project?.name || ''} · Venc. ${formatDate(inv.due_date)}</div>
+          <div class="invoice-desc">${escapeHtml(clProjetos.find(p => p.id === inv.project_id)?.name || '')} · Venc. ${formatDate(inv.due_date)}</div>
         </div>
         <div class="invoice-amount">
           <div class="invoice-value">R$ ${Number(inv.amount).toLocaleString('pt-BR', {minimumFractionDigits:2})}</div>
@@ -814,47 +648,6 @@ async function loadPortalData() {
     `).join('');
   }
 
-  // Arquivos
-  const { data: files } = await supabase
-    .from('files')
-    .select('*')
-    .eq('client_id', userId)
-    .order('created_at', { ascending: false });
-
-  if (files?.length) {
-    const card = document.querySelector('#tab-arquivos .card');
-    const header = card.querySelector('div[style*="justify-content:space-between"]');
-    card.innerHTML = '';
-    card.appendChild(header);
-    files.forEach(f => {
-      const ext = (f.type || f.name.split('.').pop()).toUpperCase();
-      const iconClass = ['PDF','DOC'].includes(ext) ? 'pdf' : ext === 'FIG' ? 'fig' : ext === 'ZIP' ? 'zip' : 'doc';
-      const div = document.createElement('div');
-      div.className = 'file-row';
-      div.innerHTML = `
-        <div class="file-icon ${iconClass}">${ext}</div>
-        <div>
-          <div class="file-name">${f.name}</div>
-          <div class="file-meta">${f.size_kb ? f.size_kb + ' KB' : ''} · ${formatDate(f.created_at)}</div>
-        </div>
-        <a href="#" class="file-dl" data-path="${f.storage_path || ''}">
-          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          Baixar
-        </a>`;
-      card.appendChild(div);
-    });
-
-    // Download via Supabase Storage
-    card.querySelectorAll('.file-dl').forEach(a => {
-      a.addEventListener('click', async e => {
-        e.preventDefault();
-        const path = a.dataset.path;
-        if (!path) return;
-        const { data } = await supabase.storage.from('project-files').createSignedUrl(path, 3600);
-        if (data?.signedUrl) window.open(data.signedUrl, '_blank');
-      });
-    });
-  }
 }
 
 /* ── AVISO FLUTUANTE ── */
@@ -883,8 +676,487 @@ const notif = await ligarNotificacoes({
     if (!link) return;
     link.click();
     if (aba === 'suporte' && referencia) window._abrirChamadoCliente(referencia);
+    if (aba === 'projetos' && referencia) window._abrirProjetoCliente(referencia);
   },
 });
+
+/* ── MEUS PROJETOS ── */
+let clProjetos = [], clEtapas = [], clAtualizacoes = [], clAprovacoes = [],
+    clDocumentos = [], clMensagens = [], clAberto = null, clPerfil = null;
+
+const clEl = id => document.getElementById(id);
+const clMsg = (id, t, tipo = 'error') => { const m = clEl(id); m.textContent = t; m.className = 'form-msg show ' + tipo; };
+const clHoje = () => new Date().toISOString().slice(0, 10);
+
+async function carregarProjetos() {
+  const { data: projetos } = await supabase.from('projects').select('*')
+    .eq('client_id', userId).order('created_at', { ascending: false });
+  clProjetos = projetos || [];
+  const ids = clProjetos.map(p => p.id);
+
+  if (ids.length) {
+    const [et, at, ap, dc, ms] = await Promise.all([
+      supabase.from('projeto_etapas').select('*').in('project_id', ids).order('ordem'),
+      supabase.from('projeto_atualizacoes').select('*').in('project_id', ids).order('created_at', { ascending: false }),
+      supabase.from('projeto_aprovacoes').select('*').in('project_id', ids).order('created_at', { ascending: false }),
+      supabase.from('projeto_documentos').select('*').in('project_id', ids).order('created_at', { ascending: false }),
+      supabase.from('projeto_mensagens').select('*').in('project_id', ids).order('created_at'),
+    ]);
+    clEtapas = et.data || []; clAtualizacoes = at.data || []; clAprovacoes = ap.data || [];
+    clDocumentos = dc.data || []; clMensagens = ms.data || [];
+  } else {
+    clEtapas = []; clAtualizacoes = []; clAprovacoes = []; clDocumentos = []; clMensagens = [];
+  }
+
+  const opcoesProjeto = clProjetos.map(p =>
+    `<option value="${p.id}">${escapeHtml(p.codigo ? p.codigo + ' · ' : '')}${escapeHtml(p.name)}</option>`).join('');
+  clEl('cd-projeto').innerHTML = opcoesProjeto || '<option value="">Nenhum projeto</option>';
+  clEl('cc-projeto').innerHTML = opcoesProjeto || '<option value="">Nenhum projeto</option>';
+  clEl('cd-pasta').innerHTML = '<option value="">Todas</option>'
+    + Object.entries(PASTAS_DOC).map(([v, l]) => `<option value="${v}">${l}</option>`).join('');
+
+  renderInicio();
+  renderMeusProjetos();
+  renderAprovacoes();
+  renderDocumentosCliente();
+  renderConversaCliente();
+}
+
+const etapasDe = id => clEtapas.filter(e => e.project_id === id);
+const ATIVOS = p => !['CONCLUIDO', 'CANCELADO'].includes(p.status);
+
+/* ── início ── */
+function renderInicio() {
+  const nome = clPerfil?.company || clPerfil?.name || '';
+  clEl('cl-saudacao').textContent = nome ? `Olá, ${nome}!` : 'Olá!';
+
+  const pendentes = clAprovacoes.filter(a => a.situacao === 'PENDENTE');
+  clEl('cl-numeros').innerHTML = [
+    { label: 'Projetos ativos',      valor: clProjetos.filter(ATIVOS).length, cor: 'var(--text)' },
+    { label: 'Concluídos',           valor: clProjetos.filter(p => p.status === 'CONCLUIDO').length, cor: 'var(--green)' },
+    { label: 'Aguardando você',      valor: pendentes.length, cor: pendentes.length ? 'var(--orange)' : 'var(--text)' },
+    { label: 'Chamados abertos',     valor: csChamados.filter(t => !['CONCLUIDO','CANCELADO'].includes(t.status)).length, cor: 'var(--text)' },
+  ].map(c => `<div class="resumo-card" style="text-align:left">
+      <div class="resumo-label" style="margin:0 0 6px">${c.label}</div>
+      <div class="resumo-valor" style="color:${c.cor};font-size:24px">${c.valor}</div>
+    </div>`).join('');
+
+  // A pendência aparece antes de tudo: é o que trava o projeto do lado
+  // do cliente, e é o motivo mais comum de atraso.
+  const esperando = clProjetos.filter(p => p.status === 'AGUARDANDO_CLIENTE');
+  const avisos = [
+    ...pendentes.map(a => ({
+      texto: `Aprovação pendente: <strong>${escapeHtml(a.titulo)}</strong>${
+        a.prazo ? ` · responder até ${formatDate(a.prazo)}` : ''}`,
+      aba: 'aprovacoes', botao: 'Ver aprovação',
+    })),
+    ...esperando.map(p => ({
+      texto: `O projeto <strong>${escapeHtml(p.name)}</strong> está aguardando você${
+        p.motivo_espera ? `: ${escapeHtml(p.motivo_espera)}` : '.'}`,
+      aba: 'comunicacao', botao: 'Falar com a equipe',
+    })),
+  ];
+  clEl('cl-pendencias').innerHTML = avisos.length ? `
+    <div class="card" style="border-color:rgba(255,106,0,0.32)">
+      <div class="card-title" style="margin-bottom:10px">Pendências</div>
+      ${avisos.map(a => `<div class="meurh-linha">
+        <span>${a.texto}</span>
+        <button class="team-btn" onclick="window._irPara('${a.aba}')">${a.botao}</button></div>`).join('')}
+    </div>` : '';
+
+  const destaque = clProjetos.filter(ATIVOS)
+    .sort((a, b) => (b.progress || 0) - (a.progress || 0))[0];
+  if (destaque) {
+    const st = PROJETO_STATUS[destaque.status] || { label: destaque.status, cls: '' };
+    clEl('cl-destaque-sub').textContent = `${destaque.codigo || ''} · ${SERVICOS[destaque.servico]?.nome || ''}`;
+    clEl('cl-destaque').innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:10px">
+        <strong style="font-size:15px">${escapeHtml(destaque.name)}</strong>
+        <span class="status ${st.cls}">${st.label}</span>
+      </div>
+      <div class="progress-bar"><div class="progress-bar-fill" style="width:${destaque.progress || 0}%"></div></div>
+      <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:11.5px;color:var(--text-dim)">
+        <span>${destaque.progress || 0}% concluído</span>
+        <span>${destaque.previsao_entrega ? 'Previsão: ' + formatDate(destaque.previsao_entrega) : 'Sem data definida'}</span>
+      </div>
+      <button class="btn btn-outline" style="margin-top:14px" onclick="window._abrirProjetoCliente('${destaque.id}')">Acompanhar projeto</button>`;
+  } else {
+    clEl('cl-destaque-sub').textContent = 'Nenhum projeto em andamento.';
+    clEl('cl-destaque').innerHTML = '<div class="rh-item-sub">Quando a SertCode iniciar um projeto seu, ele aparece aqui.</div>';
+  }
+
+  const recentes = clAtualizacoes.slice(0, 5);
+  clEl('cl-recentes').innerHTML = recentes.length ? recentes.map(a => {
+    const p = clProjetos.find(x => x.id === a.project_id);
+    return `<div class="hist-item">
+      <div class="hist-topo">
+        <span style="font-size:12.5px;font-weight:600">${escapeHtml(a.titulo)}</span>
+        <span class="hist-data">${formatDate(a.created_at)}</span>
+      </div>
+      ${a.descricao ? `<div class="hist-nota">${escapeHtml(a.descricao)}</div>` : ''}
+      <div class="hist-autor">${escapeHtml(p?.name || '')}</div>
+    </div>`;
+  }).join('') : '<div class="rh-item-sub">Nenhuma atualização ainda.</div>';
+}
+
+window._irPara = (aba) => document.querySelector(`.sidebar-nav a[data-tab="${aba}"]`)?.click();
+
+/* ── lista de projetos ── */
+function renderMeusProjetos() {
+  if (!clProjetos.length) {
+    clEl('cp-cartoes').innerHTML = `<div class="card"><div class="rh-item-sub">
+      Você ainda não tem projetos cadastrados. Assim que a SertCode registrar o seu,
+      ele aparece aqui com todas as fases.</div></div>`;
+    return;
+  }
+  clEl('cp-cartoes').innerHTML = clProjetos.map(p => {
+    const st = PROJETO_STATUS[p.status] || { label: p.status, cls: '' };
+    const etapas = etapasDe(p.id);
+    const feitas = etapas.filter(e => e.status === 'CONCLUIDO').length;
+    const valem = etapas.filter(e => e.status !== 'CANCELADO').length;
+    return `<div class="card cp-card" onclick="window._abrirProjetoCliente('${p.id}')" style="margin-bottom:14px">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap">
+        <div style="min-width:0">
+          <div style="font-size:15px;font-weight:700">${escapeHtml(p.name)}</div>
+          <div class="rh-item-sub">${escapeHtml(p.codigo || '')}${
+            p.servico ? ' · ' + escapeHtml(SERVICOS[p.servico]?.nome || p.servico) : ''}</div>
+        </div>
+        <span class="status ${st.cls}">${st.label}</span>
+      </div>
+      <div class="progress-bar" style="margin:12px 0 8px"><div class="progress-bar-fill" style="width:${p.progress || 0}%"></div></div>
+      <div style="display:flex;justify-content:space-between;font-size:11.5px;color:var(--text-dim)">
+        <span>${p.progress || 0}% concluído${valem ? ` · ${feitas} de ${valem} etapas` : ''}</span>
+        <span>${p.previsao_entrega ? 'Previsão: ' + formatDate(p.previsao_entrega) : 'Sem data'}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+window._voltarProjetosCliente = () => {
+  clAberto = null;
+  clEl('cp-ficha').hidden = true;
+  clEl('cp-lista').hidden = false;
+};
+
+window._abrirProjetoCliente = (id) => {
+  clAberto = clProjetos.find(p => p.id === id);
+  if (!clAberto) return;
+  window._irPara('projetos');
+  clEl('cp-lista').hidden = true;
+  clEl('cp-ficha').hidden = false;
+
+  const p = clAberto;
+  const st = PROJETO_STATUS[p.status] || { label: p.status, cls: '' };
+  const etapas = etapasDe(p.id);
+  const feitas = etapas.filter(e => e.status === 'CONCLUIDO').length;
+  const valem = etapas.filter(e => e.status !== 'CANCELADO').length;
+
+  clEl('cp-nome').textContent = p.name;
+  clEl('cp-sub').textContent = [p.codigo, SERVICOS[p.servico]?.nome].filter(Boolean).join(' · ');
+  clEl('cp-progresso').textContent = (p.progress || 0) + '%';
+  clEl('cp-barra').style.width = (p.progress || 0) + '%';
+  clEl('cp-situacao').innerHTML = `<span class="status ${st.cls}">${st.label}</span>
+    <div class="rh-item-sub" style="margin-top:6px;text-align:right">${
+      p.previsao_entrega ? 'Previsão de entrega: ' + formatDate(p.previsao_entrega) : 'Sem data definida'}</div>`;
+  clEl('cp-etapas-feitas').textContent = valem ? `${feitas} de ${valem} etapas concluídas` : 'Etapas ainda não definidas';
+
+  // Mesmo agrupamento por fase do painel da gestão: os dois lados contam
+  // a mesma história, com detalhe diferente.
+  const porFase = {};
+  etapas.forEach(e => { (porFase[e.fase] ||= []).push(e); });
+  clEl('cp-etapas').innerHTML = Object.keys(porFase).length
+    ? Object.entries(FASES).filter(([f]) => porFase[f]).map(([f, fase]) => {
+        const lista = porFase[f];
+        const feito = progressoGeral(lista);
+        const st2 = feito === 100 ? { label: 'Concluído', cls: 'status-done' }
+          : feito > 0 ? { label: 'Em andamento', cls: 'status-dev' }
+          : { label: 'Não iniciado', cls: '' };
+        return `<div class="card" style="margin-bottom:12px">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap">
+            <div style="min-width:0">
+              <div style="font-size:14px;font-weight:700">${fase.ordem}. ${fase.nome}</div>
+              <div class="rh-item-sub">${fase.descricao}</div>
+            </div>
+            <span class="status ${st2.cls}">${st2.label}</span>
+          </div>
+          <div class="progress-bar" style="margin:10px 0 6px"><div class="progress-bar-fill" style="width:${feito}%"></div></div>
+          <div class="rh-item-sub">${feito}% · ${lista.filter(e => e.status === 'CONCLUIDO').length} de ${lista.length} atividades</div>
+          <div style="margin-top:10px">${lista.map(e => {
+            const es = ETAPA_STATUS[e.status] || { label: e.status, cls: '' };
+            return `<div class="meurh-linha">
+              <span>${escapeHtml(e.nome)}</span>
+              <span><span class="status ${es.cls}">${es.label}</span></span></div>`;
+          }).join('')}</div>
+        </div>`;
+      }).join('')
+    : '<div class="card"><div class="rh-item-sub">As fases deste projeto ainda não foram cadastradas pela equipe.</div></div>';
+
+  clEl('cp-informacoes').innerHTML = [
+    ['Código', p.codigo], ['Serviço', SERVICOS[p.servico]?.nome],
+    ['Situação', st.label], ['Responsável pelo atendimento', p.responsavel_nome],
+    ['Data da solicitação', p.requested_at && formatDate(p.requested_at)],
+    ['Data de início', p.previsao_inicio && formatDate(p.previsao_inicio)],
+    ['Previsão de entrega', p.previsao_entrega && formatDate(p.previsao_entrega)],
+  ].map(([r, v]) => `<div class="meurh-linha"><span>${r}</span><strong>${escapeHtml(v || '—')}</strong></div>`).join('')
+  + (p.description ? `<div style="margin-top:14px;font-size:13px;line-height:1.7">${escapeHtml(p.description)}</div>` : '')
+  + (p.objetivo ? `<div class="sup-aviso" style="margin-top:12px"><strong>Objetivo:</strong> ${escapeHtml(p.objetivo)}</div>` : '');
+
+  const atualizacoes = clAtualizacoes.filter(a => a.project_id === p.id);
+  clEl('cp-atualizacoes').innerHTML = atualizacoes.length ? atualizacoes.map(a => `
+    <div class="hist-item">
+      <div class="hist-topo">
+        <span style="font-size:12.5px;font-weight:600">${escapeHtml(a.titulo)}</span>
+        <span class="hist-data">${formatDate(a.created_at)}</span>
+      </div>
+      ${a.descricao ? `<div class="hist-nota">${escapeHtml(a.descricao)}</div>` : ''}
+      ${a.anexo ? `<button class="cbo-link" onclick="window._baixarArquivoProjeto('${a.anexo}')">Ver arquivo</button>` : ''}
+    </div>`).join('') : '<div class="rh-item-sub">Nenhuma atualização publicada ainda.</div>';
+};
+
+document.querySelectorAll('#cp-abas .rh-aba').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('#cp-abas .rh-aba').forEach(x => x.classList.remove('active'));
+  b.classList.add('active');
+  document.querySelectorAll('#cp-ficha > .rh-painel').forEach(p => p.classList.remove('active'));
+  clEl('cp-p-' + b.dataset.cp).classList.add('active');
+}));
+
+/* ── aprovações ── */
+function renderAprovacoes() {
+  const SIT = {
+    PENDENTE: { label: 'Aguardando você', cls: 'status-pending' },
+    APROVADA: { label: 'Aprovada',        cls: 'status-done' },
+    AJUSTES:  { label: 'Ajustes pedidos', cls: 'status-expirado' },
+  };
+  const pendentes = clAprovacoes.filter(a => a.situacao === 'PENDENTE').length;
+  const badge = clEl('badge-aprovacoes');
+  badge.textContent = pendentes || '';
+  badge.style.display = pendentes ? '' : 'none';
+
+  clEl('ca-lista').innerHTML = clAprovacoes.length ? clAprovacoes.map(a => {
+    const p = clProjetos.find(x => x.id === a.project_id);
+    const s = SIT[a.situacao];
+    const vencida = a.prazo && a.prazo < clHoje() && a.situacao === 'PENDENTE';
+    return `<div class="card" style="margin-bottom:14px${
+      a.situacao === 'PENDENTE' ? ';border-color:rgba(255,106,0,0.32)' : ''}">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap">
+        <div style="min-width:0">
+          <div style="font-size:14px;font-weight:700">${escapeHtml(a.titulo)}</div>
+          <div class="rh-item-sub">${TIPOS_APROVACAO[a.tipo] || a.tipo} · ${escapeHtml(p?.name || '')}</div>
+        </div>
+        <span class="status ${s.cls}">${s.label}</span>
+      </div>
+      ${a.descricao ? `<div style="margin-top:12px;font-size:13px;line-height:1.7">${escapeHtml(a.descricao)}</div>` : ''}
+      <div class="rh-item-sub" style="margin-top:8px">
+        Solicitada em ${formatDate(a.created_at)}${a.prazo ? ` · responder até ${formatDate(a.prazo)}` : ''}
+        ${vencida ? ' · <span style="color:var(--red)">prazo vencido</span>' : ''}</div>
+      ${a.anexo ? `<button class="cbo-link" style="margin-top:8px" onclick="window._baixarArquivoProjeto('${a.anexo}')">Ver arquivo para avaliação</button>` : ''}
+
+      ${a.situacao === 'PENDENTE' ? `
+        <div class="form-group" style="margin:14px 0 10px">
+          <label>Observação (obrigatória ao pedir ajustes)</label>
+          <textarea id="ca-obs-${a.id}" placeholder="O que precisa mudar, se for o caso."></textarea>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn btn-primary" onclick="window._responderAprovacao('${a.id}','APROVADA')">Aprovar</button>
+          <button class="btn btn-outline" onclick="window._responderAprovacao('${a.id}','AJUSTES')">Solicitar ajustes</button>
+        </div>
+        <div class="form-msg" id="ca-msg-${a.id}" role="alert"></div>`
+      : `${a.resposta ? `<div class="sup-aviso" style="margin-top:12px"><strong>Sua resposta:</strong> ${escapeHtml(a.resposta)}</div>` : ''}
+         <div class="rh-item-sub" style="margin-top:6px">Respondida em ${
+           a.respondido_em ? formatDate(a.respondido_em) : '—'}</div>`}
+    </div>`;
+  }).join('') : '<div class="card"><div class="rh-item-sub">Nenhuma aprovação solicitada.</div></div>';
+}
+
+window._responderAprovacao = async (id, situacao) => {
+  const obs = clEl('ca-obs-' + id)?.value.trim() || '';
+  if (situacao === 'AJUSTES' && !obs) {
+    return clMsg('ca-msg-' + id, 'Escreva o que precisa ser ajustado.');
+  }
+  if (situacao === 'APROVADA' && !confirm('Confirmar a aprovação? A equipe segue com a próxima etapa.')) return;
+
+  const { error } = await supabase.from('projeto_aprovacoes')
+    .update({ situacao, resposta: obs || null }).eq('id', id);
+  if (error) return clMsg('ca-msg-' + id, 'Não foi possível responder: ' + error.message);
+
+  await carregarProjetos();
+  notif.recarregar();
+  window._aviso(situacao === 'APROVADA'
+    ? 'Aprovação registrada. A equipe da SertCode foi avisada.'
+    : 'Pedido de ajustes enviado à equipe da SertCode.');
+};
+
+/* ── documentos ── */
+function renderDocumentosCliente() {
+  const pasta = clEl('cd-pasta').value;
+  const lista = clDocumentos.filter(d => !pasta || d.pasta === pasta);
+  if (!lista.length) {
+    clEl('cd-lista').innerHTML = `<div class="card"><div class="rh-item-sub">${
+      clDocumentos.length ? 'Nenhum arquivo nesta pasta.' : 'Nenhum arquivo disponível ainda.'}</div></div>`;
+    return;
+  }
+  const porPasta = {};
+  lista.forEach(d => { (porPasta[d.pasta] ||= []).push(d); });
+
+  clEl('cd-lista').innerHTML = Object.entries(PASTAS_DOC)
+    .filter(([p]) => porPasta[p])
+    .map(([p, nome]) => `<div class="card" style="margin-bottom:14px">
+      <div class="card-title" style="margin-bottom:12px">${nome}</div>
+      ${porPasta[p].map(d => {
+        const proj = clProjetos.find(x => x.id === d.project_id);
+        return `<div class="hist-item" style="margin-bottom:8px">
+          <div class="hist-topo">
+            <span style="font-size:12.5px;font-weight:600">${escapeHtml(d.nome)}</span>
+            <span class="hist-data">${formatDate(d.created_at)}</span>
+          </div>
+          <div class="hist-autor">${escapeHtml(proj?.name || '')}${
+            d.enviado_tipo === 'CLIENTE' ? ' · enviado por você' : ' · enviado pela SertCode'}</div>
+          <button class="team-btn" style="margin-top:8px" onclick="window._baixarArquivoProjeto('${d.caminho}')">Baixar</button>
+        </div>`;
+      }).join('')}
+    </div>`).join('');
+}
+clEl('cd-pasta').addEventListener('change', renderDocumentosCliente);
+
+window._baixarArquivoProjeto = async (caminho) => {
+  const { data, error } = await supabase.storage.from('projeto-arquivos').createSignedUrl(caminho, 60);
+  if (error) return alert('Não foi possível abrir: ' + error.message);
+  window.open(data.signedUrl, '_blank');
+};
+
+async function enviarArquivoCliente(input, projetoId, limiteMb = 20) {
+  const arquivo = input.files[0];
+  if (!arquivo) return { caminho: null };
+  if (arquivo.size > limiteMb * 1024 * 1024) return { erro: `O arquivo precisa ter no máximo ${limiteMb} MB.` };
+  const caminho = `${projetoId}/${Date.now()}-${arquivo.name.replace(/[^\w.\-]/g, '_')}`;
+  const { error } = await supabase.storage.from('projeto-arquivos').upload(caminho, arquivo);
+  if (error) return { erro: 'Não foi possível enviar: ' + error.message };
+  return { caminho, nome: arquivo.name, tamanho: arquivo.size };
+}
+
+window._enviarDocumentoCliente = async () => {
+  const btn = clEl('cd-btn'), orig = btn.textContent;
+  const projetoId = clEl('cd-projeto').value;
+  if (!projetoId) return clMsg('cd-msg', 'Você precisa ter um projeto para enviar arquivos.');
+  if (!clEl('cd-arquivo').files[0]) return clMsg('cd-msg', 'Escolha o arquivo.');
+
+  btn.textContent = 'Enviando...'; btn.disabled = true;
+  const enviado = await enviarArquivoCliente(clEl('cd-arquivo'), projetoId);
+  if (enviado.erro) { btn.textContent = orig; btn.disabled = false; return clMsg('cd-msg', enviado.erro); }
+
+  // Vai para a pasta Briefing: é o que o cliente manda na prática, e a
+  // equipe reclassifica se for outra coisa.
+  const { error } = await supabase.from('projeto_documentos').insert({
+    project_id: projetoId, client_id: userId, pasta: 'BRIEFING',
+    nome: enviado.nome, caminho: enviado.caminho, tamanho: enviado.tamanho,
+    publico: true, enviado_por: clPerfil?.name || 'Cliente', enviado_tipo: 'CLIENTE',
+  });
+  btn.textContent = orig; btn.disabled = false;
+  if (error) return clMsg('cd-msg', 'Não foi possível registrar: ' + error.message);
+
+  clEl('cd-arquivo').value = '';
+  await carregarProjetos();
+  clMsg('cd-msg', 'Arquivo enviado. A equipe da SertCode já consegue ver.', 'success');
+};
+
+/* ── comunicação ── */
+function renderConversaCliente() {
+  const projetoId = clEl('cc-projeto').value;
+  const lista = clMensagens.filter(m => m.project_id === projetoId);
+
+  const naoLidas = clMensagens.filter(m => m.autor_tipo === 'EQUIPE').length;
+  const badge = clEl('badge-comunicacao');
+  badge.textContent = naoLidas || '';
+  badge.style.display = naoLidas ? '' : 'none';
+
+  clEl('cc-conversa').innerHTML = lista.length ? lista.map(m => `
+    <div class="hist-item${m.autor_tipo === 'EQUIPE' ? ' sup-equipe' : ''}">
+      <div class="hist-topo">
+        <span style="font-size:12.5px;font-weight:600">${m.autor_tipo === 'EQUIPE' ? 'SertCode' : 'Você'}</span>
+        <span class="hist-data">${formatDate(m.created_at)}</span>
+      </div>
+      <div class="hist-nota">${escapeHtml(m.mensagem)}</div>
+      ${m.anexo ? `<button class="cbo-link" onclick="window._baixarArquivoProjeto('${m.anexo}')">Ver anexo</button>` : ''}
+    </div>`).join('')
+    : `<div class="rh-item-sub">${clProjetos.length
+        ? 'Nenhuma mensagem neste projeto ainda.' : 'Você ainda não tem projetos.'}</div>`;
+}
+clEl('cc-projeto').addEventListener('change', renderConversaCliente);
+
+window._enviarMensagemCliente = async () => {
+  const btn = clEl('cc-btn'), orig = btn.textContent;
+  const projetoId = clEl('cc-projeto').value;
+  if (!projetoId) return clMsg('cc-msg', 'Você precisa ter um projeto para conversar.');
+  const texto = clEl('cc-texto').value.trim();
+  if (!texto) return clMsg('cc-msg', 'Escreva a mensagem.');
+
+  btn.textContent = 'Enviando...'; btn.disabled = true;
+  const anexo = await enviarArquivoCliente(clEl('cc-anexo'), projetoId);
+  if (anexo.erro) { btn.textContent = orig; btn.disabled = false; return clMsg('cc-msg', anexo.erro); }
+
+  const { error } = await supabase.from('projeto_mensagens').insert({
+    project_id: projetoId, autor_id: userId, autor_nome: clPerfil?.name || 'Cliente',
+    autor_tipo: 'CLIENTE', mensagem: texto, anexo: anexo.caminho,
+  });
+  btn.textContent = orig; btn.disabled = false;
+  if (error) return clMsg('cc-msg', 'Não foi possível enviar: ' + error.message);
+
+  clEl('cc-texto').value = ''; clEl('cc-anexo').value = '';
+  await carregarProjetos();
+  notif.recarregar();
+  clMsg('cc-msg', 'Mensagem enviada. A equipe foi avisada.', 'success');
+};
+
+/* ── meu perfil ── */
+function preencherPerfil() {
+  if (!clPerfil) return;
+  const v = (id, valor) => { clEl(id).value = valor || ''; };
+  v('cm-empresa', clPerfil.company);
+  v('cm-cnpj', clPerfil.cnpj);
+  v('cm-nome', clPerfil.name);
+  v('cm-cargo', clPerfil.cargo);
+  v('cm-telefone', clPerfil.phone);
+  v('cm-whatsapp', clPerfil.phone2);
+  v('cm-email', clPerfil.email);
+  v('cm-cep', clPerfil.cep);
+  v('cm-endereco', clPerfil.endereco);
+  v('cm-bairro', clPerfil.bairro);
+  v('cm-cidade', clPerfil.cidade);
+  v('cm-uf', clPerfil.estado);
+}
+
+window._salvarPerfilCliente = async () => {
+  const btn = clEl('cm-btn'), orig = btn.textContent;
+  const pega = id => clEl(id).value.trim() || null;
+  if (!pega('cm-nome')) return clMsg('cm-msg', 'Informe o nome do responsável.');
+
+  btn.textContent = 'Salvando...'; btn.disabled = true;
+  const campos = {
+    company: pega('cm-empresa'), cnpj: pega('cm-cnpj'), name: pega('cm-nome'),
+    cargo: pega('cm-cargo'), phone: pega('cm-telefone'), phone2: pega('cm-whatsapp'),
+    cep: pega('cm-cep'), endereco: pega('cm-endereco'), bairro: pega('cm-bairro'),
+    cidade: pega('cm-cidade'), estado: pega('cm-uf')?.toUpperCase() || null,
+  };
+  const { error } = await supabase.from('profiles').update(campos).eq('id', userId);
+  btn.textContent = orig; btn.disabled = false;
+  if (error) return clMsg('cm-msg', 'Não foi possível salvar: ' + error.message);
+
+  Object.assign(clPerfil, campos);
+  renderInicio();
+  document.querySelector('.sidebar-user-name').textContent = clPerfil.name || 'Cliente';
+  document.querySelector('.sidebar-user-role').textContent = clPerfil.company || '';
+  clMsg('cm-msg', 'Dados atualizados.', 'success');
+};
+
+window._trocarSenhaCliente = async () => {
+  if (!clPerfil?.email) return alert('Sua conta não tem e-mail cadastrado.');
+  if (!confirm(`Enviar um link de nova senha para ${clPerfil.email}?`)) return;
+  const { error } = await supabase.auth.resetPasswordForEmail(clPerfil.email, {
+    redirectTo: new URL('cliente.html', location.href).href,
+  });
+  if (error) return alert('Não foi possível enviar: ' + error.message);
+  window._aviso(`Link enviado para ${clPerfil.email}. Verifique a caixa de entrada.`);
+};
 
 /* ── HELPERS ── */
 const PORTAL_FATURA = {
@@ -906,7 +1178,6 @@ function formatDate(d) {
   return new Date(d).toLocaleDateString('pt-BR', { day:'2-digit', month:'short', year:'numeric' });
 }
 
-loadPortalData();
 
 /* ── LOGOUT ── */
 document.querySelector('.sidebar-logout').addEventListener('click', async e => {
@@ -917,9 +1188,9 @@ document.querySelector('.sidebar-logout').addEventListener('click', async e => {
 
 /* ── TAB NAVIGATION ── */
 const tabTitles = {
-  dashboard:'Dashboard', projeto:'Meu Projeto',
-  suporte:'Suporte / SLA', arquivos:'Arquivos',
-  financeiro:'Financeiro', feedback:'Feedback'
+  dashboard:'Início', projetos:'Meus Projetos', aprovacoes:'Aprovações',
+  arquivos:'Documentos', comunicacao:'Comunicação', suporte:'Suporte',
+  financeiro:'Financeiro', perfil:'Meu Perfil', feedback:'Feedback'
 };
 document.querySelectorAll('.sidebar-nav a[data-tab]').forEach(link => {
   link.addEventListener('click', e => {
@@ -1226,6 +1497,9 @@ document.getElementById('ticket-submit').addEventListener('click', async () => {
         CS_SLA_TEXTO(CS_SLA[criado.type])}.`
     : 'Chamado registrado. A equipe da SertCode vai responder conforme o SLA.');
 });
+
+// A carga vem por último: o módulo inteiro já está declarado aqui.
+loadPortalData();
 
 /* ── MODAL ── */
 document.getElementById('modal-close-btn').addEventListener('click', () => {

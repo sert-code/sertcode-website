@@ -8,6 +8,24 @@
 -- histórico. Nada avança sozinho: quem registra é a equipe.
 -- ════════════════════════════════════════════════════════════════
 
+-- 0. Cadastro da empresa cliente ─────────────────────────────────
+-- O portal passa a ter "Meu Perfil"; esses campos vinham faltando.
+alter table public.profiles
+  add column if not exists cnpj     text,
+  add column if not exists cargo    text,
+  add column if not exists cep      text,
+  add column if not exists endereco text,
+  add column if not exists bairro   text,
+  add column if not exists cidade   text,
+  add column if not exists estado   text;
+
+-- O cliente mantém os próprios dados. Papel e situação continuam
+-- protegidos pelo gatilho protect_profile_access, de colaboradores.sql.
+drop policy if exists "cliente_atualiza_proprio_perfil" on public.profiles;
+create policy "cliente_atualiza_proprio_perfil" on public.profiles
+  for update to authenticated
+  using (id = auth.uid()) with check (id = auth.uid());
+
 -- 1. Campos do projeto ───────────────────────────────────────────
 create sequence if not exists public.projeto_numero_seq start 1;
 
