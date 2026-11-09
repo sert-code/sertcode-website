@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/portal.css?v=18">
+  <link rel="stylesheet" href="css/portal.css?v=19">
   <style>
     .admin-badge {
       font-size: 9px; font-weight: 800;
@@ -1142,24 +1142,97 @@
 
       <!-- ════════════ EQUIPE ════════════ -->
       <section class="tab-section" id="tab-equipe">
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:14px;margin-bottom:20px">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:14px;margin-bottom:18px">
           <div>
             <div class="section-title">Equipe</div>
-            <div class="section-sub" style="margin-bottom:0">Cadastre, desative ou reative o acesso. Clique na linha para editar os dados e a senha.</div>
+            <div class="section-sub" style="margin-bottom:0">Quem acessa o painel e o que cada um pode fazer. Os dados da pessoa ficam em Gestão de Pessoas.</div>
           </div>
           <button class="btn btn-primary" onclick="window._novoColaborador()">
             <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            Novo colaborador
+            Novo acesso
           </button>
         </div>
 
-        <div class="card">
-          <div class="table-scroll">
-            <table class="data-table">
-              <thead><tr><th>Colaborador</th><th>Papel</th><th>Nascimento</th><th>Telefone</th><th>Status</th><th>Ações</th></tr></thead>
-              <tbody id="equipe-membros"></tbody>
-            </table>
+        <nav class="rh-abas" id="eq-abas">
+          <button class="rh-aba active" data-eq="usuarios">Usuários</button>
+          <button class="rh-aba" data-eq="perfis">Perfis de acesso</button>
+          <button class="rh-aba" data-eq="permissoes">Permissões</button>
+          <button class="rh-aba" data-eq="acessos">Histórico de acessos</button>
+        </nav>
+
+        <!-- ── Usuários ── -->
+        <div class="rh-painel active" id="eq-usuarios">
+          <div class="card" id="eq-pendentes-card" hidden style="margin-bottom:18px">
+            <div class="card-title">Aguardando aprovação</div>
+            <div class="card-sub">Pedidos de acesso que ainda não foram liberados</div>
+            <div id="eq-pendentes"></div>
           </div>
+
+          <div class="card">
+            <div class="table-scroll">
+              <table class="data-table">
+                <thead><tr><th>Colaborador</th><th>Perfil</th><th>Situação</th><th>Ficha</th><th>Último acesso</th><th>Ações</th></tr></thead>
+                <tbody id="equipe-membros"></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="rh-bloco-texto" style="margin-top:12px">
+            Verde = ativo · amarelo = em férias ou afastado · vermelho = desligado ou inativo.
+            Clique na linha para editar o acesso e a senha.
+          </div>
+        </div>
+
+        <!-- ── Perfis de acesso ── -->
+        <div class="rh-painel" id="eq-perfis">
+          <div class="rh-aviso">
+            O perfil define o que a pessoa acessa por padrão. Para abrir ou fechar um item para alguém
+            em específico, use a aba Permissões — ela vale sobre o perfil.
+          </div>
+          <div class="card">
+            <div class="table-scroll">
+              <table class="data-table">
+                <thead id="eq-perfis-cabecalho"></thead>
+                <tbody id="eq-perfis-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Permissões ── -->
+        <div class="rh-painel" id="eq-permissoes">
+          <div class="rh-aviso">
+            O que estiver marcado aqui vale para a pessoa escolhida, mesmo que o perfil dela não inclua.
+            Desmarcar um item que o perfil dá também vale — a exceção é guardada em separado.
+          </div>
+          <div class="form-group" style="max-width:420px">
+            <label>Colaborador</label>
+            <select id="eq-pessoa"></select>
+          </div>
+          <div id="eq-permissoes-lista"></div>
+          <div style="display:flex;gap:10px;margin-top:16px">
+            <button class="btn btn-primary" id="eq-salvar-perm" onclick="window._salvarPermissoes()">Salvar permissões</button>
+            <button class="btn btn-outline" onclick="window._voltarAoPerfil()">Voltar ao padrão do perfil</button>
+          </div>
+          <div class="form-msg" id="eq-perm-msg" role="alert"></div>
+        </div>
+
+        <!-- ── Histórico de acessos ── -->
+        <div class="rh-painel" id="eq-acessos">
+          <div class="sup-filtros" style="margin-bottom:16px">
+            <div class="form-group" style="margin:0"><label>Evento</label>
+              <select id="eq-ac-evento"><option value="">Todos</option></select></div>
+            <div class="form-group" style="margin:0;grid-column:span 2"><label>Pesquisar</label>
+              <input type="text" id="eq-ac-busca" placeholder="Pessoa ou detalhe"></div>
+          </div>
+          <div class="card">
+            <div class="table-scroll">
+              <table class="data-table">
+                <thead><tr><th>Data</th><th>Pessoa</th><th>Evento</th><th>Detalhe</th></tr></thead>
+                <tbody id="eq-acessos-body"></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="rh-bloco-texto" style="margin-top:12px">Últimos 200 registros.</div>
         </div>
       </section>
 
@@ -1743,8 +1816,8 @@
       <div class="form-group"><label>Como é chamado</label><input type="text" id="ac-apelido" maxlength="40"></div>
     </div>
     <div class="form-row-2">
-      <div class="form-group"><label>Papel</label>
-        <select id="ac-papel"><option value="colaborador">Colaborador</option><option value="gestor">Gestor</option></select></div>
+      <div class="form-group"><label>Perfil de acesso</label>
+        <select id="ac-perfil"></select></div>
       <div class="form-group"><label>Telefone</label><input type="tel" id="ac-telefone" maxlength="15" inputmode="numeric"></div>
     </div>
 
@@ -1785,11 +1858,8 @@
         <input type="text" id="co-apelido" placeholder="Ex.: Ana" maxlength="40">
       </div>
       <div class="form-group">
-        <label>Papel</label>
-        <select id="co-papel">
-          <option value="colaborador">Colaborador</option>
-          <option value="gestor">Gestor</option>
-        </select>
+        <label>Perfil de acesso</label>
+        <select id="co-perfil"></select>
       </div>
     </div>
     <div class="form-row-2">
@@ -2000,6 +2070,15 @@ const myName = myProfile?.nickname || myProfile?.name || 'Equipe SertCode';
 document.querySelector('.sidebar-user-name').textContent = myName;
 document.querySelector('.sidebar-avatar').textContent = myName.trim().charAt(0).toUpperCase();
 
+// A entrada no painel entra no histórico de acessos: é o registro que
+// permite ver depois quem abriu salários e dados de cliente.
+supabase.from('profiles').update({ ultimo_acesso: new Date().toISOString() })
+  .eq('id', session.user.id).then(() =>
+    supabase.from('equipe_acessos').insert({
+      profile_id: session.user.id, pessoa: myName, evento: 'ENTRADA',
+      detalhe: null,
+    }));
+
 /* ── CARREGAR DADOS ── */
 let allClients = [], allProjects = [], allTickets = [], allInvoices = [], allTestimonials = [], allFeedbacks = [];
 let slClients = [];
@@ -2108,6 +2187,9 @@ async function loadRh() {
   await loadRhLeitura();
   await loadFinPessoal();
   await loadSolicitacoes();
+  // A lista da Equipe mostra a situação que vem da ficha de RH, então ela
+  // precisa ser desenhada de novo depois que as fichas chegam.
+  if (allTeam.length) renderEquipe();
 }
 
 function montarSelectsRh() {
@@ -3366,11 +3448,11 @@ window._editarAcesso = (id) => {
   el('ac-sub').textContent = m.email || '';
   el('ac-nome').value = m.name || '';
   el('ac-apelido').value = m.nickname || '';
-  el('ac-papel').value = m.role || 'colaborador';
+  el('ac-perfil').value = m.perfil || (m.role === 'gestor' ? 'ADMINISTRADOR' : 'SUPORTE');
   el('ac-telefone').value = m.phone || '';
   el('ac-msg').className = 'form-msg';
-  // Ninguém tira o próprio acesso de gestor por engano.
-  el('ac-papel').disabled = m.id === session.user.id;
+  // Ninguém tira o próprio acesso de administrador por engano.
+  el('ac-perfil').disabled = m.id === session.user.id;
   mostrarCadastroRh(m);
   openModal('modal-acesso');
 };
@@ -3439,7 +3521,7 @@ window._salvarAcesso = async () => {
   btn.textContent = 'Salvando...'; btn.disabled = true;
   const { error } = await supabase.from('profiles').update({
     name: val('ac-nome'), nickname: val('ac-apelido') || null,
-    phone: val('ac-telefone') || null, role: el('ac-papel').value,
+    phone: val('ac-telefone') || null, perfil: el('ac-perfil').value,
   }).eq('id', acEditId);
   if (error) { btn.textContent = orig; btn.disabled = false; return acSet('Não foi possível salvar: ' + error.message); }
 
@@ -3449,6 +3531,11 @@ window._salvarAcesso = async () => {
       nome: val('ac-nome'), apelido: val('ac-apelido') || null,
       telefone: val('ac-telefone') || null, updated_at: new Date().toISOString(),
     }).eq('id', ficha.id);
+  }
+
+  const antes = allTeam.find(x => x.id === acEditId);
+  if (antes && antes.perfil !== el('ac-perfil').value) {
+    await registrarAcesso('PERFIL', `${antes.nickname || antes.name}: ${PERFIS[antes.perfil]?.label || 'sem perfil'} → ${PERFIS[el('ac-perfil').value].label}`);
   }
 
   btn.textContent = orig; btn.disabled = false;
@@ -4650,23 +4737,139 @@ async function registrarRh(acao, alvo, detalhe, colaboradorId = null) {
 }
 
 /* ── EQUIPE (somente gestor) ── */
-let allTeam = [];
+let allTeam = [], eqPermissoes = [], eqAcessos = [], eqPessoaId = null;
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const fmtBirth = d => d ? d.split('-').reverse().join('/') : '—';
 const teamStatus = {
   ativo:    '<span class="status status-done">Ativo</span>',
+  pendente: '<span class="status status-pending">Aguardando</span>',
   inativo:  '<span class="status" style="background:rgba(255,255,255,.05);color:var(--text-dim)">Inativo</span>',
   recusado: '<span class="status" style="background:rgba(239,68,68,.08);color:var(--red)">Recusado</span>',
 };
 
-async function loadEquipe() {
-  if (!isGestor) return;
-  const { data } = await supabase.from('profiles').select('*')
-    .in('role', ['gestor', 'colaborador']).order('created_at', { ascending: false });
-  allTeam = data || [];
-  renderEquipe();
+const PERFIS = {
+  ADMINISTRADOR: { label: 'Administrador', para: 'CEO, diretoria, administração' },
+  GESTOR:        { label: 'Gestor',        para: 'Liderança do suporte e dos projetos' },
+  SUPORTE:       { label: 'Suporte',       para: 'Atendimento do dia a dia' },
+  FINANCEIRO:    { label: 'Financeiro',    para: 'Cobranças e contas' },
+  RH:            { label: 'Gestor de RH',  para: 'RH da SertCode' },
+};
+
+// Cada chave é um recurso do painel; o valor lista os perfis que o têm por
+// padrão. O administrador fica de fora da lista porque recebe tudo.
+const RECURSOS = [
+  { grupo: 'Clientes', itens: [
+    { chave: 'clientes.ver',      label: 'Visualizar',  perfis: ['GESTOR','SUPORTE','FINANCEIRO'] },
+    { chave: 'clientes.criar',    label: 'Criar',       perfis: ['GESTOR'] },
+    { chave: 'clientes.editar',   label: 'Editar',      perfis: ['GESTOR'] },
+    { chave: 'clientes.suspender',label: 'Suspender',   perfis: [] },
+  ]},
+  { grupo: 'Projetos', itens: [
+    { chave: 'projetos.ver',    label: 'Visualizar', perfis: ['GESTOR','SUPORTE'] },
+    { chave: 'projetos.criar',  label: 'Criar',      perfis: ['GESTOR'] },
+    { chave: 'projetos.editar', label: 'Editar',     perfis: ['GESTOR'] },
+    { chave: 'projetos.cancelar', label: 'Pausar ou cancelar', perfis: ['GESTOR'] },
+  ]},
+  { grupo: 'Chamados', itens: [
+    { chave: 'chamados.ver',       label: 'Visualizar', perfis: ['GESTOR','SUPORTE'] },
+    { chave: 'chamados.responder', label: 'Responder',  perfis: ['GESTOR','SUPORTE'] },
+    { chave: 'chamados.atribuir',  label: 'Atribuir',   perfis: ['GESTOR'] },
+    { chave: 'chamados.concluir',  label: 'Concluir',   perfis: ['GESTOR','SUPORTE'] },
+    { chave: 'chamados.reabrir',   label: 'Reabrir',    perfis: ['GESTOR'] },
+  ]},
+  { grupo: 'Financeiro', itens: [
+    { chave: 'financeiro.ver',       label: 'Visualizar', perfis: ['FINANCEIRO'] },
+    { chave: 'financeiro.editar',    label: 'Editar',     perfis: ['FINANCEIRO'] },
+    { chave: 'financeiro.reembolsar',label: 'Reembolsar', perfis: ['FINANCEIRO'] },
+  ]},
+  { grupo: 'Relatórios', itens: [
+    { chave: 'relatorios.ver',        label: 'Visualizar',            perfis: ['GESTOR','FINANCEIRO','RH'] },
+    { chave: 'relatorios.financeiros',label: 'Relatórios financeiros',perfis: ['FINANCEIRO'] },
+  ]},
+  { grupo: 'Equipe', itens: [
+    { chave: 'equipe.ver',        label: 'Visualizar',  perfis: ['GESTOR'] },
+    { chave: 'equipe.criar',      label: 'Criar',       perfis: [] },
+    { chave: 'equipe.editar',     label: 'Editar',      perfis: [] },
+    { chave: 'equipe.permissoes', label: 'Permissões',  perfis: [] },
+  ]},
+  { grupo: 'Gestão de Pessoas', itens: [
+    { chave: 'pessoas.funcionais',label: 'Ver dados funcionais',    perfis: ['GESTOR','RH'] },
+    { chave: 'pessoas.salarios',  label: 'Ver salários e valores',  perfis: ['FINANCEIRO','RH'] },
+    { chave: 'pessoas.cadastro',  label: 'Cadastro e documentos',   perfis: ['RH'] },
+    { chave: 'pessoas.montar',    label: 'Montar a folha',          perfis: ['RH'] },
+    { chave: 'pessoas.aprovar',   label: 'Aprovar a folha',         perfis: [] },
+    { chave: 'pessoas.pagamentos',label: 'Pagamentos e encargos',   perfis: ['FINANCEIRO'] },
+  ]},
+  { grupo: 'Configurações', itens: [
+    { chave: 'config.ver',       label: 'Visualizar',          perfis: ['GESTOR','FINANCEIRO','RH'] },
+    { chave: 'config.alterar',   label: 'Alterar',             perfis: [] },
+    { chave: 'config.historico', label: 'Histórico de acessos',perfis: ['GESTOR'] },
+  ]},
+];
+const TODAS_CHAVES = RECURSOS.flatMap(g => g.itens);
+
+const EQ_EVENTOS = {
+  ENTRADA:      'Entrada no painel',
+  FALHA:        'Tentativa de entrada',
+  PERMISSOES:   'Permissões alteradas',
+  SENHA:        'Senha redefinida',
+  PERFIL:       'Perfil de acesso alterado',
+  ACESSO:       'Acesso ativado ou desativado',
+  DADOS_CLIENTE:'Dados de cliente baixados',
+  ENCERRAMENTO: 'Conta de cliente encerrada',
+};
+
+// A regra é: o perfil dá o padrão, a exceção pessoal vale por cima.
+function podeFazer(pessoa, chave) {
+  if (!pessoa) return false;
+  const excecao = eqPermissoes.find(p => p.profile_id === pessoa.id && p.chave === chave);
+  if (excecao) return excecao.permitido;
+  if (pessoa.perfil === 'ADMINISTRADOR') return true;
+  return (TODAS_CHAVES.find(r => r.chave === chave)?.perfis || []).includes(pessoa.perfil);
+}
+const euPosso = chave => podeFazer(allTeam.find(m => m.id === session.user.id) || myProfile, chave);
+
+async function registrarAcesso(evento, detalhe = null) {
+  await supabase.from('equipe_acessos').insert({
+    profile_id: session.user.id, pessoa: myName, evento, detalhe,
+  });
 }
 
+async function loadEquipe() {
+  if (!isGestor) return;
+  const [perfis, perms, acessos] = await Promise.all([
+    supabase.from('profiles').select('*').in('role', ['gestor', 'colaborador']).order('created_at', { ascending: false }),
+    supabase.from('equipe_permissoes').select('*'),
+    supabase.from('equipe_acessos').select('*').order('created_at', { ascending: false }).limit(200),
+  ]);
+  allTeam      = perfis.data || [];
+  eqPermissoes = perms.data || [];
+  eqAcessos    = acessos.data || [];
+
+  el('eq-ac-evento').innerHTML = '<option value="">Todos</option>'
+    + Object.entries(EQ_EVENTOS).map(([v, l]) => `<option value="${v}">${l}</option>`).join('');
+
+  renderEquipe();
+  renderPerfis();
+  renderPessoasPerm();
+  renderAcessos();
+}
+
+// Os dois seletores saem da mesma lista: perfil novo entra em um lugar só.
+['ac-perfil', 'co-perfil'].forEach(id => {
+  el(id).innerHTML = Object.entries(PERFIS)
+    .map(([v, p]) => `<option value="${v}">${p.label} — ${p.para}</option>`).join('');
+});
+
+/* ── sub-abas ── */
+document.querySelectorAll('#eq-abas .rh-aba').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('#eq-abas .rh-aba').forEach(x => x.classList.remove('active'));
+  b.classList.add('active');
+  document.querySelectorAll('#tab-equipe > .rh-painel').forEach(p => p.classList.remove('active'));
+  el('eq-' + b.dataset.eq).classList.add('active');
+}));
+
+/* ── usuários ── */
 function teamPerson(m) {
   const apelido = m.nickname || m.name || '—';
   return `<div style="display:flex;align-items:center;gap:10px">
@@ -4678,59 +4881,225 @@ function teamPerson(m) {
 const teamBtn = (id, status, label, cls = '') =>
   `<button class="team-btn ${cls}" data-team-id="${esc(id)}" data-team-status="${status}" onclick="event.stopPropagation()">${label}</button>`;
 
-function renderEquipe() {
-  const badge = document.getElementById('equipe-badge');
-  if (badge) badge.style.display = 'none';
+// A bolinha segue a situação na ficha de RH, não o acesso: quem está de
+// férias continua com acesso, e é isso que o gestor precisa distinguir.
+function bolinhaSituacao(m) {
+  const ficha = rhColabs.find(c => c.profile_id === m.id);
+  const cor = m.status !== 'ativo' || ficha?.situacao === 'DESLIGADO' ? 'var(--red)'
+    : ['FERIAS','AFASTADO'].includes(ficha?.situacao) ? 'var(--orange)'
+    : 'var(--green)';
+  const nota = ficha ? (RH_SITUACAO[ficha.situacao]?.label || ficha.situacao) : 'Sem ficha';
+  return `<span style="display:inline-flex;align-items:center;gap:7px">
+    <span style="width:8px;height:8px;border-radius:50%;background:${cor};flex-shrink:0"></span>
+    ${teamStatus[m.status] || esc(m.status)}
+    <span style="font-size:11px;color:var(--text-dim)">${esc(nota)}</span></span>`;
+}
 
-  document.getElementById('equipe-membros').innerHTML = allTeam.length ? allTeam.map(m => {
-    const acao = m.id === session.user.id ? '<span style="font-size:11.5px;color:var(--text-dim)">Você</span>'
-      : m.status === 'ativo' ? teamBtn(m.id, 'inativo', 'Desativar', 'danger')
-      : teamBtn(m.id, 'ativo', 'Reativar', 'approve');
+function renderEquipe() {
+  const pendentes = allTeam.filter(m => m.status === 'pendente');
+  el('eq-pendentes-card').hidden = !pendentes.length;
+  el('eq-pendentes').innerHTML = pendentes.map(m => `
+    <div class="aviso-item" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      <div style="flex:1;min-width:200px">${teamPerson(m)}</div>
+      <div class="team-actions">
+        ${teamBtn(m.id, 'ativo', 'Aprovar', 'approve')}
+        ${teamBtn(m.id, 'recusado', 'Reprovar', 'danger')}
+      </div>
+    </div>`).join('');
+
+  const badge = el('equipe-badge');
+  if (badge) { badge.textContent = pendentes.length || ''; badge.style.display = pendentes.length ? '' : 'none'; }
+
+  const lista = allTeam.filter(m => m.status !== 'pendente');
+  el('equipe-membros').innerHTML = lista.length ? lista.map(m => {
+    const eu = m.id === session.user.id;
+    const ficha = rhColabs.find(c => c.profile_id === m.id);
+    const acao = eu ? '<span style="font-size:11.5px;color:var(--text-dim)">Você</span>'
+      : (m.status === 'ativo' ? teamBtn(m.id, 'inativo', 'Desativar', 'danger')
+                              : teamBtn(m.id, 'ativo', 'Reativar', 'approve'))
+        + `<button class="team-btn" onclick="event.stopPropagation();window._novaSenha('${m.id}')">Gerar nova senha</button>`;
     return `<tr class="rh-linha" onclick="window._editarAcesso('${m.id}')">
       <td>${teamPerson(m)}</td>
-      <td>${m.role === 'gestor' ? 'Gestor' : 'Colaborador'}</td>
-      <td>${fmtBirth(m.birth_date)}</td>
-      <td>${esc(m.phone || '—')}</td>
-      <td>${teamStatus[m.status] || esc(m.status)}</td>
+      <td>${PERFIS[m.perfil]?.label || (m.role === 'gestor' ? 'Administrador' : 'Sem perfil')}</td>
+      <td>${bolinhaSituacao(m)}</td>
+      <td>${ficha
+        ? `<button class="cbo-link" onclick="event.stopPropagation();window._abrirFichaDaEquipe('${ficha.id}')">Abrir ficha</button>`
+        : '<span style="font-size:11.5px;color:var(--orange)">Sem cadastro</span>'}</td>
+      <td style="color:var(--text-dim);font-size:12px">${m.ultimo_acesso ? fmtDateTime(m.ultimo_acesso) : '—'}</td>
       <td><div class="team-actions">${acao}</div></td>
     </tr>`;
   }).join('')
     : '<tr><td colspan="6" class="team-empty">Nenhum colaborador cadastrado.</td></tr>';
 }
 
-/* ── NOVO COLABORADOR ── */
+window._abrirFichaDaEquipe = (fichaId) => {
+  document.querySelector('.sidebar-nav a[data-tab="pessoas"]')?.click();
+  document.querySelector('#rh-abas .rh-aba[data-rh="colaboradores"]')?.click();
+  window._editarColab(fichaId);
+};
+
+/* ── perfis de acesso ── */
+function renderPerfis() {
+  const chaves = Object.keys(PERFIS);
+  el('eq-perfis-cabecalho').innerHTML = '<tr><th>Recurso</th>'
+    + chaves.map(p => `<th>${PERFIS[p].label}</th>`).join('') + '</tr>';
+
+  el('eq-perfis-body').innerHTML = RECURSOS.map(g => `
+    <tr><td colspan="${chaves.length + 1}" style="font-weight:700;background:var(--fill)">${g.grupo}</td></tr>`
+    + g.itens.map(r => `<tr>
+        <td style="color:var(--text-dim)">${r.label}</td>`
+      + chaves.map(p => {
+          const tem = p === 'ADMINISTRADOR' || r.perfis.includes(p);
+          return `<td style="text-align:center;color:${tem ? 'var(--green)' : 'var(--text-dim)'};font-weight:700">${tem ? '✓' : '—'}</td>`;
+        }).join('')
+      + '</tr>').join('')
+  ).join('');
+
+  const contagem = chaves.map(p => `${PERFIS[p].label}: ${allTeam.filter(m => m.perfil === p && m.status === 'ativo').length}`);
+  el('eq-perfis').querySelector('.rh-aviso').title = contagem.join(' · ');
+}
+
+/* ── permissões ── */
+function renderPessoasPerm() {
+  const lista = allTeam.filter(m => m.status === 'ativo');
+  el('eq-pessoa').innerHTML = lista.map(m =>
+    `<option value="${m.id}">${esc(m.nickname || m.name)} — ${PERFIS[m.perfil]?.label || 'sem perfil'}</option>`).join('');
+  if (!eqPessoaId || !lista.some(m => m.id === eqPessoaId)) eqPessoaId = lista[0]?.id || null;
+  if (eqPessoaId) el('eq-pessoa').value = eqPessoaId;
+  renderPermissoes();
+}
+
+function renderPermissoes() {
+  const pessoa = allTeam.find(m => m.id === eqPessoaId);
+  if (!pessoa) { el('eq-permissoes-lista').innerHTML = '<div class="rh-item-sub">Nenhum colaborador ativo.</div>'; return; }
+
+  const admin = pessoa.perfil === 'ADMINISTRADOR';
+  el('eq-permissoes-lista').innerHTML = (admin
+      ? '<div class="rh-aviso">O administrador acessa tudo; não há o que ajustar aqui.</div>' : '')
+    + RECURSOS.map(g => `
+      <div class="card" style="margin-bottom:14px">
+        <div class="rh-bloco-titulo">${g.grupo}</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px;margin-top:10px">
+          ${g.itens.map(r => {
+            const padrao = (r.perfis || []).includes(pessoa.perfil);
+            const marcado = podeFazer(pessoa, r.chave);
+            return `<label class="eq-perm${marcado !== padrao && !admin ? ' excecao' : ''}">
+              <input type="checkbox" data-chave="${r.chave}"${marcado ? ' checked' : ''}${admin ? ' disabled' : ''}>
+              <span>${r.label}
+                <span class="rh-item-sub">${padrao ? 'padrão do perfil' : 'fora do perfil'}</span></span>
+            </label>`;
+          }).join('')}
+        </div>
+      </div>`).join('');
+}
+
+el('eq-pessoa').addEventListener('change', e => { eqPessoaId = e.target.value; renderPermissoes(); });
+el('eq-permissoes-lista').addEventListener('change', e => {
+  if (!e.target.matches('[data-chave]')) return;
+  const pessoa = allTeam.find(m => m.id === eqPessoaId);
+  const padrao = (TODAS_CHAVES.find(r => r.chave === e.target.dataset.chave)?.perfis || []).includes(pessoa?.perfil);
+  e.target.closest('.eq-perm').classList.toggle('excecao', e.target.checked !== padrao);
+});
+
+window._salvarPermissoes = async () => {
+  const pessoa = allTeam.find(m => m.id === eqPessoaId);
+  if (!pessoa) return;
+  const btn = el('eq-salvar-perm'), orig = btn.textContent;
+  const msg = (t, tipo = 'error') => { const m = el('eq-perm-msg'); m.textContent = t; m.className = 'form-msg show ' + tipo; };
+
+  btn.textContent = 'Salvando...'; btn.disabled = true;
+
+  // Só grava o que diverge do perfil: o resto volta a seguir o padrão
+  // sozinho se o perfil da pessoa mudar depois.
+  const excecoes = [], iguais = [];
+  document.querySelectorAll('#eq-permissoes-lista [data-chave]').forEach(cx => {
+    const padrao = (TODAS_CHAVES.find(r => r.chave === cx.dataset.chave)?.perfis || []).includes(pessoa.perfil);
+    (cx.checked === padrao ? iguais : excecoes).push({ chave: cx.dataset.chave, permitido: cx.checked });
+  });
+
+  if (iguais.length) {
+    await supabase.from('equipe_permissoes').delete()
+      .eq('profile_id', pessoa.id).in('chave', iguais.map(i => i.chave));
+  }
+  const { error } = excecoes.length
+    ? await supabase.from('equipe_permissoes').upsert(
+        excecoes.map(e => ({ profile_id: pessoa.id, chave: e.chave, permitido: e.permitido,
+                             definido_por: myName, updated_at: new Date().toISOString() })),
+        { onConflict: 'profile_id,chave' })
+    : { error: null };
+
+  btn.textContent = orig; btn.disabled = false;
+  if (error) return msg('Não foi possível salvar: ' + error.message);
+
+  await registrarAcesso('PERMISSOES', `${pessoa.nickname || pessoa.name}: ${excecoes.length} exceção(ões)`);
+  await loadEquipe();
+  el('eq-pessoa').value = eqPessoaId;
+  renderPermissoes();
+  msg(excecoes.length
+    ? `Permissões salvas com ${excecoes.length} exceção(ões) ao perfil.`
+    : 'Permissões salvas. Esta pessoa segue o padrão do perfil.', 'success');
+};
+
+window._voltarAoPerfil = () => {
+  document.querySelectorAll('#eq-permissoes-lista [data-chave]').forEach(cx => {
+    const pessoa = allTeam.find(m => m.id === eqPessoaId);
+    cx.checked = (TODAS_CHAVES.find(r => r.chave === cx.dataset.chave)?.perfis || []).includes(pessoa?.perfil)
+      || pessoa?.perfil === 'ADMINISTRADOR';
+    cx.closest('.eq-perm').classList.remove('excecao');
+  });
+};
+
+/* ── histórico de acessos ── */
+function renderAcessos() {
+  const evento = val('eq-ac-evento'), busca = val('eq-ac-busca').toLowerCase();
+  const lista = eqAcessos.filter(a => {
+    if (evento && a.evento !== evento) return false;
+    if (busca && !`${a.pessoa || ''} ${a.detalhe || ''}`.toLowerCase().includes(busca)) return false;
+    return true;
+  });
+  el('eq-acessos-body').innerHTML = lista.length ? lista.map(a => `<tr>
+      <td style="color:var(--text-dim);font-size:12px">${fmtDateTime(a.created_at)}</td>
+      <td style="font-weight:600">${esc(a.pessoa || '—')}</td>
+      <td>${EQ_EVENTOS[a.evento] || esc(a.evento)}</td>
+      <td style="color:var(--text-dim);font-size:12px">${esc(a.detalhe || '—')}</td>
+    </tr>`).join('')
+    : '<tr><td colspan="4" class="team-empty">Nenhum registro.</td></tr>';
+}
+['eq-ac-evento','eq-ac-busca'].forEach(id => el(id).addEventListener('input', renderAcessos));
+
+/* ── NOVO ACESSO ── */
 const coSet = (t, tipo = 'error') => {
-  const m = document.getElementById('co-msg'); m.textContent = t; m.className = 'form-msg show ' + tipo;
+  const m = el('co-msg'); m.textContent = t; m.className = 'form-msg show ' + tipo;
 };
 
 window._gerarSenhaColab = () => {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789';
   const bytes = crypto.getRandomValues(new Uint32Array(12));
-  document.getElementById('co-senha').value = [...bytes].map(n => chars[n % chars.length]).join('');
+  el('co-senha').value = [...bytes].map(n => chars[n % chars.length]).join('');
 };
 
 window._novoColaborador = () => {
-  ['co-nome','co-apelido','co-nascimento','co-telefone','co-email'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('co-papel').value = 'colaborador';
-  document.getElementById('co-nascimento').max = new Date().toISOString().slice(0, 10);
-  document.getElementById('co-msg').className = 'form-msg';
+  ['co-nome','co-apelido','co-nascimento','co-telefone','co-email'].forEach(id => el(id).value = '');
+  el('co-perfil').value = 'SUPORTE';
+  el('co-nascimento').max = new Date().toISOString().slice(0, 10);
+  el('co-msg').className = 'form-msg';
   window._gerarSenhaColab();
   openModal('modal-colaborador');
 };
 
 window._salvarColaborador = async () => {
-  const btn = document.getElementById('co-btn'), orig = btn.textContent;
-  const nome     = document.getElementById('co-nome').value.trim().replace(/\s+/g, ' ');
-  const apelido  = document.getElementById('co-apelido').value.trim();
-  const papel    = document.getElementById('co-papel').value;
-  const nasc     = document.getElementById('co-nascimento').value;
-  const phone    = document.getElementById('co-telefone').value.trim();
-  const email    = document.getElementById('co-email').value.trim();
-  const senha    = document.getElementById('co-senha').value;
+  const btn = el('co-btn'), orig = btn.textContent;
+  const nome    = val('co-nome').replace(/\s+/g, ' ');
+  const apelido = val('co-apelido');
+  const perfil  = el('co-perfil').value;
+  const nasc    = val('co-nascimento');
+  const phone   = val('co-telefone');
+  const email   = val('co-email');
+  const senha   = el('co-senha').value;
 
   if (nome.split(' ').length < 2)                 return coSet('Informe o nome completo (nome e sobrenome).');
   if (!apelido)                                   return coSet('Informe como a pessoa gostaria de ser chamada.');
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return coSet('Informe um e-mail válido.');
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))  return coSet('Informe um e-mail válido.');
   if (senha.length < 8)                           return coSet('A senha precisa ter pelo menos 8 caracteres.');
 
   btn.textContent = 'Cadastrando...'; btn.disabled = true;
@@ -4751,22 +5120,28 @@ window._salvarColaborador = async () => {
 
   const { error: perfilErro } = await supabase.from('profiles').upsert({
     id: data.user.id, email, name: nome, nickname: apelido, phone,
-    birth_date: nasc || null, role: papel, status: 'ativo',
+    birth_date: nasc || null, perfil, status: 'ativo', senha_provisoria: true,
   }, { onConflict: 'id' });
   if (perfilErro) { fim(); return coSet('Acesso criado, mas o perfil falhou: ' + perfilErro.message); }
 
+  await registrarAcesso('ACESSO', `${apelido} cadastrado como ${PERFIS[perfil].label}`);
   await loadEquipe();
   fim();
-  coSet(`${apelido} cadastrado com acesso liberado. ${data.session ? '' : 'A pessoa precisa confirmar o e-mail antes do primeiro acesso. '}Envie a senha provisória por um canal privado.`, 'success');
+  coSet(`${apelido} cadastrado como ${PERFIS[perfil].label}. ${data.session ? '' : 'A pessoa precisa confirmar o e-mail antes do primeiro acesso. '}Envie a senha provisória por um canal privado.`, 'success');
 };
 
-document.getElementById('tab-equipe')?.addEventListener('click', async e => {
+/* ── liberar, desativar e reprovar ── */
+el('tab-equipe').addEventListener('click', async e => {
   const btn = e.target.closest('[data-team-id]');
   if (!btn) return;
   const id = btn.dataset.teamId, status = btn.dataset.teamStatus;
   const m = allTeam.find(x => x.id === id);
   const quem = m?.nickname || m?.name || 'este colaborador';
-  const pergunta = { ativo: `Reativar o acesso de ${quem} ao painel?`, inativo: `Desativar o acesso de ${quem}?` }[status];
+  const pergunta = {
+    ativo:    `Liberar o acesso de ${quem} ao painel?`,
+    inativo:  `Desativar o acesso de ${quem}?`,
+    recusado: `Reprovar o pedido de acesso de ${quem}?`,
+  }[status];
   if (!confirm(pergunta)) return;
 
   btn.disabled = true;
@@ -4775,9 +5150,20 @@ document.getElementById('tab-equipe')?.addEventListener('click', async e => {
     btn.disabled = false;
     return alert('Não foi possível atualizar o acesso. ' + (error?.message || 'Verifique se o SQL de colaboradores foi aplicado no Supabase.'));
   }
-  m.status = status;
-  renderEquipe();
+
+  await registrarAcesso('ACESSO',
+    `${quem}: ${{ ativo: 'liberado', inativo: 'desativado', recusado: 'reprovado' }[status]}`);
+  await loadEquipe();
 });
+
+/* ── senha provisória ── */
+// O painel não define a senha de outra pessoa: isso exigiria a chave de
+// serviço, que não pode viver numa página aberta no navegador. O que dá
+// para fazer é mandar o link, e é o que a ficha do acesso já faz.
+window._novaSenha = (id) => {
+  acEditId = id;
+  window._resetarSenhaEquipe();
+};
 
 /* ── HELPERS ── */
 function ini(name) { return (name||'?').split(' ').map(n=>n[0]).slice(0,2).join('').toUpperCase(); }

@@ -1237,6 +1237,21 @@ button { font-family: var(--font); }
 }
 
 /* ══════════════════════════════════════
+   EQUIPE: PERMISSÕES
+══════════════════════════════════════ */
+.eq-perm {
+  display: flex; align-items: flex-start; gap: 9px; cursor: pointer;
+  padding: 9px 11px; border-radius: 9px; font-size: 12.5px; line-height: 1.5;
+  background: var(--fill); border: 1px solid var(--border); transition: var(--tr);
+}
+.eq-perm:hover { border-color: rgba(255,106,0,0.3); }
+.eq-perm input { margin-top: 2px; flex-shrink: 0; accent-color: var(--orange); }
+.eq-perm .rh-item-sub { display: block; margin-top: 2px; }
+/* Quem foge do padrão do perfil fica marcado: é o que o gestor revisa. */
+.eq-perm.excecao { border-color: rgba(255,106,0,0.45); background: rgba(255,106,0,0.06); }
+.eq-perm:has(input:disabled) { opacity: .55; cursor: default; }
+
+/* ══════════════════════════════════════
    SUPORTE
 ══════════════════════════════════════ */
 .sup-contadores { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; }
