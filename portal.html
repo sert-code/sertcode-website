@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/portal.css?v=17">
+  <link rel="stylesheet" href="css/portal.css?v=18">
 <script>
   // Lido antes da tela aparecer, para não piscar o tema errado ao abrir.
   try { if (localStorage.getItem('sertcode_theme') === 'light') document.documentElement.setAttribute('data-theme', 'light'); } catch (e) {}
@@ -370,69 +370,95 @@
       ════════════════════════ -->
       <section class="tab-section" id="tab-suporte">
 
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:14px;margin-bottom:24px">
-          <div>
-            <div class="section-title">Suporte / SLA</div>
-            <div class="section-sub" style="margin-bottom:0">Central de chamados e abertura de tickets</div>
+        <div id="cs-lista">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:14px;margin-bottom:24px">
+            <div>
+              <div class="section-title">Suporte</div>
+              <div class="section-sub" style="margin-bottom:0">Abra um chamado e acompanhe a conversa com a equipe da SertCode</div>
+            </div>
+            <button class="btn btn-primary" onclick="window._abrirNovoChamado()">
+              <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Abrir chamado
+            </button>
           </div>
-          <button class="btn btn-primary" onclick="document.getElementById('modal-ticket').classList.add('open')">
-            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            Abrir chamado
-          </button>
+
+          <div class="sup-contadores" id="cs-contadores"></div>
+
+          <div class="card" style="margin:18px 0">
+            <div class="sup-filtros">
+              <div class="form-group" style="margin:0"><label>Tipo</label>
+                <select id="cs-tipo"><option value="">Todos</option></select></div>
+              <div class="form-group" style="margin:0"><label>Situa&ccedil;&atilde;o</label>
+                <select id="cs-situacao"><option value="">Todas</option></select></div>
+              <div class="form-group" style="margin:0;grid-column:span 2"><label>Pesquisar</label>
+                <input type="text" id="cs-busca" placeholder="N&uacute;mero do chamado ou t&iacute;tulo"></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="table-scroll">
+              <table class="data-table">
+                <thead><tr><th>Chamado</th><th>T&iacute;tulo</th><th>Tipo</th><th>Situa&ccedil;&atilde;o</th><th>Aberto em</th><th>&Uacute;ltima resposta</th></tr></thead>
+                <tbody id="cs-body"></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="sup-aviso" style="margin-top:12px">Chamados destacados esperam uma resposta sua.</div>
+
+          <div class="card" style="margin-top:16px">
+            <div class="card-title">SLA de atendimento</div>
+            <div class="card-sub">Tempos de resposta garantidos por prioridade</div>
+            <div class="status-row">
+              <div class="status-dot ok"></div>
+              <span class="status-label">Cr&iacute;tico &mdash; sistema fora do ar</span>
+              <span class="status-val">At&eacute; 2 horas</span>
+            </div>
+            <div class="status-row">
+              <div class="status-dot ok"></div>
+              <span class="status-label">Alta &mdash; bug grave / bloqueio de opera&ccedil;&atilde;o</span>
+              <span class="status-val">At&eacute; 4 horas</span>
+            </div>
+            <div class="status-row">
+              <div class="status-dot ok"></div>
+              <span class="status-label">M&eacute;dia &mdash; erro funcional / inconveni&ecirc;ncia</span>
+              <span class="status-val">At&eacute; 1 dia &uacute;til</span>
+            </div>
+            <div class="status-row">
+              <div class="status-dot ok"></div>
+              <span class="status-label">Baixa &mdash; melhoria / sugest&atilde;o</span>
+              <span class="status-val">At&eacute; 3 dias &uacute;teis</span>
+            </div>
+          </div>
         </div>
 
-        <div class="card">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Assunto</th>
-                <th>Categoria</th>
-                <th>Aberto em</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><span class="ticket-id">#SC-001</span></td>
-                <td>Dashboard apresenta lentidão ao carregar</td>
-                <td style="color:var(--text-dim)">Performance</td>
-                <td style="color:var(--text-dim)">21 Mai 2026</td>
-                <td><span class="status status-analysis">Em análise</span></td>
-              </tr>
-              <tr>
-                <td><span class="ticket-id">#SC-002</span></td>
-                <td>Solicitação: exportar relatório em PDF</td>
-                <td style="color:var(--text-dim)">Melhoria</td>
-                <td style="color:var(--text-dim)">15 Mai 2026</td>
-                <td><span class="status status-done">Concluído</span></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <!-- ficha do chamado -->
+        <div id="cs-ficha" hidden>
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:20px">
+            <div>
+              <div class="section-title" style="margin:0" id="cf-numero">Chamado</div>
+              <div class="section-sub" style="margin:4px 0 0" id="cf-sub"></div>
+            </div>
+            <button class="btn btn-outline" onclick="window._voltarChamados()">&larr; Voltar</button>
+          </div>
 
-        <div class="card" style="margin-top:16px">
-          <div class="card-title">SLA de atendimento</div>
-          <div class="card-sub">Tempos de resposta garantidos por prioridade</div>
-          <div class="status-row">
-            <div class="status-dot ok"></div>
-            <span class="status-label">🔴 Crítico — sistema fora do ar</span>
-            <span class="status-val">Até 2 horas</span>
+          <div class="card" style="margin-bottom:18px">
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:14px" id="cf-marcas"></div>
+            <div class="sup-trilha" id="cf-trilha"></div>
+            <div style="margin:16px 0 6px;font-size:13px;line-height:1.7" id="cf-descricao"></div>
+            <div class="sup-aviso" id="cf-anexo"></div>
           </div>
-          <div class="status-row">
-            <div class="status-dot ok"></div>
-            <span class="status-label">🟠 Alta — bug grave / bloqueio de operação</span>
-            <span class="status-val">Até 4 horas</span>
-          </div>
-          <div class="status-row">
-            <div class="status-dot ok"></div>
-            <span class="status-label">🟡 Média — erro funcional / inconveniência</span>
-            <span class="status-val">Até 1 dia útil</span>
-          </div>
-          <div class="status-row">
-            <div class="status-dot ok"></div>
-            <span class="status-label">🟢 Baixa — melhoria / sugestão</span>
-            <span class="status-val">Até 3 dias úteis</span>
+
+          <div class="card">
+            <div class="card-title" style="margin-bottom:14px">Conversa</div>
+            <div id="cf-conversa" class="hist-lista"></div>
+
+            <div id="cf-envio">
+              <div class="sup-aviso" style="margin:16px 0 10px">Sua mensagem vai para a equipe da SertCode e reabre o atendimento.</div>
+              <div class="form-group"><textarea id="cf-texto" placeholder="Escreva aqui."></textarea></div>
+              <div class="form-group"><label>Anexo (opcional)</label><input type="file" id="cf-arquivo"></div>
+              <button class="btn btn-primary" id="cf-enviar" onclick="window._responderComoCliente()">Enviar</button>
+              <div class="form-msg" id="cf-msg" role="alert"></div>
+            </div>
           </div>
         </div>
 
@@ -650,34 +676,23 @@
   <div class="modal-box">
     <button class="modal-close" id="modal-close-btn" aria-label="Fechar">&times;</button>
     <div class="modal-title">Abrir novo chamado</div>
-    <div class="modal-sub">Descreva o problema ou solicitação em detalhes para agilizarmos o atendimento.</div>
+    <div class="modal-sub">Descreva o que aconteceu com o maior detalhe poss&iacute;vel. A prioridade quem define &eacute; a equipe, pelo SLA.</div>
 
     <div class="form-group">
-      <label>Assunto</label>
-      <input type="text" placeholder="Ex: Erro ao salvar cadastro de clientes">
+      <label>Tipo</label>
+      <select id="nt-tipo"></select>
     </div>
     <div class="form-group">
-      <label>Categoria</label>
-      <select>
-        <option>Bug / Erro</option>
-        <option>Performance</option>
-        <option>Melhoria / Nova funcionalidade</option>
-        <option>Dúvida de uso</option>
-        <option>Outro</option>
-      </select>
+      <label>T&iacute;tulo</label>
+      <input type="text" id="nt-titulo" placeholder="Ex: Erro ao salvar cadastro de clientes">
     </div>
     <div class="form-group">
-      <label>Prioridade</label>
-      <select>
-        <option>Média — erro funcional</option>
-        <option>Alta — bug grave</option>
-        <option>Crítica — sistema fora do ar</option>
-        <option>Baixa — sugestão</option>
-      </select>
+      <label>Descri&ccedil;&atilde;o</label>
+      <textarea id="nt-descricao" placeholder="O que aconteceu, como repetir o problema e o que era esperado."></textarea>
     </div>
     <div class="form-group">
-      <label>Descrição</label>
-      <textarea placeholder="Descreva o que aconteceu, como reproduzir o problema e qual era o comportamento esperado..."></textarea>
+      <label>Anexo (opcional)</label>
+      <input type="file" id="nt-arquivo">
     </div>
 
     <div style="display:flex;gap:10px;margin-top:4px">
@@ -688,9 +703,7 @@
       <button class="btn btn-outline" onclick="document.getElementById('modal-ticket').classList.remove('open')">Cancelar</button>
     </div>
 
-    <div id="ticket-success" style="display:none;margin-top:12px;padding:10px 14px;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);border-radius:8px;font-size:12.5px;color:var(--green)">
-      ✓ Chamado aberto com sucesso! Você receberá uma resposta conforme o SLA definido.
-    </div>
+    <div class="form-msg" id="nt-msg" role="alert"></div>
   </div>
 </div>
 
@@ -751,41 +764,7 @@ async function loadPortalData() {
       project.name + ' — Acompanhamento detalhado em tempo real';
   }
 
-  // Tickets
-  const { data: tickets } = await supabase
-    .from('tickets')
-    .select('*')
-    .eq('client_id', userId)
-    .order('created_at', { ascending: false });
-
-  if (tickets?.length) {
-    const tbody = document.querySelector('#tab-suporte .data-table tbody');
-    // A resposta da equipe vem logo abaixo do chamado: é o que o cliente
-    // abre o portal para ver, e ficava invisível até agora.
-    tbody.innerHTML = tickets.map((t, i) => `
-      <tr>
-        <td><span class="ticket-id">#SC-${String(i+1).padStart(3,'0')}</span></td>
-        <td>${escapeHtml(t.subject)}</td>
-        <td style="color:var(--text-dim)">${labelType(t.type)}</td>
-        <td style="color:var(--text-dim)">${formatDate(t.created_at)}</td>
-        <td><span class="status ${statusClass(t.status)}">${labelStatus2(t.status)}</span></td>
-      </tr>
-      ${t.description ? `<tr class="ticket-detalhe"><td colspan="5">
-        <div class="ticket-descricao">${escapeHtml(t.description)}</div>
-      </td></tr>` : ''}
-      ${t.response ? `<tr class="ticket-detalhe"><td colspan="5">
-        <div class="ticket-resposta">
-          <div class="ticket-resposta-topo">Resposta da SertCode${t.updated_at ? ` · ${formatDate(t.updated_at)}` : ''}</div>
-          ${escapeHtml(t.response)}
-        </div>
-      </td></tr>` : ''}
-    `).join('');
-
-    const open = tickets.filter(t => t.status !== 'done').length;
-    const badge = document.querySelector('.sidebar-nav a[data-tab="suporte"] .sidebar-badge');
-    if (badge) badge.textContent = open || '';
-    if (badge && !open) badge.style.display = 'none';
-  }
+  await carregarChamados();
 
   // Financeiro
   const { data: invoices } = await supabase
@@ -879,15 +858,6 @@ function labelStatus(s) {
   return { cadastrado:'Cadastrado', andamento:'Em andamento', pausado:'Pausado',
            cancelado:'Cancelado', concluido:'Concluído' }[s] || s;
 }
-function labelStatus2(s) {
-  return { open:'Aberto', analysis:'Em análise', done:'Concluído' }[s] || s;
-}
-function statusClass(s) {
-  return { open:'status-dev', analysis:'status-analysis', done:'status-done' }[s] || '';
-}
-function labelType(t) {
-  return { bug:'Bug / Erro', feature:'Melhoria', doubt:'Dúvida', urgent:'Urgente' }[t] || t;
-}
 function formatDate(d) {
   if (!d) return '—';
   return new Date(d).toLocaleDateString('pt-BR', { day:'2-digit', month:'short', year:'numeric' });
@@ -968,39 +938,221 @@ document.getElementById('feedback-btn').addEventListener('click', async () => {
   }, 5000);
 });
 
-/* ── TICKET SUBMIT (com Supabase) ── */
-document.getElementById('ticket-submit').addEventListener('click', async () => {
-  const btn     = document.getElementById('ticket-submit');
-  const msg     = document.getElementById('ticket-success');
-  const subject = document.querySelector('#modal-ticket input[type="text"]');
-  const cat     = document.querySelector('#modal-ticket select:nth-of-type(1)');
-  const orig    = btn.innerHTML;
+/* ── SUPORTE DO CLIENTE ── */
+const CS_TIPO = {
+  ERRO:'Erro', FINANCEIRO:'Financeiro', SUGESTAO:'Sugestão',
+  ELOGIO:'Elogio', FUNCIONALIDADE:'Solicitação de funcionalidade',
+};
+const CS_STATUS = {
+  ABERTO:              { label: 'Aberto',              cls: 'status-dev' },
+  EM_ATENDIMENTO:      { label: 'Em atendimento',      cls: 'status-analysis' },
+  AGUARDANDO_RESPOSTA: { label: 'Aguardando sua resposta', cls: 'status-analysis' },
+  CONCLUIDO:           { label: 'Concluído',           cls: 'status-done' },
+  CANCELADO:           { label: 'Cancelado',           cls: 'status-cancelado' },
+};
+const CS_TRILHA = ['ABERTO', 'EM_ATENDIMENTO', 'AGUARDANDO_RESPOSTA', 'CONCLUIDO'];
 
-  if (!subject?.value.trim()) { subject?.focus(); return; }
+let csChamados = [], csAberto = null, csMensagens = [], csMontado = false;
 
-  btn.textContent = 'Enviando...';
-  btn.disabled = true;
+const csNumero = t => '#SC-' + String(t.numero ?? 0).padStart(6, '0');
+const csEl = id => document.getElementById(id);
+const csMsg = (txt, tipo = 'error') => { const m = csEl('cf-msg'); m.textContent = txt; m.className = 'form-msg show ' + tipo; };
 
-  const typeMap = { 'Bug / Erro':'bug', 'Performance':'bug', 'Melhoria / Nova funcionalidade':'feature', 'Dúvida de uso':'doubt', 'Outro':'doubt' };
+async function carregarChamados() {
+  const { data } = await supabase.from('tickets').select('*')
+    .eq('client_id', userId).order('created_at', { ascending: false });
+  csChamados = data || [];
 
-  await supabase.from('tickets').insert({
-    client_id:   userId,
-    subject:     subject.value.trim(),
-    type:        typeMap[cat?.value] || 'doubt',
-    status:      'open',
-    description: document.querySelector('#modal-ticket textarea')?.value || ''
+  if (!csMontado) {
+    const ops = obj => Object.entries(obj).map(([v, l]) => `<option value="${v}">${l}</option>`).join('');
+    csEl('cs-tipo').innerHTML = '<option value="">Todos</option>' + ops(CS_TIPO);
+    csEl('cs-situacao').innerHTML = '<option value="">Todas</option>' + ops(CS_STATUS);
+    csEl('nt-tipo').innerHTML = ops(CS_TIPO);
+    ['cs-tipo','cs-situacao','cs-busca'].forEach(id => csEl(id).addEventListener('input', renderChamadosCliente));
+    csMontado = true;
+  }
+  renderChamadosCliente();
+}
+
+function renderChamadosCliente() {
+  const tipo = csEl('cs-tipo').value, situacao = csEl('cs-situacao').value;
+  const busca = csEl('cs-busca').value.trim().toLowerCase();
+
+  // Contador por tipo, como no SertLink: mostra onde o histórico se concentra.
+  csEl('cs-contadores').innerHTML = Object.entries(CS_TIPO).map(([v, l]) => `
+    <div class="resumo-card" style="text-align:left">
+      <div class="resumo-label" style="margin:0 0 6px">${l}</div>
+      <div class="resumo-valor" style="font-size:22px">${csChamados.filter(t => t.type === v).length}</div>
+    </div>`).join('')
+    + `<div class="resumo-card" style="text-align:left">
+      <div class="resumo-label" style="margin:0 0 6px">Em aberto</div>
+      <div class="resumo-valor" style="font-size:22px;color:var(--orange)">${
+        csChamados.filter(t => !['CONCLUIDO','CANCELADO'].includes(t.status)).length}</div>
+    </div>`;
+
+  const lista = csChamados.filter(t => {
+    if (tipo && t.type !== tipo) return false;
+    if (situacao && t.status !== situacao) return false;
+    if (busca && !`${csNumero(t)} ${t.subject}`.toLowerCase().includes(busca)) return false;
+    return true;
   });
 
-  msg.style.display = 'block';
-  btn.innerHTML = orig;
-  btn.disabled = false;
+  csEl('cs-body').innerHTML = lista.length ? lista.map(t => {
+    const st = CS_STATUS[t.status] || { label: t.status, cls: '' };
+    const minhaVez = t.status === 'AGUARDANDO_RESPOSTA';
+    return `<tr class="rh-linha${minhaVez ? ' sup-espera' : ''}" onclick="window._abrirChamadoCliente('${t.id}')">
+      <td><span class="ticket-id">${csNumero(t)}</span></td>
+      <td style="font-weight:600">${escapeHtml(t.subject)}</td>
+      <td style="color:var(--text-dim)">${CS_TIPO[t.type] || t.type}</td>
+      <td><span class="status ${st.cls}">${st.label}</span></td>
+      <td style="color:var(--text-dim);font-size:12px">${formatDate(t.created_at)}</td>
+      <td style="color:var(--text-dim);font-size:12px">${t.atualizado_em ? formatDate(t.atualizado_em) : '—'}</td>
+    </tr>`;
+  }).join('')
+  : `<tr><td colspan="6" style="text-align:center;color:var(--text-dim);padding:22px">${
+      csChamados.length ? 'Nenhum chamado no filtro escolhido.' : 'Você ainda não abriu nenhum chamado.'}</td></tr>`;
 
-  setTimeout(async () => {
-    document.getElementById('modal-ticket').classList.remove('open');
-    msg.style.display = 'none';
-    if (subject) subject.value = '';
-    await loadPortalData(); // atualiza lista de tickets
-  }, 2500);
+  const abertos = csChamados.filter(t => !['CONCLUIDO','CANCELADO'].includes(t.status)).length;
+  const badge = document.querySelector('.sidebar-nav a[data-tab="suporte"] .sidebar-badge');
+  if (badge) { badge.textContent = abertos || ''; badge.style.display = abertos ? '' : 'none'; }
+}
+
+window._voltarChamados = () => {
+  csAberto = null;
+  csEl('cs-ficha').hidden = true;
+  csEl('cs-lista').hidden = false;
+};
+
+window._abrirChamadoCliente = async (id) => {
+  csAberto = csChamados.find(t => t.id === id);
+  if (!csAberto) return;
+  csEl('cs-lista').hidden = true;
+  csEl('cs-ficha').hidden = false;
+  csEl('cf-msg').className = 'form-msg';
+  csEl('cf-texto').value = '';
+  csEl('cf-conversa').innerHTML = '<div style="color:var(--text-dim);font-size:12.5px">Carregando...</div>';
+
+  const t = csAberto;
+  const st = CS_STATUS[t.status] || { label: t.status, cls: '' };
+  csEl('cf-numero').textContent = 'Chamado ' + csNumero(t);
+  csEl('cf-sub').textContent = t.subject;
+  csEl('cf-marcas').innerHTML = `<span class="status">${CS_TIPO[t.type] || t.type}</span>
+    <span class="status ${st.cls}">${st.label}</span>
+    <span style="font-size:12px;color:var(--text-dim)">Aberto em ${formatDate(t.created_at)}</span>`;
+
+  const atual = CS_TRILHA.indexOf(t.status);
+  csEl('cf-trilha').innerHTML = CS_TRILHA.map((etapa, i) => `
+    <div class="sup-etapa${i <= atual && atual >= 0 ? ' feita' : ''}">
+      <div class="sup-barra"></div>
+      <div class="sup-rotulo">${CS_STATUS[etapa].label}</div>
+    </div>`).join('');
+
+  csEl('cf-descricao').textContent = t.description || '(sem descrição)';
+  csEl('cf-anexo').innerHTML = t.anexo
+    ? `<button class="cbo-link" onclick="window._verAnexoChamado('${t.anexo}')">Ver arquivo que você anexou</button>`
+    : 'Nenhum arquivo anexado.';
+
+  const { data } = await supabase.from('ticket_mensagens').select('*')
+    .eq('ticket_id', id).order('created_at');
+  csMensagens = data || [];
+
+  // A nota interna da equipe não chega aqui: a política do banco já a esconde.
+  const linhas = [
+    { autor_tipo: 'CLIENTE', mensagem: t.description || '(sem descrição)', created_at: t.created_at },
+    ...csMensagens,
+  ];
+  csEl('cf-conversa').innerHTML = linhas.map(m => {
+    const daEquipe = m.autor_tipo === 'EQUIPE';
+    return `<div class="hist-item${daEquipe ? ' sup-equipe' : ''}">
+      <div class="hist-topo">
+        <span style="font-size:12.5px;font-weight:600">${daEquipe ? 'SertCode' : 'Você'}${
+          m.tipo === 'SOLICITACAO' ? ' · Pedido de informação' : ''}</span>
+        <span class="hist-data">${formatDate(m.created_at)}</span>
+      </div>
+      <div class="hist-nota">${escapeHtml(m.mensagem)}</div>
+      ${m.anexo ? `<button class="cbo-link" onclick="window._verAnexoChamado('${m.anexo}')">Ver anexo</button>` : ''}
+    </div>`;
+  }).join('');
+};
+
+window._verAnexoChamado = async (caminho) => {
+  const { data, error } = await supabase.storage.from('suporte-anexos').createSignedUrl(caminho, 60);
+  if (error) return alert('Não foi possível abrir: ' + error.message);
+  window.open(data.signedUrl, '_blank');
+};
+
+async function enviarAnexoChamado(input) {
+  const arquivo = input.files[0];
+  if (!arquivo) return { caminho: null };
+  if (arquivo.size > 10 * 1024 * 1024) return { erro: 'O anexo precisa ter no máximo 10 MB.' };
+  // O caminho começa com o id do cliente: é assim que a política do bucket autoriza.
+  const caminho = `${userId}/${Date.now()}-${arquivo.name.replace(/[^\w.\-]/g, '_')}`;
+  const { error } = await supabase.storage.from('suporte-anexos').upload(caminho, arquivo);
+  if (error) return { erro: 'Não foi possível enviar o anexo: ' + error.message };
+  return { caminho };
+}
+
+window._responderComoCliente = async () => {
+  const btn = csEl('cf-enviar'), orig = btn.textContent;
+  const texto = csEl('cf-texto').value.trim();
+  if (!texto) return csMsg('Escreva a mensagem.');
+
+  btn.textContent = 'Enviando...'; btn.disabled = true;
+  const fim = () => { btn.textContent = orig; btn.disabled = false; };
+
+  const anexo = await enviarAnexoChamado(csEl('cf-arquivo'));
+  if (anexo.erro) { fim(); return csMsg(anexo.erro); }
+
+  const { error } = await supabase.from('ticket_mensagens').insert({
+    ticket_id: csAberto.id, autor_id: userId, autor_tipo: 'CLIENTE',
+    tipo: 'RESPOSTA', mensagem: texto, anexo: anexo.caminho,
+  });
+  if (error) { fim(); return csMsg('Não foi possível enviar: ' + error.message); }
+
+  csEl('cf-arquivo').value = '';
+  fim();
+  csMsg('Mensagem enviada. A equipe foi avisada no painel.', 'success');
+  await carregarChamados();
+  await window._abrirChamadoCliente(csAberto.id);
+};
+
+/* ── ABRIR CHAMADO ── */
+window._abrirNovoChamado = () => {
+  csEl('nt-titulo').value = '';
+  csEl('nt-descricao').value = '';
+  csEl('nt-arquivo').value = '';
+  csEl('nt-msg').className = 'form-msg';
+  csEl('modal-ticket').classList.add('open');
+};
+
+document.getElementById('ticket-submit').addEventListener('click', async () => {
+  const btn = csEl('ticket-submit'), orig = btn.innerHTML;
+  const aviso = (txt, tipo = 'error') => { const m = csEl('nt-msg'); m.textContent = txt; m.className = 'form-msg show ' + tipo; };
+
+  const titulo = csEl('nt-titulo').value.trim();
+  const descricao = csEl('nt-descricao').value.trim();
+  if (!titulo) { csEl('nt-titulo').focus(); return aviso('Escreva um título para o chamado.'); }
+  if (!descricao) { csEl('nt-descricao').focus(); return aviso('Descreva o que aconteceu.'); }
+
+  btn.textContent = 'Enviando...'; btn.disabled = true;
+  const fim = () => { btn.innerHTML = orig; btn.disabled = false; };
+
+  const anexo = await enviarAnexoChamado(csEl('nt-arquivo'));
+  if (anexo.erro) { fim(); return aviso(anexo.erro); }
+
+  const { error } = await supabase.from('tickets').insert({
+    client_id: userId, subject: titulo, description: descricao,
+    type: csEl('nt-tipo').value, status: 'ABERTO', anexo: anexo.caminho,
+  });
+  if (error) { fim(); return aviso('Não foi possível abrir o chamado: ' + error.message); }
+
+  fim();
+  aviso('Chamado aberto. A equipe responde conforme o SLA.', 'success');
+  await carregarChamados();
+  setTimeout(() => {
+    csEl('modal-ticket').classList.remove('open');
+    csEl('nt-msg').className = 'form-msg';
+  }, 2200);
 });
 
 /* ── MODAL ── */

@@ -938,22 +938,6 @@ button { font-family: var(--font); }
 @media (max-width: 900px) { .sertlink-resumo { grid-template-columns: repeat(3, 1fr); } }
 @media (max-width: 520px) { .sertlink-resumo { grid-template-columns: repeat(2, 1fr); } }
 
-/* ── Suporte do cliente: descrição e resposta ── */
-.ticket-detalhe td { padding-top: 0 !important; border-bottom: 0 !important; }
-.ticket-descricao {
-  font-size: 12.5px; color: var(--text-dim); line-height: 1.7;
-  padding: 0 0 10px 2px; white-space: pre-wrap;
-}
-.ticket-resposta {
-  background: rgba(255,106,0,0.05); border: 1px solid rgba(255,106,0,0.18);
-  border-radius: 10px; padding: 12px 14px; margin-bottom: 12px;
-  font-size: 13px; color: var(--text); line-height: 1.7; white-space: pre-wrap;
-}
-.ticket-resposta-topo {
-  font-size: 10.5px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase;
-  color: var(--orange); margin-bottom: 6px;
-}
-
 /* ── Gestão de Pessoas: sub-abas ── */
 .rh-abas {
   display: flex; flex-wrap: wrap; gap: 6px; padding: 5px;
@@ -1253,6 +1237,47 @@ button { font-family: var(--font); }
 }
 
 /* ══════════════════════════════════════
+   SUPORTE
+══════════════════════════════════════ */
+.sup-contadores { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; }
+.sup-filtros    { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.sup-cartoes    { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+.sup-cartoes .card { padding: 16px 16px 14px; }
+
+/* Linha que espera a equipe: a lista existe para encontrar essas primeiro. */
+.sup-espera > td:first-child { box-shadow: inset 2px 0 0 var(--orange); }
+.sup-espera > td { background: rgba(255,106,0,0.045); }
+[data-theme="light"] .sup-espera > td { background: rgba(255,106,0,0.06); }
+
+/* Nota interna: cor diferente para não confundir com o que o cliente lê. */
+.sup-nota { border-color: rgba(255,106,0,0.28); background: rgba(255,106,0,0.05); }
+.sup-nota .hist-nota { color: var(--text-mid); }
+
+.sup-aviso {
+  font-size: 12px; line-height: 1.65; color: var(--text-dim);
+}
+/* Resposta da equipe: o cliente precisa achá-la de relance na conversa. */
+.sup-equipe { border-color: rgba(255,106,0,0.3); background: rgba(255,106,0,0.05); }
+
+.sup-trilha { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 8px; }
+.sup-etapa .sup-barra {
+  height: 4px; border-radius: 3px; background: var(--fill-forte);
+  transition: var(--tr);
+}
+.sup-etapa .sup-rotulo {
+  margin-top: 7px; font-size: 10.5px; font-weight: 700; letter-spacing: .04em;
+  text-transform: uppercase; color: var(--text-dim);
+}
+.sup-etapa.feita .sup-barra  { background: var(--orange); }
+.sup-etapa.feita .sup-rotulo { color: var(--text); }
+
+@media (max-width: 1100px) {
+  .sup-contadores { grid-template-columns: repeat(3, 1fr); }
+  .sup-cartoes    { grid-template-columns: repeat(2, 1fr); }
+  .sup-filtros    { grid-template-columns: 1fr 1fr; }
+}
+
+/* ══════════════════════════════════════
    RESPONSIVE
 ══════════════════════════════════════ */
 @media (max-width: 1100px) {
@@ -1269,4 +1294,10 @@ button { font-family: var(--font); }
   .grid-2   { grid-template-columns: 1fr; }
   .kanban   { grid-template-columns: 1fr; }
   .portal-header { padding: 0 16px; }
+  .sup-contadores { grid-template-columns: 1fr 1fr; }
+  .sup-cartoes    { grid-template-columns: 1fr; }
+  .sup-filtros    { grid-template-columns: 1fr; }
+  .sup-trilha { grid-auto-flow: row; grid-auto-columns: auto; }
+  .sup-etapa { display: grid; grid-template-columns: 70px 1fr; align-items: center; gap: 10px; }
+  .sup-etapa .sup-rotulo { margin: 0; order: -1; }
 }
