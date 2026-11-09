@@ -21,6 +21,7 @@ alter table public.tickets
   add column if not exists responsavel_id uuid,
   add column if not exists responsavel_nome text,
   add column if not exists prazo          date,
+  add column if not exists primeira_resposta_em timestamptz,
   add column if not exists concluido_em   timestamptz,
   add column if not exists cancelado_em   timestamptz,
   add column if not exists atualizado_em  timestamptz default now();
@@ -78,7 +79,53 @@ alter table public.tickets
   add constraint tickets_status_check
   check (status in ('ABERTO','EM_ATENDIMENTO','AGUARDANDO_RESPOSTA','CONCLUIDO','CANCELADO'));
 
--- 3. Conversa ────────────────────────────────────────────────────
+-- 3. Prazo de primeira resposta (SLA) ────────────────────────────
+-- O prazo nasce do tipo do chamado, não da mão de quem atende: assim o
+-- cliente sabe o que esperar antes de alguém olhar o chamado.
+create or replace function public.dias_uteis(partida date, dias int)
+returns date language plpgsql immutable as $$
+declare
+  d date := partida;
+  faltam int := dias;
+begin
+  while faltam > 0 loop
+    d := d + 1;
+    -- Sábado e domingo não contam no prazo.
+    if extract(isodow from d) < 6 then
+      faltam := faltam - 1;
+    end if;
+  end loop;
+  return d;
+end $$;
+
+create or replace function public.ticket_define_prazo()
+returns trigger language plpgsql as $$
+declare
+  dias int := case new.type
+    when 'ERRO'           then 1
+    when 'FINANCEIRO'     then 1
+    when 'SUGESTAO'       then 3
+    when 'FUNCIONALIDADE' then 3
+    else null                        -- Elogio não tem prazo
+  end;
+begin
+  if new.prazo is null and dias is not null then
+    new.prazo := public.dias_uteis(coalesce(new.created_at, now())::date, dias);
+  end if;
+  return new;
+end $$;
+
+drop trigger if exists ticket_define_prazo on public.tickets;
+create trigger ticket_define_prazo
+  before insert on public.tickets
+  for each row execute function public.ticket_define_prazo();
+
+-- Preenche o prazo dos chamados que já existiam.
+update public.tickets t set prazo = public.dias_uteis(t.created_at::date,
+  case t.type when 'ERRO' then 1 when 'FINANCEIRO' then 1 else 3 end)
+where t.prazo is null and t.type <> 'ELOGIO';
+
+-- 4. Conversa ────────────────────────────────────────────────────
 -- A resposta única não bastava: cliente e equipe trocam mensagens, e
 -- a equipe precisa de uma anotação que o cliente não vê.
 create table if not exists public.ticket_mensagens (
@@ -108,6 +155,10 @@ begin
 
   update public.tickets set
     aguardando_equipe = (new.autor_tipo = 'CLIENTE'),
+    -- A primeira resposta da equipe é o que o SLA mede.
+    primeira_resposta_em = case
+      when new.autor_tipo = 'EQUIPE' and primeira_resposta_em is null
+        then now() else primeira_resposta_em end,
     status = case
       when new.autor_tipo = 'CLIENTE' and status in ('AGUARDANDO_RESPOSTA','CONCLUIDO')
         then 'EM_ATENDIMENTO'
@@ -126,7 +177,7 @@ create trigger ticket_mensagem_marca
   after insert on public.ticket_mensagens
   for each row execute function public.ticket_mensagem_marca();
 
--- 4. Histórico ───────────────────────────────────────────────────
+-- 5. Histórico ───────────────────────────────────────────────────
 -- Quem mudou situação, prioridade ou responsável, e quando.
 create table if not exists public.ticket_eventos (
   id         uuid primary key default gen_random_uuid(),
@@ -139,7 +190,7 @@ create table if not exists public.ticket_eventos (
 create index if not exists ticket_eventos_idx
   on public.ticket_eventos (ticket_id, created_at desc);
 
--- 5. Anexos ──────────────────────────────────────────────────────
+-- 6. Anexos ──────────────────────────────────────────────────────
 insert into storage.buckets (id, name, public)
 values ('suporte-anexos', 'suporte-anexos', false)
 on conflict (id) do nothing;
@@ -172,7 +223,7 @@ create policy "cliente_le_anexos_suporte" on storage.objects
     and (storage.foldername(name))[1] = auth.uid()::text
   );
 
--- 6. Acesso ──────────────────────────────────────────────────────
+-- 7. Acesso ──────────────────────────────────────────────────────
 alter table public.ticket_mensagens enable row level security;
 alter table public.ticket_eventos   enable row level security;
 
@@ -194,6 +245,37 @@ create policy "cliente_le_mensagens_ticket" on public.ticket_mensagens
     )
   );
 
+-- Cancelar é decisão do cliente: ele desiste do pedido. A equipe conclui,
+-- não cancela. A policy abaixo é a única escrita do cliente em tickets, e
+-- o gatilho garante que nada além da situação muda.
+drop policy if exists "cliente_cancela_ticket" on public.tickets;
+create policy "cliente_cancela_ticket" on public.tickets
+  for update to authenticated
+  using (client_id = auth.uid() and status <> 'CANCELADO')
+  with check (client_id = auth.uid() and status = 'CANCELADO');
+
+create or replace function public.ticket_cliente_so_cancela()
+returns trigger language plpgsql security definer set search_path = public as $$
+begin
+  if current_user in ('anon', 'authenticated')
+     and not public.is_equipe()
+     and old.client_id = auth.uid() then
+    -- Devolve tudo ao que era, menos a situação e as marcas de cancelamento.
+    new := old;
+    new.status := 'CANCELADO';
+    new.cancelado_em := now();
+    new.aguardando_equipe := false;
+    new.atualizado_em := now();
+  end if;
+  return new;
+end $$;
+
+drop trigger if exists ticket_cliente_so_cancela on public.tickets;
+create trigger ticket_cliente_so_cancela
+  before update on public.tickets
+  for each row execute function public.ticket_cliente_so_cancela();
+
+-- Chamado cancelado não recebe mais mensagem de ninguém.
 drop policy if exists "cliente_responde_ticket" on public.ticket_mensagens;
 create policy "cliente_responde_ticket" on public.ticket_mensagens
   for insert to authenticated
@@ -201,7 +283,9 @@ create policy "cliente_responde_ticket" on public.ticket_mensagens
     autor_tipo = 'CLIENTE' and tipo = 'RESPOSTA'
     and exists (
       select 1 from public.tickets t
-      where t.id = ticket_mensagens.ticket_id and t.client_id = auth.uid()
+      where t.id = ticket_mensagens.ticket_id
+        and t.client_id = auth.uid()
+        and t.status <> 'CANCELADO'
     )
   );
 

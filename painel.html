@@ -515,17 +515,14 @@
 
           <div class="card" style="margin:18px 0">
             <div class="sup-filtros">
-              <div class="form-group" style="margin:0"><label>Período</label>
-                <select id="sup-periodo">
-                  <option value="30">Últimos 30 dias</option>
-                  <option value="7">Últimos 7 dias</option>
-                  <option value="90">Últimos 90 dias</option>
-                  <option value="">Todo o período</option>
-                </select></div>
+              <div class="form-group" style="margin:0"><label>De</label><input type="date" id="sup-de"></div>
+              <div class="form-group" style="margin:0"><label>Até</label><input type="date" id="sup-ate"></div>
               <div class="form-group" style="margin:0"><label>Tipo</label>
                 <select id="sup-tipo"><option value="">Todos</option></select></div>
               <div class="form-group" style="margin:0"><label>Situação</label>
                 <select id="sup-situacao"><option value="">Todas</option></select></div>
+              <div class="form-group" style="margin:0"><label>Cliente</label>
+                <select id="sup-cliente"><option value="">Todos</option></select></div>
               <div class="form-group" style="margin:0"><label>Responsável</label>
                 <select id="sup-responsavel"><option value="">Todos</option></select></div>
             </div>
@@ -585,6 +582,7 @@
               <div class="card" style="margin-bottom:18px">
                 <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px" id="sf-marcas"></div>
                 <div class="sup-trilha" id="sf-trilha"></div>
+                <div class="sup-aviso" id="sf-sla" style="margin-top:14px"></div>
                 <div style="margin:14px 0 6px;font-size:13px;line-height:1.7" id="sf-descricao"></div>
                 <div class="rh-item-sub" id="sf-anexo">Nenhum arquivo anexado.</div>
               </div>
@@ -1132,6 +1130,8 @@
               <div class="team-actions" id="fd-acoes"></div>
             </div>
 
+            <div class="sup-trilha" id="fd-trilha" style="margin-top:18px"></div>
+
             <div class="sertlink-resumo" id="fd-resumo" style="grid-template-columns:repeat(4,1fr);margin:18px 0"></div>
 
             <div class="card">
@@ -1460,6 +1460,7 @@
 
     <nav class="rh-abas rh-abas-modal" id="rc-abas">
       <button class="rh-aba active" data-rc="pessoais">Dados pessoais</button>
+      <button class="rh-aba" data-rc="acesso">Acesso ao painel</button>
       <button class="rh-aba" data-rc="vinculo">Vínculo</button>
       <button class="rh-aba" data-rc="remuneracao">Remuneração</button>
       <button class="rh-aba so-edicao" data-rc="beneficios">Benefícios</button>
@@ -1496,29 +1497,53 @@
         <div class="form-group"><label>UF</label><select id="rc-uf"></select></div>
       </div>
 
-      <div class="rh-bloco" id="rc-bloco-acesso">
-        <div class="rh-bloco-titulo">Acesso ao painel de gestão</div>
-        <div class="rh-bloco-texto">Quem tem acesso aparece na Equipe. Nome, cargo e perfil vêm deste cadastro; no desligamento o acesso é desativado.</div>
-        <div class="form-group" style="margin-bottom:0">
-          <label>Acesso</label>
-          <select id="rc-acesso">
-            <option value="">Sem acesso ao painel</option>
-            <option value="colaborador">Colaborador</option>
-            <option value="gestor">Gestor</option>
-          </select>
-        </div>
-        <div id="rc-acesso-senha" hidden>
-          <div class="form-group" style="margin-top:12px;margin-bottom:0">
-            <label>Senha provisória</label>
-            <div class="pass-wrap">
-              <input type="text" id="rc-senha" placeholder="Mínimo 8 caracteres">
-              <button type="button" class="pass-toggle" title="Gerar senha" onclick="window._gerarSenhaRh()">
-                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M23 4v6h-6"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
-              </button>
-            </div>
-            <div style="font-size:11px;color:var(--text-dim);margin-top:6px">Entregue por um canal privado e peça que a pessoa troque no primeiro acesso.</div>
+    </div>
+
+    <!-- ── Acesso ao painel ── -->
+    <div class="rh-painel" id="rc-p-acesso">
+      <div class="rh-bloco-titulo">Acesso ao painel de gestão</div>
+      <div class="rh-bloco-texto">Quem tem acesso aparece na Equipe. O perfil define o que a pessoa
+        vê; as exceções ficam em Equipe → Permissões. No desligamento o acesso é desativado.</div>
+
+      <div class="form-group" style="margin-top:14px">
+        <label>Acesso</label>
+        <select id="rc-acesso">
+          <option value="">Sem acesso ao painel</option>
+          <option value="NOVO">Criar acesso novo</option>
+          <option value="VINCULAR">Vincular um acesso que já existe</option>
+        </select>
+      </div>
+
+      <div id="rc-acesso-novo" hidden>
+        <div class="form-group"><label>Perfil de acesso</label><select id="rc-perfil"></select></div>
+        <div class="form-group">
+          <label>Senha provisória</label>
+          <div class="pass-wrap">
+            <input type="text" id="rc-senha" placeholder="Mínimo 8 caracteres">
+            <button type="button" class="pass-toggle" title="Gerar senha" onclick="window._gerarSenhaRh()">
+              <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M23 4v6h-6"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
+            </button>
           </div>
         </div>
+        <div class="form-group">
+          <label>Confirmar senha</label>
+          <input type="text" id="rc-senha2" placeholder="Repita a senha">
+          <div style="font-size:11px;color:var(--text-dim);margin-top:6px">Entregue por um canal privado e peça que a pessoa troque no primeiro acesso.</div>
+        </div>
+      </div>
+
+      <div id="rc-acesso-vincular" hidden>
+        <div class="form-group">
+          <label>Acesso já cadastrado</label>
+          <select id="rc-vinculo-acesso"></select>
+          <div style="font-size:11px;color:var(--text-dim);margin-top:6px">Mostra só quem ainda não tem ficha de colaborador.</div>
+        </div>
+      </div>
+
+      <div id="rc-acesso-atual" hidden class="rh-bloco" style="margin-top:14px">
+        <div class="rh-bloco-titulo" id="rc-acesso-nome"></div>
+        <div class="rh-bloco-texto" id="rc-acesso-nota"></div>
+        <button class="btn btn-outline" style="width:100%;justify-content:center" onclick="window._abrirAcessoDaFicha()">Abrir na Equipe</button>
       </div>
     </div>
 
@@ -2425,10 +2450,30 @@ window._gerarSenhaRh = () => {
   el('rc-senha').value = [...crypto.getRandomValues(new Uint32Array(12))].map(n => chars[n % chars.length]).join('');
 };
 el('rc-acesso').addEventListener('change', e => {
-  const comAcesso = Boolean(e.target.value);
-  el('rc-acesso-senha').hidden = !comAcesso || Boolean(rcEditId);
-  if (comAcesso && !rcEditId && !val('rc-senha')) window._gerarSenhaRh();
+  const modo = e.target.value;
+  el('rc-acesso-novo').hidden = modo !== 'NOVO' || Boolean(rcEditId);
+  el('rc-acesso-vincular').hidden = modo !== 'VINCULAR';
+  if (modo === 'NOVO' && !rcEditId && !val('rc-senha')) window._gerarSenhaRh();
+  if (modo === 'VINCULAR') montarAcessosLivres();
 });
+
+// Só entram os acessos sem ficha: vincular dois colaboradores ao mesmo
+// login deixaria dois Meus RH apontando para a mesma pessoa.
+function montarAcessosLivres() {
+  const livres = allTeam.filter(m =>
+    m.status === 'ativo' && !rhColabs.some(c => c.profile_id === m.id && c.id !== rcEditId));
+  el('rc-vinculo-acesso').innerHTML = livres.length
+    ? livres.map(m => `<option value="${m.id}">${esc(m.nickname || m.name)} — ${esc(m.email || '')}</option>`).join('')
+    : '<option value="">Nenhum acesso livre</option>';
+}
+
+window._abrirAcessoDaFicha = () => {
+  const c = rhColabs.find(x => x.id === rcEditId);
+  if (!c?.profile_id) return;
+  closeModal('modal-rh-colab');
+  document.querySelector('.sidebar-nav a[data-tab="equipe"]').click();
+  window._editarAcesso(c.profile_id);
+};
 el('rc-situacao').addEventListener('change', e => {
   el('rc-desligamento').hidden = e.target.value !== 'DESLIGADO';
 });
@@ -2438,9 +2483,13 @@ window._novoColab = () => {
   rcLimpar.forEach(id => el(id).value = '');
   el('rc-salario').value = ''; el('rc-dependentes').value = '0'; el('rc-dia').value = '5';
   el('rc-cargo').value = ''; el('rc-vinculo').value = 'CLT'; el('rc-situacao').value = 'ATIVO';
-  el('rc-periodicidade').value = 'MENSAL'; el('rc-acesso').value = ''; el('rc-senha').value = '';
-  el('rc-acesso-senha').hidden = true; el('rc-desligamento').hidden = true;
-  el('rc-bloco-acesso').hidden = false;
+  el('rc-periodicidade').value = 'MENSAL'; el('rc-acesso').value = '';
+  el('rc-senha').value = ''; el('rc-senha2').value = '';
+  el('rc-acesso-novo').hidden = true; el('rc-acesso-vincular').hidden = true;
+  el('rc-acesso-atual').hidden = true; el('rc-desligamento').hidden = true;
+  el('rc-perfil').innerHTML = Object.entries(PERFIS)
+    .map(([v, p]) => `<option value="${v}">${p.label} — ${p.para}</option>`).join('');
+  el('rc-perfil').value = 'SUPORTE';
   document.querySelectorAll('#rc-abas .so-edicao').forEach(b => b.hidden = true);
   el('rc-encerrar').hidden = true;
   el('rc-titulo').textContent = 'Novo colaborador';
@@ -2469,8 +2518,21 @@ window._editarColab = async (id) => {
   v('rc-banco', c.banco); v('rc-agencia', c.banco_agencia); v('rc-conta', c.banco_conta);
 
   el('rc-desligamento').hidden = c.situacao !== 'DESLIGADO';
-  el('rc-bloco-acesso').hidden = true;        // acesso ao painel muda na aba Equipe
-  el('rc-acesso-senha').hidden = true;
+
+  // Numa ficha que já existe, criar login de novo duplicaria a conta: o que
+  // resta é mostrar o acesso atual ou vincular um que já exista.
+  const acesso = allTeam.find(m => m.id === c.profile_id);
+  el('rc-acesso-novo').hidden = true;
+  el('rc-acesso-vincular').hidden = Boolean(acesso);
+  el('rc-acesso-atual').hidden = !acesso;
+  el('rc-acesso').value = acesso ? '' : 'VINCULAR';
+  el('rc-acesso').disabled = Boolean(acesso);
+  if (acesso) {
+    el('rc-acesso-nome').textContent = (acesso.nickname || acesso.name) + ' · ' + (PERFIS[acesso.perfil]?.label || 'sem perfil');
+    el('rc-acesso-nota').textContent = acesso.email || '';
+  } else {
+    montarAcessosLivres();
+  }
   document.querySelectorAll('#rc-abas .so-edicao').forEach(b => b.hidden = false);
   el('rc-encerrar').hidden = false;
   el('rc-titulo').textContent = c.nome;
@@ -2516,8 +2578,14 @@ window._salvarColab = async () => {
 
   const acesso = val('rc-acesso');
   const senha  = val('rc-senha');
-  if (!rcEditId && acesso && senha.length < 8) { rcAba('pessoais'); return rcSet('A senha provisória precisa ter pelo menos 8 caracteres.'); }
-  if (!rcEditId && acesso && !val('rc-email')) { rcAba('pessoais'); return rcSet('Informe o e-mail: é por ele que a pessoa entra no painel.'); }
+  if (!rcEditId && acesso === 'NOVO') {
+    if (senha.length < 8)          { rcAba('acesso'); return rcSet('A senha provisória precisa ter pelo menos 8 caracteres.'); }
+    if (senha !== val('rc-senha2')){ rcAba('acesso'); return rcSet('As duas senhas não são iguais.'); }
+    if (!val('rc-email'))          { rcAba('acesso'); return rcSet('Informe o e-mail: é por ele que a pessoa entra no painel.'); }
+  }
+  if (acesso === 'VINCULAR' && !val('rc-vinculo-acesso')) {
+    rcAba('acesso'); return rcSet('Escolha o acesso a vincular, ou deixe sem acesso.');
+  }
 
   const desligado = val('rc-situacao') === 'DESLIGADO';
   const dados = {
@@ -2567,8 +2635,10 @@ window._salvarColab = async () => {
     }
     await registrarRh('ALTEROU', 'Colaborador', nome, rcEditId);
   } else {
-    // Com acesso ao painel: cria o login antes, para gravar o vínculo junto.
-    if (acesso) {
+    if (acesso === 'VINCULAR') dados.profile_id = val('rc-vinculo-acesso');
+
+    // Com acesso novo: cria o login antes, para gravar o vínculo junto.
+    if (acesso === 'NOVO') {
       const { data, error } = await createSignupClient().auth.signUp({
         email: val('rc-email'), password: senha,
         options: { data: { signup_type: 'equipe', name: nome, nickname: nome.split(' ')[0] } },
@@ -2582,10 +2652,11 @@ window._salvarColab = async () => {
       const { error: pErro } = await supabase.from('profiles').upsert({
         id: data.user.id, email: val('rc-email'), name: nome, nickname: nome.split(' ')[0],
         phone: val('rc-telefone') || null, birth_date: val('rc-nascimento') || null,
-        role: acesso, status: 'ativo',
+        perfil: el('rc-perfil').value, status: 'ativo', senha_provisoria: true,
       }, { onConflict: 'id' });
       if (pErro) { fim(); return rcSet('Acesso criado, mas o perfil falhou: ' + pErro.message); }
       dados.profile_id = data.user.id;
+      await registrarAcesso('ACESSO', `${nome} cadastrado como ${PERFIS[el('rc-perfil').value].label}`);
     }
 
     const { data: criado, error } = await supabase.from('rh_colaboradores').insert(dados).select('id').single();
@@ -2596,7 +2667,9 @@ window._salvarColab = async () => {
 
   await loadRh();
   fim();
-  rcSet(rcEditId ? 'Alterações salvas.' : 'Colaborador cadastrado.' + (acesso ? ' Envie a senha provisória por um canal privado.' : ''), 'success');
+  await loadEquipe();
+  rcSet(rcEditId ? 'Alterações salvas.'
+    : 'Colaborador cadastrado.' + (acesso === 'NOVO' ? ' Envie a senha provisória por um canal privado.' : ''), 'success');
   if (!rcEditId) setTimeout(() => closeModal('modal-rh-colab'), 1600);
 };
 
@@ -2789,13 +2862,19 @@ async function carregarHistorico(id) {
 }
 
 /* ── folha de pagamento ── */
+// Rascunho é onde se monta; em apuração, onde se confere; aprovada é a
+// decisão; aguardando pagamento é com o Financeiro. Juntar aprovar e pagar
+// numa etapa só esconderia de quem a folha está esperando.
 const FOLHA_STATUS = {
   RASCUNHO:             { label: 'Rascunho',              cls: 'status-pending' },
+  EM_APURACAO:          { label: 'Em apuração',           cls: 'status-pending' },
   AGUARDANDO_APROVACAO: { label: 'Aguardando aprovação',  cls: 'status-analysis' },
-  APROVADA:             { label: 'Aguardando pagamento',  cls: 'status-analysis' },
+  APROVADA:             { label: 'Aprovada',              cls: 'status-analysis' },
+  AGUARDANDO_PAGAMENTO: { label: 'Aguardando pagamento',  cls: 'status-analysis' },
   PAGA:                 { label: 'Paga',                  cls: 'status-done' },
   CANCELADA:            { label: 'Cancelada',             cls: 'status-cancelado' },
 };
+const FOLHA_TRILHA = ['RASCUNHO','EM_APURACAO','AGUARDANDO_APROVACAO','APROVADA','AGUARDANDO_PAGAMENTO','PAGA'];
 const PROVENTOS = {
   HORAS_EXTRAS:'Horas extras', ADICIONAL_NOTURNO:'Adicional noturno', COMISSAO:'Comissão',
   BONUS:'Bônus / premiação', OUTROS:'Outros proventos',
@@ -2947,16 +3026,31 @@ function renderFolhaDetalhe() {
   const botoes = [`<button class="team-btn" onclick="window._demonstrativos()">Demonstrativos</button>`];
   if (f.status === 'RASCUNHO') botoes.push(
     `<button class="team-btn" onclick="window._recalcularFolha()">Recalcular</button>`,
-    `<button class="team-btn approve" onclick="window._mudarFolha('AGUARDANDO_APROVACAO')">Enviar para aprovação</button>`,
+    `<button class="team-btn approve" onclick="window._mudarFolha('EM_APURACAO')">Fechar lançamentos</button>`,
     `<button class="team-btn danger" onclick="window._cancelarFolha()">Cancelar</button>`);
+  if (f.status === 'EM_APURACAO') botoes.push(
+    `<button class="team-btn" onclick="window._recalcularFolha()">Recalcular</button>`,
+    `<button class="team-btn approve" onclick="window._mudarFolha('AGUARDANDO_APROVACAO')">Enviar para aprovação</button>`,
+    `<button class="team-btn danger" onclick="window._mudarFolha('RASCUNHO')">Voltar para rascunho</button>`);
   if (f.status === 'AGUARDANDO_APROVACAO') botoes.push(
     `<button class="team-btn" onclick="window._recalcularFolha()">Recalcular</button>`,
     `<button class="team-btn approve" onclick="window._aprovarFolha()">✓ Aprovar folha</button>`,
-    `<button class="team-btn danger" onclick="window._mudarFolha('RASCUNHO')">Voltar para rascunho</button>`);
+    `<button class="team-btn danger" onclick="window._mudarFolha('EM_APURACAO')">Devolver para apuração</button>`);
   if (f.status === 'APROVADA') botoes.push(
+    `<button class="team-btn approve" onclick="window._mudarFolha('AGUARDANDO_PAGAMENTO')">Enviar para pagamento</button>`,
+    `<button class="team-btn" onclick="window._reabrirFolha()">Reabrir para ajuste</button>`,
+    `<button class="team-btn danger" onclick="window._cancelarFolha()">Cancelar</button>`);
+  if (f.status === 'AGUARDANDO_PAGAMENTO') botoes.push(
     `<button class="team-btn" onclick="window._reabrirFolha()">Reabrir para ajuste</button>`,
     `<button class="team-btn danger" onclick="window._cancelarFolha()">Cancelar</button>`);
   el('fd-acoes').innerHTML = botoes.join('');
+
+  const etapa = FOLHA_TRILHA.indexOf(f.status);
+  el('fd-trilha').innerHTML = f.status === 'CANCELADA'
+    ? '<div class="sup-aviso">Folha cancelada. O histórico fica, os lançamentos não valem.</div>'
+    : FOLHA_TRILHA.map((e, i) => `<div class="sup-etapa${i <= etapa && etapa >= 0 ? ' feita' : ''}">
+        <div class="sup-barra"></div>
+        <div class="sup-rotulo">${FOLHA_STATUS[e].label}</div></div>`).join('');
 
   el('fd-resumo').innerHTML = [
     { label: 'Folha bruta', valor: moeda(t.bruto), nota: `${folhaItens.length} colaborador(es)`, cor: 'var(--text)' },
@@ -2969,8 +3063,8 @@ function renderFolhaDetalhe() {
       <div style="font-size:11px;color:var(--text-dim);margin-top:4px">${c.nota}</div>
     </div>`).join('');
 
-  const podeAjustar = ['RASCUNHO', 'AGUARDANDO_APROVACAO'].includes(f.status);
-  const podePagar = f.status === 'APROVADA';
+  const podeAjustar = ['RASCUNHO', 'EM_APURACAO', 'AGUARDANDO_APROVACAO'].includes(f.status);
+  const podePagar = ['APROVADA', 'AGUARDANDO_PAGAMENTO'].includes(f.status);
 
   el('fd-itens').innerHTML = folhaItens.length ? folhaItens.map(i => {
     const pago = i.status_pagamento === 'PAGO';
@@ -3004,7 +3098,7 @@ function renderFolhaDetalhe() {
 
 async function carregarLancamentosFolha() {
   const card = el('fd-lancamentos-card');
-  if (!['APROVADA', 'PAGA'].includes(folhaAberta.status)) { card.hidden = true; return; }
+  if (!['APROVADA', 'AGUARDANDO_PAGAMENTO', 'PAGA'].includes(folhaAberta.status)) { card.hidden = true; return; }
 
   const { data } = await supabase.from('rh_custos').select('*').eq('folha_id', folhaAberta.id).order('tipo');
   const liquidos = somarFolha(folhaItens).liquido;
@@ -3380,7 +3474,7 @@ async function loadFinPessoal() {
   finCustos = custos.data || [];
   const porFolha = Object.fromEntries(rhFolhas.map(f => [f.id, f]));
   finSalarios = (itens.data || [])
-    .filter(i => ['APROVADA', 'PAGA'].includes(porFolha[i.folha_id]?.status))
+    .filter(i => ['APROVADA', 'AGUARDANDO_PAGAMENTO', 'PAGA'].includes(porFolha[i.folha_id]?.status))
     .map(i => ({ ...i, competencia: porFolha[i.folha_id].competencia, vencimento: porFolha[i.folha_id].vencimento }));
 
   const competencias = [...new Set([...finCustos, ...finSalarios].map(x => x.competencia))].sort().reverse();
@@ -4032,7 +4126,10 @@ function telaRemuneracao() {
     </div>
     ${beneficios}
 
-    <div class="card-title" style="margin:22px 0 10px">Histórico de pagamentos</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:22px 0 10px">
+      <div class="card-title" style="margin:0">Demonstrativos de pagamento</div>
+      ${meusHolerites.length ? '<button class="team-btn" onclick="window._meusDemonstrativos()">Baixar todos</button>' : ''}
+    </div>
     <div class="card">
       <div class="table-scroll">
         <table class="data-table">
@@ -4058,6 +4155,15 @@ function telaRemuneracao() {
     </div>
     <button class="btn btn-outline" onclick="window._novaSolicitacao('FINANCEIRO')">Questionar remuneração ou desconto</button>`;
 }
+
+// Todos os meses de uma vez, dois por folha A4, como a Gestão de Pessoas emite.
+window._meusDemonstrativos = () => {
+  if (!meusHolerites.length) return;
+  const anterior = folhaAberta;
+  const paginas = meusHolerites.map(h => { folhaAberta = h.folha; return htmlDemonstrativo(h); }).join('');
+  folhaAberta = anterior;
+  abrirImpressao(paginas, 'meus-demonstrativos');
+};
 
 // O demonstrativo usa a competência da folha do próprio holerite.
 window._meuDemonstrativo = (i) => {
@@ -5928,6 +6034,11 @@ const SUP_STATUS = {
 // A trilha mostra o caminho normal do chamado; cancelado sai dela.
 const SUP_TRILHA = ['ABERTO', 'EM_ATENDIMENTO', 'AGUARDANDO_RESPOSTA', 'CONCLUIDO'];
 const SUP_PRIORIDADE = { ALTA:'Alta', MEDIA:'Média', BAIXA:'Baixa' };
+// Prazo de PRIMEIRA resposta, em dias úteis. O banco calcula a data ao
+// abrir o chamado; aqui a tabela serve para mostrar e para avisar.
+const SUP_SLA = { ERRO: 1, FINANCEIRO: 1, SUGESTAO: 3, FUNCIONALIDADE: 3, ELOGIO: null };
+const SLA_TEXTO = d => d === null ? 'Sem prazo' : d === 1 ? '1 dia útil' : d + ' dias úteis';
+
 const NOTA_RESPOSTA = {
   RESPOSTA:     'Vai para o cliente e muda a situação para "Em atendimento".',
   SOLICITACAO:  'Pede algo ao cliente e muda a situação para "Aguardando resposta".',
@@ -5949,12 +6060,25 @@ async function loadSuporte() {
   el('sup-tipo').innerHTML = '<option value="">Todos</option>' + opcoes(SUP_TIPO);
   el('sup-situacao').innerHTML = '<option value="">Todas</option>' + opcoes(SUP_STATUS);
   el('sf-prioridade').innerHTML = opcoes(SUP_PRIORIDADE);
-  el('sf-situacao').innerHTML = opcoes(SUP_STATUS);
+  // Cancelar é do cliente: a equipe conclui. Deixar a opção aqui convidaria
+  // a encerrar chamado alheio sem o cliente saber.
+  el('sf-situacao').innerHTML = Object.entries(SUP_STATUS)
+    .filter(([v]) => v !== 'CANCELADO')
+    .map(([v, s]) => `<option value="${v}">${s.label}</option>`).join('');
 
   const nomes = [...new Set(supChamados.map(t => t.responsavel_nome).filter(Boolean))];
   el('sup-responsavel').innerHTML = '<option value="">Todos</option>'
     + '<option value="__sem">Sem responsável</option>'
     + nomes.map(n => `<option value="${esc(n)}">${esc(n)}</option>`).join('');
+
+  el('sup-cliente').innerHTML = '<option value="">Todos</option>'
+    + allClients.map(c => `<option value="${c.id}">${esc(c.company || c.name)}</option>`).join('');
+
+  if (!val('sup-de')) {
+    const trinta = new Date(Date.now() - 30 * 86400000);
+    el('sup-de').value = trinta.toISOString().slice(0, 10);
+    el('sup-ate').value = new Date().toISOString().slice(0, 10);
+  }
 
   const equipe = allTeam.filter(m => m.status === 'ativo');
   el('sf-responsavel').innerHTML = '<option value="">Sem responsável (na fila)</option>'
@@ -5964,14 +6088,18 @@ async function loadSuporte() {
 }
 
 function supFiltrados() {
-  const dias = val('sup-periodo'), tipo = val('sup-tipo'), situacao = val('sup-situacao');
-  const resp = val('sup-responsavel'), busca = val('sup-busca').toLowerCase();
-  const limite = dias ? Date.now() - Number(dias) * 86400000 : 0;
+  const de = val('sup-de'), ate = val('sup-ate');
+  const tipo = val('sup-tipo'), situacao = val('sup-situacao');
+  const cliente = val('sup-cliente'), resp = val('sup-responsavel');
+  const busca = val('sup-busca').toLowerCase();
 
   return supChamados.filter(t => {
-    if (limite && new Date(t.created_at) < limite) return false;
+    const aberto = (t.created_at || '').slice(0, 10);
+    if (de && aberto < de) return false;
+    if (ate && aberto > ate) return false;
     if (tipo && t.type !== tipo) return false;
     if (situacao && t.status !== situacao) return false;
+    if (cliente && t.client_id !== cliente) return false;
     if (resp === '__sem' && t.responsavel_nome) return false;
     if (resp && resp !== '__sem' && t.responsavel_nome !== resp) return false;
     if (busca) {
@@ -5981,6 +6109,15 @@ function supFiltrados() {
     }
     return true;
   });
+}
+
+// O prazo só conta até a primeira resposta: depois dela o SLA já foi
+// cumprido, mesmo que o chamado siga aberto por semanas.
+function noPrazo(t) {
+  if (!t.prazo || t.primeira_resposta_em) return null;
+  if (['CONCLUIDO','CANCELADO'].includes(t.status)) return null;
+  const falta = Math.ceil((new Date(t.prazo) - Date.now()) / 86400000);
+  return falta < 0 ? 'estourado' : falta <= 1 ? 'perto' : 'dentro';
 }
 
 function renderSuporte() {
@@ -5993,7 +6130,8 @@ function renderSuporte() {
     { label: 'Esperando a equipe',  valor: conta(t => t.aguardando_equipe && !['CONCLUIDO','CANCELADO'].includes(t.status)), cor: 'var(--orange)' },
     { label: 'Em atendimento',      valor: conta(t => t.status === 'EM_ATENDIMENTO'), cor: 'var(--text)' },
     { label: 'Aguardando o cliente',valor: conta(t => t.status === 'AGUARDANDO_RESPOSTA'), cor: 'var(--text)' },
-    { label: 'Prazo excedido',      valor: conta(t => t.prazo && t.prazo < hoje && !['CONCLUIDO','CANCELADO'].includes(t.status)), cor: 'var(--red)' },
+    { label: 'Próximos do prazo',   valor: conta(t => noPrazo(t) === 'perto'), cor: 'var(--orange)' },
+    { label: 'Prazo excedido',      valor: conta(t => noPrazo(t) === 'estourado'), cor: 'var(--red)' },
     { label: 'Concluídos',          valor: conta(t => t.status === 'CONCLUIDO'), cor: 'var(--green)' },
   ];
   el('sup-contadores').innerHTML = cartoes.map(c => `<div class="resumo-card" style="text-align:left">
@@ -6006,7 +6144,7 @@ function renderSuporte() {
     const st = SUP_STATUS[t.status] || { label: t.status, cls: '' };
     // A última palavra é do cliente: destaque, porque é o que para a fila.
     const espera = t.aguardando_equipe && !['CONCLUIDO','CANCELADO'].includes(t.status);
-    const atrasado = t.prazo && t.prazo < hoje && !['CONCLUIDO','CANCELADO'].includes(t.status);
+    const prazo = noPrazo(t);
     return `<tr class="rh-linha${espera ? ' sup-espera' : ''}" onclick="window._abrirChamado('${t.id}')">
       <td><span class="ticket-id">${numeroChamado(t)}</span></td>
       <td style="font-weight:600">${esc(cl?.company || cl?.name || '—')}</td>
@@ -6015,7 +6153,10 @@ function renderSuporte() {
       <td><span class="status ${t.prioridade === 'ALTA' ? 'status-expirado' : 'status-pending'}">${SUP_PRIORIDADE[t.prioridade] || t.prioridade}</span></td>
       <td style="color:var(--text-dim)">${SUP_TIPO[t.type] || t.type}</td>
       <td><span class="status ${st.cls}">${st.label}</span></td>
-      <td style="font-size:12px;${atrasado ? 'color:var(--red);font-weight:600' : 'color:var(--text-dim)'}">${t.prazo ? fmtDate(t.prazo) : 'Sem prazo'}</td>
+      <td style="font-size:12px;${prazo === 'estourado' ? 'color:var(--red);font-weight:600'
+        : prazo === 'perto' ? 'color:var(--orange);font-weight:600' : 'color:var(--text-dim)'}">${
+        t.prazo ? fmtDate(t.prazo) : 'Sem prazo'}
+        <div class="rh-item-sub">${t.primeira_resposta_em ? 'respondido' : prazo === 'estourado' ? 'vencido' : 'resposta'}</div></td>
       <td style="color:var(--text-dim);font-size:12px">${fmtDate(t.created_at)}</td>
       <td style="color:var(--text-dim);font-size:12px">${diasDesde(t.created_at)} dias</td>
     </tr>`;
@@ -6027,8 +6168,8 @@ function renderSuporte() {
   if (badge) { badge.textContent = pendentes || ''; badge.style.display = pendentes ? '' : 'none'; }
 }
 
-['sup-periodo','sup-tipo','sup-situacao','sup-responsavel','sup-busca'].forEach(id =>
-  el(id).addEventListener('input', renderSuporte));
+['sup-de','sup-ate','sup-tipo','sup-situacao','sup-cliente','sup-responsavel','sup-busca']
+  .forEach(id => el(id).addEventListener('input', renderSuporte));
 
 /* ── ficha do chamado ── */
 window._voltarSuporte = () => {
@@ -6070,7 +6211,21 @@ function renderFichaChamado() {
 
   el('sf-responsavel').value = t.responsavel_id || '';
   el('sf-prioridade').value = t.prioridade || 'MEDIA';
+  // Um chamado cancelado pelo cliente não volta atrás pelo painel.
+  const cancelado = t.status === 'CANCELADO';
+  el('sf-situacao').innerHTML = (cancelado ? '<option value="CANCELADO">Cancelado</option>' : '')
+    + Object.entries(SUP_STATUS).filter(([v]) => v !== 'CANCELADO')
+        .map(([v, s]) => `<option value="${v}">${s.label}</option>`).join('');
   el('sf-situacao').value = t.status;
+  ['sf-situacao','sf-prioridade','sf-responsavel','sf-enviar'].forEach(id => el(id).disabled = cancelado);
+  const prazoFicha = noPrazo(t);
+  el('sf-sla').innerHTML = `Prazo de primeira resposta: <strong>${SLA_TEXTO(SUP_SLA[t.type])}</strong>`
+    + (t.prazo ? ` · vence em ${fmtDate(t.prazo)}` : '')
+    + (t.primeira_resposta_em
+        ? ` · <span style="color:var(--green)">respondido em ${fmtDateTime(t.primeira_resposta_em)}</span>`
+        : prazoFicha === 'estourado' ? ' · <span style="color:var(--red)">prazo vencido</span>'
+        : prazoFicha === 'perto' ? ' · <span style="color:var(--orange)">vence em menos de um dia</span>' : '');
+
   el('sf-situacao-nota').textContent = t.status === 'CONCLUIDO'
     ? 'Concluído: o cliente ainda pode responder e reabrir a conversa.'
     : 'Mudar aqui avisa o cliente no portal dele.';
@@ -6194,7 +6349,9 @@ window._responderChamado = async () => {
   let anexo = null;
   const arquivo = el('sf-anexo-envio').files[0];
   if (arquivo) {
-    if (arquivo.size > 10 * 1024 * 1024) { fim(); return supSet('O anexo precisa ter no máximo 10 MB.'); }
+    if (arquivo.size > 3 * 1024 * 1024) { fim(); return supSet('O anexo precisa ter no máximo 3 MB.'); }
+    const jaTem = supMensagens.filter(m => m.anexo).length + (supAberto.anexo ? 1 : 0);
+    if (jaTem >= 10) { fim(); return supSet('Este chamado já tem 10 anexos, o limite.'); }
     const caminho = `${supAberto.client_id}/${Date.now()}-${arquivo.name.replace(/[^\w.\-]/g, '_')}`;
     const { error } = await supabase.storage.from('suporte-anexos').upload(caminho, arquivo);
     if (error) { fim(); return supSet('Não foi possível enviar o anexo: ' + error.message); }

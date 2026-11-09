@@ -438,12 +438,16 @@
               <div class="section-title" style="margin:0" id="cf-numero">Chamado</div>
               <div class="section-sub" style="margin:4px 0 0" id="cf-sub"></div>
             </div>
-            <button class="btn btn-outline" onclick="window._voltarChamados()">&larr; Voltar</button>
+            <div class="team-actions">
+              <button class="team-btn danger" id="cf-cancelar" onclick="window._cancelarChamado()">Cancelar chamado</button>
+              <button class="btn btn-outline" onclick="window._voltarChamados()">&larr; Voltar</button>
+            </div>
           </div>
 
           <div class="card" style="margin-bottom:18px">
             <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:14px" id="cf-marcas"></div>
             <div class="sup-trilha" id="cf-trilha"></div>
+            <div class="sup-aviso" id="cf-sla" style="margin-top:14px"></div>
             <div style="margin:16px 0 6px;font-size:13px;line-height:1.7" id="cf-descricao"></div>
             <div class="sup-aviso" id="cf-anexo"></div>
           </div>
@@ -960,6 +964,8 @@ const CS_STATUS = {
   CANCELADO:           { label: 'Cancelado',           cls: 'status-cancelado' },
 };
 const CS_TRILHA = ['ABERTO', 'EM_ATENDIMENTO', 'AGUARDANDO_RESPOSTA', 'CONCLUIDO'];
+const CS_SLA = { ERRO: 1, FINANCEIRO: 1, SUGESTAO: 3, FUNCIONALIDADE: 3, ELOGIO: null };
+const CS_SLA_TEXTO = d => d === null ? 'Sem prazo' : d === 1 ? '1 dia útil' : d + ' dias úteis';
 
 let csChamados = [], csAberto = null, csMensagens = [], csMontado = false;
 
@@ -1056,6 +1062,16 @@ window._abrirChamadoCliente = async (id) => {
       <div class="sup-rotulo">${CS_STATUS[etapa].label}</div>
     </div>`).join('');
 
+  csEl('cf-sla').innerHTML = `Prazo de primeira resposta: <strong>${CS_SLA_TEXTO(CS_SLA[t.type])}</strong>`
+    + (t.primeira_resposta_em
+        ? ` · respondido em ${formatDate(t.primeira_resposta_em)}`
+        : t.prazo ? ` · até ${formatDate(t.prazo)}` : '');
+
+  // Cancelado encerra o caminho: o chamado fica no histórico como está.
+  const cancelado = t.status === 'CANCELADO';
+  csEl('cf-envio').hidden = cancelado;
+  csEl('cf-cancelar').hidden = cancelado || t.status === 'CONCLUIDO';
+
   csEl('cf-descricao').textContent = t.description || '(sem descrição)';
   csEl('cf-anexo').innerHTML = t.anexo
     ? `<button class="cbo-link" onclick="window._verAnexoChamado('${t.anexo}')">Ver arquivo que você anexou</button>`
@@ -1084,6 +1100,16 @@ window._abrirChamadoCliente = async (id) => {
   }).join('');
 };
 
+window._cancelarChamado = async () => {
+  if (!confirm('Cancelar este chamado? Ele fica no histórico e não recebe mais respostas.')) return;
+  const { error } = await supabase.from('tickets')
+    .update({ status: 'CANCELADO' }).eq('id', csAberto.id);
+  if (error) return csMsg('Não foi possível cancelar: ' + error.message);
+  await carregarChamados();
+  await window._abrirChamadoCliente(csAberto.id);
+  csMsg('Chamado cancelado.', 'info');
+};
+
 window._verAnexoChamado = async (caminho) => {
   const { data, error } = await supabase.storage.from('suporte-anexos').createSignedUrl(caminho, 60);
   if (error) return alert('Não foi possível abrir: ' + error.message);
@@ -1093,7 +1119,7 @@ window._verAnexoChamado = async (caminho) => {
 async function enviarAnexoChamado(input) {
   const arquivo = input.files[0];
   if (!arquivo) return { caminho: null };
-  if (arquivo.size > 10 * 1024 * 1024) return { erro: 'O anexo precisa ter no máximo 10 MB.' };
+  if (arquivo.size > 3 * 1024 * 1024) return { erro: 'O anexo precisa ter no máximo 3 MB.' };
   // O caminho começa com o id do cliente: é assim que a política do bucket autoriza.
   const caminho = `${userId}/${Date.now()}-${arquivo.name.replace(/[^\w.\-]/g, '_')}`;
   const { error } = await supabase.storage.from('suporte-anexos').upload(caminho, arquivo);
