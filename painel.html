@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/portal.css?v=21">
+  <link rel="stylesheet" href="css/portal.css?v=22">
   <style>
     .admin-badge {
       font-size: 9px; font-weight: 800;
@@ -440,66 +440,261 @@
 
       <!-- ════════════ PROJETOS ════════════ -->
       <section class="tab-section" id="tab-projetos">
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:14px;margin-bottom:20px">
-          <div>
-            <div class="section-title">Projetos</div>
-            <div class="section-sub" style="margin-bottom:0">Pedidos e projetos em andamento, por ordem de solicitação</div>
+        <!-- ══ lista ══ -->
+        <div id="pj-lista">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:14px;margin-bottom:18px">
+            <div>
+              <div class="section-title">Projetos</div>
+              <div class="section-sub" style="margin-bottom:0">Serviços contratados, etapas de execução e acompanhamento manual do progresso.</div>
+            </div>
+            <button class="btn btn-primary" onclick="window._novoProjeto()">
+              <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Novo projeto
+            </button>
           </div>
-          <button class="btn btn-primary" onclick="window._novoProjeto()">
-            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            Novo projeto
-          </button>
+
+          <nav class="rh-abas" id="pj-abas">
+            <button class="rh-aba active" data-pj="ativos">Projetos ativos</button>
+            <button class="rh-aba" data-pj="indicadores">Indicadores</button>
+            <button class="rh-aba" data-pj="encerrados">Histórico</button>
+          </nav>
+
+          <!-- ── ativos ── -->
+          <div class="rh-painel active" id="pj-ativos">
+            <div class="card" style="margin-bottom:18px">
+              <div class="sup-filtros">
+                <div class="form-group" style="margin:0"><label>Cliente</label>
+                  <select id="pj-f-cliente"><option value="">Todos</option></select></div>
+                <div class="form-group" style="margin:0"><label>Categoria</label>
+                  <select id="pj-f-categoria"><option value="">Todas</option></select></div>
+                <div class="form-group" style="margin:0"><label>Situação</label>
+                  <select id="pj-f-status"><option value="">Todas</option></select></div>
+                <div class="form-group" style="margin:0"><label>Responsável</label>
+                  <select id="pj-f-responsavel"><option value="">Todos</option></select></div>
+              </div>
+              <div class="form-group" style="margin:12px 0 0"><label>Pesquisar</label>
+                <input type="text" id="pj-f-busca" placeholder="Código, nome do projeto ou cliente"></div>
+            </div>
+
+            <div class="card">
+              <div class="table-scroll">
+                <table class="data-table">
+                  <thead><tr><th>Código</th><th>Projeto</th><th>Cliente</th><th>Serviço</th><th>Responsável</th><th>Progresso</th><th>Entrega</th><th>Situação</th></tr></thead>
+                  <tbody id="pj-body"></tbody>
+                </table>
+              </div>
+            </div>
+            <div class="rh-bloco-texto" style="margin-top:12px">Linhas destacadas estão fora do prazo previsto de entrega.</div>
+          </div>
+
+          <!-- ── indicadores ── -->
+          <div class="rh-painel" id="pj-indicadores">
+            <div class="sup-contadores" id="pj-numeros" style="margin-bottom:18px"></div>
+            <div class="grid-2" style="align-items:start">
+              <div class="card">
+                <div class="card-title" style="margin-bottom:10px">Por categoria</div>
+                <div id="pj-por-categoria"></div>
+              </div>
+              <div class="card">
+                <div class="card-title" style="margin-bottom:10px">Por responsável</div>
+                <div id="pj-por-responsavel"></div>
+              </div>
+            </div>
+            <div class="card" style="margin-top:18px">
+              <div class="card-title" style="margin-bottom:10px">Prazos</div>
+              <div id="pj-prazos"></div>
+            </div>
+          </div>
+
+          <!-- ── encerrados ── -->
+          <div class="rh-painel" id="pj-encerrados">
+            <div class="card">
+              <div class="table-scroll">
+                <table class="data-table">
+                  <thead><tr><th>Código</th><th>Projeto</th><th>Cliente</th><th>Serviço</th><th>Entrega prevista</th><th>Encerrado em</th><th>Situação</th></tr></thead>
+                  <tbody id="pj-encerrados-body"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div class="card" style="margin-bottom:18px">
-          <div class="proj-filtros">
-            <div class="form-group" style="margin:0">
-              <label>Cliente ou empresa</label>
-              <input type="text" id="fp-cliente" placeholder="Buscar...">
+        <!-- ══ ficha do projeto ══ -->
+        <div id="pj-ficha" hidden>
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:18px">
+            <div>
+              <div class="section-title" style="margin:0" id="pf-nome">Projeto</div>
+              <div class="section-sub" style="margin:4px 0 0" id="pf-sub"></div>
             </div>
-            <div class="form-group" style="margin:0">
-              <label>Tipo</label>
-              <select id="fp-tipo"><option value="">Todos</option></select>
+            <div class="team-actions">
+              <button class="team-btn" onclick="window._baixarProjetoPdf()">Baixar PDF</button>
+              <button class="team-btn" onclick="window._editarProjeto()">Editar cadastro</button>
+              <button class="btn btn-outline" onclick="window._voltarProjetos()">← Voltar</button>
             </div>
-            <div class="form-group" style="margin:0">
-              <label>Status</label>
-              <select id="fp-status">
-                <option value="">Todos</option>
-                <option value="cadastrado">Cadastrado</option>
-                <option value="andamento">Andamento</option>
-                <option value="pausado">Pausado</option>
-                <option value="cancelado">Cancelado</option>
-                <option value="concluido">Concluído</option>
-              </select>
-            </div>
-            <div class="form-group" style="margin:0">
-              <label>Solicitado de</label>
-              <input type="date" id="fp-de">
-            </div>
-            <div class="form-group" style="margin:0">
-              <label>até</label>
-              <input type="date" id="fp-ate">
-            </div>
-            <button class="btn btn-outline" style="height:42px" onclick="window._limparFiltros()">Limpar</button>
           </div>
-        </div>
 
-        <div class="card">
-          <div class="table-scroll">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>Solicitado em</th>
-                  <th>Cliente</th>
-                  <th>Projeto</th>
-                  <th>Tipo</th>
-                  <th>Progresso</th>
-                  <th>Status</th>
-                  <th>Ações</th>
-                </tr>
-              </thead>
-              <tbody id="projetos-body"></tbody>
-            </table>
+          <div class="sup-cartoes" style="margin-bottom:18px">
+            <div class="card">
+              <div class="resumo-label">Progresso geral</div>
+              <div class="resumo-valor" style="font-size:24px;text-align:left" id="pf-progresso">0%</div>
+              <div class="progress-bar" style="margin-top:8px"><div class="progress-bar-fill" id="pf-barra" style="width:0%"></div></div>
+              <div class="rh-item-sub" id="pf-etapas-feitas">0 de 0 etapas</div>
+            </div>
+            <div class="card">
+              <div class="resumo-label">Situação do projeto</div>
+              <select id="pf-status" style="margin-top:6px"></select>
+              <div class="rh-item-sub" id="pf-status-nota"></div>
+            </div>
+            <div class="card">
+              <div class="resumo-label">Responsável</div>
+              <select id="pf-responsavel" style="margin-top:6px"></select>
+              <div class="rh-item-sub">Quem responde pelo projeto.</div>
+            </div>
+            <div class="card">
+              <div class="resumo-label">Entrega prevista</div>
+              <input type="date" id="pf-entrega" style="margin-top:6px">
+              <div class="rh-item-sub" id="pf-prazo-nota"></div>
+            </div>
+          </div>
+
+          <nav class="rh-abas" id="pf-abas">
+            <button class="rh-aba active" data-pf="visao">Visão geral</button>
+            <button class="rh-aba" data-pf="etapas">Etapas e progresso</button>
+            <button class="rh-aba" data-pf="tarefas">Tarefas</button>
+            <button class="rh-aba" data-pf="cronograma">Cronograma</button>
+            <button class="rh-aba" data-pf="documentos">Documentos</button>
+            <button class="rh-aba" data-pf="atualizacoes">Atualizações</button>
+            <button class="rh-aba" data-pf="comunicacao">Comunicação</button>
+            <button class="rh-aba" data-pf="historico">Histórico</button>
+          </nav>
+
+          <div class="rh-painel active" id="pf-p-visao">
+            <div class="grid-2" style="align-items:start">
+              <div class="card">
+                <div class="card-title" style="margin-bottom:12px">O projeto</div>
+                <div id="pf-dados"></div>
+              </div>
+              <div class="card">
+                <div class="card-title" style="margin-bottom:12px">Cliente</div>
+                <div id="pf-cliente"></div>
+              </div>
+            </div>
+            <div class="card" style="margin-top:18px">
+              <div class="card-title" style="margin-bottom:6px">Observações internas</div>
+              <div class="rh-bloco-texto">O cliente não vê este campo.</div>
+              <div class="form-group" style="margin-top:10px"><textarea id="pf-observacoes" placeholder="Anotações da equipe sobre o projeto."></textarea></div>
+              <button class="team-btn" onclick="window._salvarObservacoes()">Salvar observações</button>
+            </div>
+          </div>
+
+          <div class="rh-painel" id="pf-p-etapas">
+            <div class="rh-aviso">
+              Nada avança sozinho: o progresso de cada etapa é registrado pela equipe. O progresso
+              geral é a média das etapas, ponderada pelo peso de cada uma.
+            </div>
+            <div style="display:flex;justify-content:flex-end;gap:10px;margin-bottom:14px">
+              <button class="team-btn" onclick="window._aplicarModelo()">Aplicar modelo do serviço</button>
+              <button class="btn btn-primary" onclick="window._novaEtapa()">+ Nova etapa</button>
+            </div>
+            <div id="pf-etapas"></div>
+          </div>
+
+          <div class="rh-painel" id="pf-p-tarefas">
+            <div style="display:flex;justify-content:flex-end;margin-bottom:14px">
+              <button class="btn btn-primary" onclick="window._novaTarefa()">+ Nova tarefa</button>
+            </div>
+            <div id="pf-tarefas"></div>
+          </div>
+
+          <div class="rh-painel" id="pf-p-cronograma">
+            <div class="card">
+              <div class="card-title" style="margin-bottom:4px">Cronograma</div>
+              <div class="card-sub">Datas previstas e realizadas de cada etapa</div>
+              <div class="table-scroll" style="margin-top:12px">
+                <table class="data-table">
+                  <thead><tr><th>Etapa</th><th>Fase</th><th>Responsável</th><th>Início</th><th>Prazo</th><th>Conclusão</th><th>Situação</th></tr></thead>
+                  <tbody id="pf-cronograma"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div class="rh-painel" id="pf-p-documentos">
+            <div class="card" style="margin-bottom:18px">
+              <div class="card-title" style="margin-bottom:10px">Enviar arquivo</div>
+              <div class="form-row-2">
+                <div class="form-group"><label>Pasta</label><select id="pf-doc-pasta"></select></div>
+                <div class="form-group"><label>Arquivo</label><input type="file" id="pf-doc-arquivo"></div>
+              </div>
+              <label class="eq-perm" style="max-width:360px">
+                <input type="checkbox" id="pf-doc-publico" checked>
+                <span>Visível para o cliente
+                  <span class="rh-item-sub">Desmarque para guardar só na equipe.</span></span>
+              </label>
+              <button class="btn btn-primary" id="pf-doc-btn" style="margin-top:12px" onclick="window._enviarDocumento()">Enviar</button>
+              <div class="form-msg" id="pf-doc-msg" role="alert"></div>
+            </div>
+            <div id="pf-documentos"></div>
+          </div>
+
+          <div class="rh-painel" id="pf-p-atualizacoes">
+            <div class="card" style="margin-bottom:18px">
+              <div class="card-title" style="margin-bottom:10px">Registrar atualização</div>
+              <div class="form-group"><label>Título</label><input type="text" id="pf-at-titulo" maxlength="120" placeholder="Ex.: Layout da home aprovado"></div>
+              <div class="form-group"><label>Descrição</label><textarea id="pf-at-descricao"></textarea></div>
+              <div class="form-row-2">
+                <div class="form-group"><label>Etapa (opcional)</label><select id="pf-at-etapa"></select></div>
+                <div class="form-group"><label>Anexo (opcional)</label><input type="file" id="pf-at-anexo"></div>
+              </div>
+              <label class="eq-perm" style="max-width:360px">
+                <input type="checkbox" id="pf-at-publica" checked>
+                <span>Compartilhar com o cliente
+                  <span class="rh-item-sub">Desmarque para registrar só internamente.</span></span>
+              </label>
+              <button class="btn btn-primary" id="pf-at-btn" style="margin-top:12px" onclick="window._registrarAtualizacao()">Registrar</button>
+              <div class="form-msg" id="pf-at-msg" role="alert"></div>
+            </div>
+
+            <div class="card" style="margin-bottom:18px">
+              <div class="card-title" style="margin-bottom:10px">Pedir aprovação ao cliente</div>
+              <div class="form-row-2">
+                <div class="form-group"><label>Tipo</label><select id="pf-ap-tipo"></select></div>
+                <div class="form-group"><label>Prazo para resposta</label><input type="date" id="pf-ap-prazo"></div>
+              </div>
+              <div class="form-group"><label>Título</label><input type="text" id="pf-ap-titulo" maxlength="120"></div>
+              <div class="form-group"><label>O que o cliente precisa avaliar</label><textarea id="pf-ap-descricao"></textarea></div>
+              <div class="form-group"><label>Arquivo (opcional)</label><input type="file" id="pf-ap-anexo"></div>
+              <button class="btn btn-primary" id="pf-ap-btn" onclick="window._pedirAprovacao()">Solicitar aprovação</button>
+              <div class="form-msg" id="pf-ap-msg" role="alert"></div>
+            </div>
+
+            <div class="card" style="margin-bottom:18px">
+              <div class="card-title" style="margin-bottom:10px">Aprovações</div>
+              <div id="pf-aprovacoes"></div>
+            </div>
+
+            <div class="card">
+              <div class="card-title" style="margin-bottom:10px">Linha do tempo</div>
+              <div id="pf-atualizacoes" class="hist-lista"></div>
+            </div>
+          </div>
+
+          <div class="rh-painel" id="pf-p-comunicacao">
+            <div class="card">
+              <div class="card-title" style="margin-bottom:12px">Conversa do projeto</div>
+              <div id="pf-conversa" class="hist-lista"></div>
+              <div class="form-group" style="margin-top:16px"><textarea id="pf-msg-texto" placeholder="Escreva para o cliente."></textarea></div>
+              <div class="form-group"><label>Anexo (opcional)</label><input type="file" id="pf-msg-anexo"></div>
+              <button class="btn btn-primary" id="pf-msg-btn" onclick="window._enviarMensagemProjeto()">Enviar</button>
+              <div class="form-msg" id="pf-msg-aviso" role="alert"></div>
+            </div>
+          </div>
+
+          <div class="rh-painel" id="pf-p-historico">
+            <div class="card">
+              <div class="card-title" style="margin-bottom:10px">Tudo o que mudou</div>
+              <div id="pf-historico" class="hist-lista"></div>
+            </div>
           </div>
         </div>
       </section>
@@ -1339,64 +1534,6 @@
   </main>
 </div><!-- /portal-layout -->
 
-<!-- ══ MODAL: Atualizar Progresso ══ -->
-<div class="modal-overlay" id="modal-progress">
-  <div class="modal-box" style="max-width:400px">
-    <button class="modal-close" onclick="closeModal('modal-progress')">&times;</button>
-    <div class="modal-title">Atualizar progresso</div>
-    <div class="modal-sub" id="prog-modal-name">Projeto</div>
-    <input type="hidden" id="prog-id">
-    <div class="form-group">
-      <label>Percentual de conclusão</label>
-      <div class="range-wrap">
-        <input type="range" id="prog-slider" min="0" max="100" value="72" oninput="document.getElementById('prog-display').textContent=this.value+'%'">
-        <div class="range-val" id="prog-display">72%</div>
-      </div>
-    </div>
-    <div class="form-group">
-      <label>Fase atual</label>
-      <select id="prog-phase">
-        <option>Diagnóstico</option><option>Planejamento</option>
-        <option>Design & UX</option><option selected>Desenvolvimento</option>
-        <option>Testes & QA</option><option>Entregue</option>
-      </select>
-    </div>
-    <div style="display:flex;gap:10px">
-      <button class="btn btn-primary" style="flex:1;justify-content:center" onclick="saveProgress()">Salvar</button>
-      <button class="btn btn-outline" onclick="closeModal('modal-progress')">Cancelar</button>
-    </div>
-  </div>
-</div>
-
-<!-- ══ MODAL: Adicionar Atividade ══ -->
-<div class="modal-overlay" id="modal-activity">
-  <div class="modal-box" style="max-width:440px">
-    <button class="modal-close" onclick="closeModal('modal-activity')">&times;</button>
-    <div class="modal-title">Adicionar atividade</div>
-    <div class="modal-sub" id="act-modal-name">Registre uma atualização visível ao cliente</div>
-    <div class="form-group">
-      <label>Descrição da atividade</label>
-      <input type="text" id="act-text" placeholder="Ex: Módulo de relatórios financeiros concluído">
-    </div>
-    <div class="form-group">
-      <label>Tipo</label>
-      <select id="act-type">
-        <option value="orange">Entrega / Conclusão</option>
-        <option value="green">Aprovação</option>
-        <option value="blue">Início de etapa</option>
-        <option value="purple">Testes / QA</option>
-      </select>
-    </div>
-    <div style="display:flex;gap:10px">
-      <button class="btn btn-primary" style="flex:1;justify-content:center" onclick="saveActivity()">Publicar atividade</button>
-      <button class="btn btn-outline" onclick="closeModal('modal-activity')">Cancelar</button>
-    </div>
-    <div id="act-success" style="display:none;margin-top:12px;padding:10px 14px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:8px;font-size:12.5px;color:var(--green)">
-      ✓ Atividade publicada com sucesso no portal do cliente!
-    </div>
-  </div>
-</div>
-
 <!-- ══ MODAL: Novo Cliente ══ -->
 <div class="modal-overlay" id="modal-cliente">
   <div class="modal-box" style="max-width:480px">
@@ -2021,33 +2158,81 @@
 
 <!-- ══ MODAL: Novo / Editar Projeto ══ -->
 <div class="modal-overlay" id="modal-projeto">
-  <div class="modal-box" style="max-width:520px">
+  <div class="modal-box" style="max-width:640px">
     <button class="modal-close" onclick="closeModal('modal-projeto')">&times;</button>
     <div class="modal-title" id="pj-titulo">Novo projeto</div>
     <div class="modal-sub">O contato é o do cadastro do cliente. Para alterá-lo, use a aba Clientes.</div>
 
-    <div class="form-group">
-      <label>Cliente</label>
-      <select id="pj-cliente"></select>
-      <div style="font-size:11px;color:var(--text-dim);margin-top:6px" id="pj-contato"></div>
-    </div>
-    <div class="form-group">
-      <label>Nome do projeto</label>
-      <input type="text" id="pj-nome" placeholder="Ex.: ERP Comercial" maxlength="120">
-    </div>
-    <div class="form-row-2">
+    <nav class="rh-abas rh-abas-modal" id="pj-abas-modal">
+      <button class="rh-aba active" data-pjm="gerais">Informações gerais</button>
+      <button class="rh-aba" data-pjm="servico">Categoria e serviço</button>
+      <button class="rh-aba" data-pjm="planejamento">Planejamento e execução</button>
+    </nav>
+
+    <!-- ── A: informações gerais ── -->
+    <div class="rh-painel active" id="pj-p-gerais">
       <div class="form-group">
-        <label>Tipo</label>
-        <select id="pj-tipo"></select>
+        <label>Cliente</label>
+        <select id="pj-cliente"></select>
+        <div style="font-size:11px;color:var(--text-dim);margin-top:6px" id="pj-contato"></div>
       </div>
-      <div class="form-group">
-        <label>Data da solicitação</label>
-        <input type="date" id="pj-data">
+      <div class="form-row-2">
+        <div class="form-group"><label>Nome do projeto</label>
+          <input type="text" id="pj-nome" placeholder="Ex.: ERP Comercial" maxlength="120"></div>
+        <div class="form-group"><label>Código</label>
+          <input type="text" id="pj-codigo" disabled placeholder="Gerado ao salvar"></div>
       </div>
+      <div class="form-row-2">
+        <div class="form-group"><label>Data da solicitação</label><input type="date" id="pj-data"></div>
+        <div class="form-group"><label>Prioridade</label><select id="pj-prioridade"></select></div>
+      </div>
+      <div class="form-group"><label>Descrição do projeto</label>
+        <textarea id="pj-descricao" placeholder="O que o cliente precisa, com o máximo de detalhes."></textarea></div>
+      <div class="form-group"><label>Objetivo</label>
+        <textarea id="pj-objetivo" placeholder="O que o projeto deve resolver para o cliente."></textarea></div>
     </div>
-    <div class="form-group">
-      <label>Descrição</label>
-      <textarea id="pj-descricao" placeholder="O que o cliente precisa, com o máximo de detalhes."></textarea>
+
+    <!-- ── B: categoria e serviço ── -->
+    <div class="rh-painel" id="pj-p-servico">
+      <div class="rh-bloco-texto" style="margin-bottom:14px">
+        O serviço escolhido define o modelo de etapas sugerido. A equipe pode editar,
+        acrescentar ou remover etapas depois.
+      </div>
+      <div class="form-row-2">
+        <div class="form-group"><label>Categoria</label><select id="pj-categoria"></select></div>
+        <div class="form-group"><label>Serviço</label><select id="pj-servico"></select></div>
+      </div>
+      <div class="rh-bloco" id="pj-modelo-previa">
+        <div class="rh-bloco-titulo">Etapas sugeridas</div>
+        <div class="rh-bloco-texto" id="pj-modelo-lista"></div>
+      </div>
+      <label class="eq-perm" style="margin-top:14px">
+        <input type="checkbox" id="pj-aplicar-modelo" checked>
+        <span>Criar estas etapas ao cadastrar
+          <span class="rh-item-sub">Desmarque para montar as etapas do zero.</span></span>
+      </label>
+    </div>
+
+    <!-- ── C: planejamento ── -->
+    <div class="rh-painel" id="pj-p-planejamento">
+      <div class="form-row-2">
+        <div class="form-group"><label>Responsável pelo projeto</label><select id="pj-responsavel"></select></div>
+        <div class="form-group"><label>Equipe envolvida</label>
+          <input type="text" id="pj-equipe" maxlength="200" placeholder="Nomes separados por vírgula"></div>
+      </div>
+      <div class="form-row-2">
+        <div class="form-group"><label>Previsão de início</label><input type="date" id="pj-inicio"></div>
+        <div class="form-group"><label>Previsão de entrega</label><input type="date" id="pj-entrega"></div>
+      </div>
+      <div class="form-row-2">
+        <div class="form-group"><label>Valor contratado (R$)</label>
+          <input type="text" id="pj-valor" inputmode="decimal" placeholder="0,00"></div>
+        <div class="form-group"><label>Modelo de contratação</label><select id="pj-contratacao"></select></div>
+      </div>
+      <div class="form-group"><label>Link do contrato ou proposta</label>
+        <input type="url" id="pj-contrato" placeholder="https://"></div>
+      <div class="form-group"><label>Observações internas</label>
+        <textarea id="pj-observacoes" placeholder="O cliente não vê este campo."></textarea></div>
     </div>
 
     <div style="display:flex;gap:10px">
@@ -2058,47 +2243,53 @@
   </div>
 </div>
 
-<!-- ══ MODAL: Mudar situação ══ -->
-<div class="modal-overlay" id="modal-status">
-  <div class="modal-box" style="max-width:440px">
-    <button class="modal-close" onclick="closeModal('modal-status')">&times;</button>
-    <div class="modal-title">Mudar situação</div>
-    <div class="modal-sub" id="st-projeto">—</div>
+<!-- ══ MODAL: Etapa do projeto ══ -->
+<div class="modal-overlay" id="modal-etapa">
+  <div class="modal-box" style="max-width:540px">
+    <button class="modal-close" onclick="closeModal('modal-etapa')">&times;</button>
+    <div class="modal-title" id="et-titulo">Etapa</div>
+    <div class="modal-sub">O progresso é registrado pela equipe; nada avança sozinho.</div>
 
-    <div class="form-group">
-      <label>Nova situação</label>
-      <select id="st-novo">
-        <option value="cadastrado">Cadastrado</option>
-        <option value="andamento">Andamento</option>
-        <option value="pausado">Pausado</option>
-        <option value="cancelado">Cancelado</option>
-        <option value="concluido">Concluído</option>
-      </select>
+    <div class="form-row-2">
+      <div class="form-group"><label>Nome da etapa</label><input type="text" id="et-nome" maxlength="120"></div>
+      <div class="form-group"><label>Fase</label><select id="et-fase"></select></div>
+    </div>
+    <div class="form-row-2">
+      <div class="form-group"><label>Situação</label><select id="et-status"></select></div>
+      <div class="form-group"><label>Responsável</label><select id="et-responsavel"></select></div>
     </div>
     <div class="form-group">
-      <label id="st-label-nota">Justificativa</label>
-      <textarea id="st-nota" placeholder="Explique o motivo. Fica registrado no histórico do projeto."></textarea>
+      <label>Progresso</label>
+      <div class="range-wrap">
+        <input type="range" id="et-progresso" min="0" max="100" step="5" value="0">
+        <div class="range-val" id="et-progresso-val">0%</div>
+      </div>
+      <div style="font-size:11px;color:var(--text-dim);margin-top:6px" id="et-progresso-nota"></div>
     </div>
+    <div class="rh-endereco-3">
+      <div class="form-group"><label>Início</label><input type="date" id="et-inicio"></div>
+      <div class="form-group"><label>Prazo previsto</label><input type="date" id="et-prazo"></div>
+      <div class="form-group"><label>Conclusão</label><input type="date" id="et-conclusao"></div>
+    </div>
+    <div class="form-row-2">
+      <div class="form-group"><label>Peso no progresso geral</label>
+        <input type="number" id="et-peso" min="1" max="10" value="1">
+        <div style="font-size:11px;color:var(--text-dim);margin-top:6px">Quanto esta etapa representa do trabalho total.</div></div>
+      <div class="form-group"><label>Ordem</label><input type="number" id="et-ordem" min="1"></div>
+    </div>
+    <div class="form-group"><label>Descrição da atividade</label>
+      <textarea id="et-descricao" placeholder="O que será executado nesta etapa."></textarea></div>
+    <div class="form-group"><label>Observações internas</label>
+      <textarea id="et-observacoes" placeholder="O cliente não vê este campo."></textarea></div>
+    <div class="form-group"><label>Registro desta atualização</label>
+      <input type="text" id="et-registro" maxlength="160" placeholder="O que mudou e por quê (entra no histórico)"></div>
 
     <div style="display:flex;gap:10px">
-      <button class="btn btn-primary" style="flex:1;justify-content:center" id="st-btn" onclick="window._salvarStatus()">Registrar mudança</button>
-      <button class="btn btn-outline" onclick="closeModal('modal-status')">Cancelar</button>
+      <button class="btn btn-primary" style="flex:1;justify-content:center" id="et-btn" onclick="window._salvarEtapa()">Salvar etapa</button>
+      <button class="btn btn-outline" onclick="closeModal('modal-etapa')">Cancelar</button>
+      <button class="team-btn danger" id="et-excluir" hidden onclick="window._excluirEtapa()">Excluir</button>
     </div>
-    <div class="form-msg" id="st-msg" role="alert"></div>
-  </div>
-</div>
-
-<!-- ══ MODAL: Histórico do projeto ══ -->
-<div class="modal-overlay" id="modal-historico">
-  <div class="modal-box" style="max-width:560px">
-    <button class="modal-close" onclick="closeModal('modal-historico')">&times;</button>
-    <div class="modal-title">Histórico do projeto</div>
-    <div class="modal-sub" id="hist-projeto">—</div>
-    <div id="hist-lista" class="hist-lista"></div>
-    <button class="btn btn-outline" style="width:100%;justify-content:center;margin-top:16px" onclick="window._baixarPdf()">
-      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-      Baixar histórico em PDF
-    </button>
+    <div class="form-msg" id="et-msg" role="alert"></div>
   </div>
 </div>
 
@@ -2209,6 +2400,10 @@
 import { supabase, createSignupClient } from './js/supabase.js'
 import { calcularItem, somarFolha, porExtenso } from './js/folha.js'
 import { ligarNotificacoes } from './js/notificacoes.js'
+import {
+  FASES, CATEGORIAS, SERVICOS, MODELOS, PRIORIDADES, CONTRATACAO,
+  PROJETO_STATUS, ETAPA_STATUS, TIPOS_APROVACAO, PASTAS_DOC, progressoGeral,
+} from './js/projetos-modelos.js'
 
 /* ── VERIFICAR SESSÃO E PAPEL ── */
 const { data: { session } } = await supabase.auth.getSession();
@@ -2264,16 +2459,15 @@ async function loadAll() {
   allFeedbacks    = f.data || [];
   slClients       = sc.data || [];
   allClients.forEach(cl => clientMap[cl.id] = cl);
-  montarSelectsTipo();
   renderSertlinkClients();
   renderDashboard();
   renderClientes();
-  renderProjetos();
   renderFinanceiro();
   renderDepoimentos();
   renderFeedbacks();
   await loadEquipe();
   loadSuporte();
+  loadProjetos();
   loadFinanceiro();
   loadRh();
   loadMeuRh();
@@ -5423,8 +5617,8 @@ function renderDashboard() {
   const liquido   = i => Number(i.amount || 0) - Number(i.desconto || 0);
   const received  = allInvoices.filter(i => i.status === 'pago').reduce((s,i) => s+liquido(i),0);
   const pending   = allInvoices.filter(i => valida(i) && i.status !== 'pago').reduce((s,i) => s+liquido(i),0);
-  const inDev    = allProjects.filter(p => ['cadastrado','andamento','pausado'].includes(p.status)).length;
-  const done     = allProjects.filter(p => p.status === 'concluido').length;
+  const inDev    = allProjects.filter(p => !['CONCLUIDO','CANCELADO'].includes(p.status)).length;
+  const done     = allProjects.filter(p => p.status === 'CONCLUIDO').length;
 
   const vals = document.querySelectorAll('#tab-dashboard .stat-value');
   if (vals[0]) {
@@ -5555,324 +5749,1073 @@ window._salvarCliente = async () => {
   window._aviso(`${nome} cadastrado. ${data.session ? 'O acesso já está liberado.' : 'O cliente precisa confirmar o e-mail antes do primeiro acesso.'} Envie a senha provisória (${senha}) por um canal privado e abra o projeto na aba Projetos.`);
 };
 
-/* ── PROJETOS ── */
-const TIPOS_PROJETO = [
-  'Landing pages', 'Sites', 'Sistemas', 'Dashboard', 'Painéis Administrativos',
-  'Automação', 'Controle e Gestão', 'Sistema de atendimento e vendas',
-  'Manutenção', 'Evolução e aprimoramento',
-];
-const PJ_STATUS = {
-  cadastrado: { label: 'Cadastrado', cls: 'status-pending' },
-  andamento:  { label: 'Andamento',  cls: 'status-dev' },
-  pausado:    { label: 'Pausado',    cls: 'status-analysis' },
-  cancelado:  { label: 'Cancelado',  cls: 'status-expirado' },
-  concluido:  { label: 'Concluído',  cls: 'status-done' },
-};
-// Pausa e cancelamento precisam de explicação: são as duas situações em que
-// alguém vai perguntar depois por que o projeto parou.
-const EXIGE_NOTA = ['pausado', 'cancelado'];
-
-let projEditId = null, stProjId = null, histProjId = null, projHistorico = [];
-
+/* ── HELPERS COMPARTILHADOS ── */
 const fmtDateTime = d => d
-  ? new Date(d).toLocaleString('pt-BR', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' })
+  ? new Date(d).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric',
+                                          hour: '2-digit', minute: '2-digit' })
   : '—';
 const nomeCliente = id => { const c = clientMap[id]; return c?.company || c?.name || '—'; };
 
-// Preenche as listas de tipo (filtro e formulário) uma única vez
-function montarSelectsTipo() {
-  const opcoes = TIPOS_PROJETO.map(t => `<option value="${t}">${t}</option>`).join('');
-  document.getElementById('fp-tipo').innerHTML = '<option value="">Todos</option>' + opcoes;
-  document.getElementById('pj-tipo').innerHTML = opcoes;
+/* ── PROJETOS ── */
+let pjEtapas = [], pjTarefas = [], pjAtualizacoes = [], pjAprovacoes = [],
+    pjDocumentos = [], pjMensagens = [], pjHistorico = [];
+let pjAberto = null, pjEditId = null, etEditId = null;
+
+const pjMoeda = v => v == null ? '—' : fmtMoney(v);
+const pjSet = (id, t, tipo = 'error') => { const m = el(id); m.textContent = t; m.className = 'form-msg show ' + tipo; };
+const servicoNome = p => SERVICOS[p.servico]?.nome || p.servico || '—';
+const categoriaNome = p => CATEGORIAS[p.categoria]?.nome || p.categoria || '—';
+const ENCERRADOS = ['CONCLUIDO', 'CANCELADO'];
+// Atrasado é o que passou da entrega prevista e ainda não encerrou.
+const pjAtrasado = p => p.previsao_entrega && p.previsao_entrega < hojeISO() && !ENCERRADOS.includes(p.status);
+const hojeISO = () => new Date().toISOString().slice(0, 10);
+
+async function loadProjetos() {
+  if (!session) return;
+  const ops = (obj, campo = 'label') => Object.entries(obj)
+    .map(([v, o]) => `<option value="${v}">${typeof o === 'string' ? o : o[campo]}</option>`).join('');
+
+  el('pj-f-categoria').innerHTML = '<option value="">Todas</option>'
+    + Object.entries(CATEGORIAS).map(([v, c]) => `<option value="${v}">${c.nome}</option>`).join('');
+  el('pj-f-status').innerHTML = '<option value="">Todas</option>' + ops(PROJETO_STATUS);
+  el('pj-f-cliente').innerHTML = '<option value="">Todos</option>'
+    + allClients.map(c => `<option value="${c.id}">${esc(c.company || c.name)}</option>`).join('');
+
+  const equipe = allTeam.filter(m => m.status === 'ativo');
+  const pessoas = m => `<option value="${m.id}">${esc(m.name || m.nickname)}</option>`;
+  el('pj-f-responsavel').innerHTML = '<option value="">Todos</option><option value="__sem">Sem responsável</option>'
+    + equipe.map(pessoas).join('');
+  el('pj-responsavel').innerHTML = '<option value="">Definir depois</option>' + equipe.map(pessoas).join('');
+  el('pf-responsavel').innerHTML = '<option value="">Sem responsável</option>' + equipe.map(pessoas).join('');
+  el('et-responsavel').innerHTML = '<option value="">Sem responsável</option>' + equipe.map(pessoas).join('');
+
+  el('pf-status').innerHTML = ops(PROJETO_STATUS);
+  el('pj-prioridade').innerHTML = ops(PRIORIDADES);
+  el('pj-contratacao').innerHTML = '<option value="">Não definido</option>' + ops(CONTRATACAO);
+  el('pj-categoria').innerHTML = Object.entries(CATEGORIAS).map(([v, c]) => `<option value="${v}">${c.nome}</option>`).join('');
+  el('et-fase').innerHTML = Object.entries(FASES).map(([v, f]) => `<option value="${v}">${f.nome}</option>`).join('');
+  el('et-status').innerHTML = ops(ETAPA_STATUS);
+  el('pf-doc-pasta').innerHTML = ops(PASTAS_DOC);
+  el('pf-ap-tipo').innerHTML = ops(TIPOS_APROVACAO);
+
+  renderProjetos();
 }
 
-function projetosFiltrados() {
-  const busca  = document.getElementById('fp-cliente').value.trim().toLowerCase();
-  const tipo   = document.getElementById('fp-tipo').value;
-  const status = document.getElementById('fp-status').value;
-  const de     = document.getElementById('fp-de').value;
-  const ate    = document.getElementById('fp-ate').value;
+/* ── sub-abas ── */
+document.querySelectorAll('#pj-abas .rh-aba').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('#pj-abas .rh-aba').forEach(x => x.classList.remove('active'));
+  b.classList.add('active');
+  document.querySelectorAll('#pj-lista > .rh-painel').forEach(p => p.classList.remove('active'));
+  el('pj-' + b.dataset.pj).classList.add('active');
+}));
+document.querySelectorAll('#pf-abas .rh-aba').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('#pf-abas .rh-aba').forEach(x => x.classList.remove('active'));
+  b.classList.add('active');
+  document.querySelectorAll('#pj-ficha > .rh-painel').forEach(p => p.classList.remove('active'));
+  el('pf-p-' + b.dataset.pf).classList.add('active');
+}));
+document.querySelectorAll('#pj-abas-modal .rh-aba').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('#pj-abas-modal .rh-aba').forEach(x => x.classList.remove('active'));
+  b.classList.add('active');
+  document.querySelectorAll('#modal-projeto .rh-painel').forEach(p => p.classList.remove('active'));
+  el('pj-p-' + b.dataset.pjm).classList.add('active');
+}));
+const pjmAba = nome => document.querySelector(`#pj-abas-modal [data-pjm="${nome}"]`).click();
+
+/* ── lista ── */
+function pjFiltrados() {
+  const cliente = val('pj-f-cliente'), categoria = val('pj-f-categoria');
+  const status = val('pj-f-status'), resp = val('pj-f-responsavel');
+  const busca = val('pj-f-busca').toLowerCase();
 
   return allProjects.filter(p => {
-    const quando = (p.requested_at || p.created_at || '').slice(0, 10);
+    if (ENCERRADOS.includes(p.status)) return false;
+    if (cliente && p.client_id !== cliente) return false;
+    if (categoria && p.categoria !== categoria) return false;
+    if (status && p.status !== status) return false;
+    if (resp === '__sem' && p.responsavel_id) return false;
+    if (resp && resp !== '__sem' && p.responsavel_id !== resp) return false;
     if (busca) {
       const cl = clientMap[p.client_id];
-      const alvo = `${cl?.name || ''} ${cl?.company || ''} ${p.name || ''}`.toLowerCase();
-      if (!alvo.includes(busca)) return false;
+      const alvo = `${p.codigo || ''} ${p.name} ${cl?.company || ''} ${cl?.name || ''}`;
+      if (!alvo.toLowerCase().includes(busca)) return false;
     }
-    if (tipo && p.type !== tipo)       return false;
-    if (status && p.status !== status) return false;
-    if (de && quando < de)             return false;
-    if (ate && quando > ate)           return false;
     return true;
-  }).sort((a, b) => new Date(b.requested_at || b.created_at || 0) - new Date(a.requested_at || a.created_at || 0));
+  });
+}
+
+function linhaProjeto(p) {
+  const cl = clientMap[p.client_id];
+  const st = PROJETO_STATUS[p.status] || { label: p.status, cls: '' };
+  return `<tr class="rh-linha${pjAtrasado(p) ? ' sup-espera' : ''}" onclick="window._abrirProjeto('${p.id}')">
+    <td><span class="ticket-id">${esc(p.codigo || '—')}</span></td>
+    <td style="font-weight:600">${esc(p.name)}
+      ${p.prioridade === 'URGENTE' || p.prioridade === 'ALTA'
+        ? `<div class="rh-item-sub" style="color:var(--orange)">Prioridade ${PRIORIDADES[p.prioridade].toLowerCase()}</div>` : ''}</td>
+    <td>${esc(cl?.company || cl?.name || '—')}</td>
+    <td style="color:var(--text-dim)">${esc(servicoNome(p))}</td>
+    <td style="color:var(--text-dim)">${esc(p.responsavel_nome || 'Na fila')}</td>
+    <td style="min-width:120px">
+      <div class="progress-bar"><div class="progress-bar-fill" style="width:${p.progress || 0}%"></div></div>
+      <div class="rh-item-sub">${p.progress || 0}%</div></td>
+    <td style="font-size:12px;${pjAtrasado(p) ? 'color:var(--red);font-weight:600' : 'color:var(--text-dim)'}">${
+      p.previsao_entrega ? fmtDate(p.previsao_entrega) : 'Sem data'}</td>
+    <td><span class="status ${st.cls}">${st.label}</span></td>
+  </tr>`;
 }
 
 function renderProjetos() {
-  const tbody = document.getElementById('projetos-body');
-  if (!tbody) return;
-  const lista = projetosFiltrados();
+  const lista = pjFiltrados();
+  el('pj-body').innerHTML = lista.length ? lista.map(linhaProjeto).join('')
+    : `<tr><td colspan="8" class="team-empty">${allProjects.filter(p => !ENCERRADOS.includes(p.status)).length
+        ? 'Nenhum projeto no filtro escolhido.' : 'Nenhum projeto ativo.'}</td></tr>`;
 
-  tbody.innerHTML = lista.length ? lista.map(p => {
-    const s = PJ_STATUS[p.status] || { label: p.status || '—', cls: '' };
-    const encerrado = ['cancelado', 'concluido'].includes(p.status);
-    return `<tr>
-      <td style="color:var(--text-dim);font-size:12px;white-space:nowrap">${fmtDateTime(p.requested_at || p.created_at)}</td>
-      <td style="font-weight:600">${esc(nomeCliente(p.client_id))}</td>
-      <td>${esc(p.name || '—')}</td>
-      <td style="color:var(--text-dim)">${esc(p.type || '—')}</td>
-      <td>
-        <div style="display:flex;align-items:center;gap:8px">
-          <div class="progress-bar-track" style="width:56px"><div class="progress-bar-fill" style="width:${p.progress || 0}%"></div></div>
-          <span style="font-size:12px;font-weight:700;color:var(--orange)">${p.progress || 0}%</span>
-        </div>
-      </td>
-      <td><span class="status ${s.cls}">${s.label}</span></td>
-      <td>
-        <div class="team-actions">
-          <button class="team-btn" onclick="window._editarProjeto('${p.id}')">Editar</button>
-          <button class="team-btn" onclick="window._mudarStatus('${p.id}')">Situação</button>
-          ${!encerrado ? `<button class="team-btn" onclick="window._openProgress('${p.id}','${String(p.name).replace(/'/g,"\\'")}',${p.progress || 0})">Progresso</button>` : ''}
-          <button class="team-btn" onclick="window._verHistorico('${p.id}')">Histórico</button>
-        </div>
-      </td>
+  const encerrados = allProjects.filter(p => ENCERRADOS.includes(p.status));
+  el('pj-encerrados-body').innerHTML = encerrados.length ? encerrados.map(p => {
+    const cl = clientMap[p.client_id];
+    const st = PROJETO_STATUS[p.status];
+    return `<tr class="rh-linha" onclick="window._abrirProjeto('${p.id}')">
+      <td><span class="ticket-id">${esc(p.codigo || '—')}</span></td>
+      <td style="font-weight:600">${esc(p.name)}</td>
+      <td>${esc(cl?.company || cl?.name || '—')}</td>
+      <td style="color:var(--text-dim)">${esc(servicoNome(p))}</td>
+      <td style="color:var(--text-dim);font-size:12px">${p.previsao_entrega ? fmtDate(p.previsao_entrega) : '—'}</td>
+      <td style="color:var(--text-dim);font-size:12px">${p.finished_at ? fmtDate(p.finished_at) : '—'}</td>
+      <td><span class="status ${st.cls}">${st.label}</span></td>
     </tr>`;
-  }).join('')
-  : `<tr><td colspan="7" style="text-align:center;color:var(--text-dim);padding:18px 0">${allProjects.length ? 'Nenhum projeto para os filtros escolhidos.' : 'Nenhum projeto cadastrado.'}</td></tr>`;
+  }).join('') : '<tr><td colspan="7" class="team-empty">Nenhum projeto encerrado.</td></tr>';
+
+  renderIndicadores();
+}
+['pj-f-cliente','pj-f-categoria','pj-f-status','pj-f-responsavel','pj-f-busca']
+  .forEach(id => el(id).addEventListener('input', renderProjetos));
+
+/* ── indicadores ── */
+function renderIndicadores() {
+  const ativos = allProjects.filter(p => !ENCERRADOS.includes(p.status));
+  const conta = f => allProjects.filter(f).length;
+  const media = ativos.length
+    ? Math.round(ativos.reduce((s, p) => s + (p.progress || 0), 0) / ativos.length) : 0;
+
+  el('pj-numeros').innerHTML = [
+    { label: 'Total de projetos', valor: allProjects.length, cor: 'var(--text)' },
+    { label: 'Em andamento',      valor: conta(p => p.status === 'ANDAMENTO'), cor: 'var(--text)' },
+    { label: 'Aguardando cliente',valor: conta(p => ['AGUARDANDO_CLIENTE','AGUARDANDO_APROVACAO'].includes(p.status)), cor: 'var(--orange)' },
+    { label: 'Pausados',          valor: conta(p => p.status === 'PAUSADO'), cor: 'var(--text)' },
+    { label: 'Atrasados',         valor: conta(pjAtrasado), cor: 'var(--red)' },
+    { label: 'Concluídos',        valor: conta(p => p.status === 'CONCLUIDO'), cor: 'var(--green)' },
+  ].map(c => `<div class="resumo-card" style="text-align:left">
+      <div class="resumo-label" style="margin:0 0 6px">${c.label}</div>
+      <div class="resumo-valor" style="color:${c.cor};font-size:22px">${c.valor}</div>
+    </div>`).join('');
+
+  const barra = (rotulo, n, total, extra = '') => `
+    <div style="margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:5px">
+        <span>${esc(rotulo)}</span><strong>${n}${extra}</strong></div>
+      <div class="progress-bar"><div class="progress-bar-fill" style="width:${total ? n / total * 100 : 0}%"></div></div>
+    </div>`;
+
+  const porCat = {};
+  allProjects.forEach(p => { porCat[p.categoria || '—'] = (porCat[p.categoria || '—'] || 0) + 1; });
+  const maxCat = Math.max(...Object.values(porCat), 1);
+  el('pj-por-categoria').innerHTML = Object.entries(porCat)
+    .sort((a, b) => b[1] - a[1])
+    .map(([c, n]) => barra(CATEGORIAS[c]?.nome || 'Sem categoria', n, maxCat)).join('')
+    || '<div class="rh-item-sub">Nenhum projeto cadastrado.</div>';
+
+  const porResp = {};
+  ativos.forEach(p => { const r = p.responsavel_nome || 'Na fila'; porResp[r] = (porResp[r] || 0) + 1; });
+  const maxResp = Math.max(...Object.values(porResp), 1);
+  el('pj-por-responsavel').innerHTML = Object.entries(porResp)
+    .sort((a, b) => b[1] - a[1]).map(([r, n]) => barra(r, n, maxResp)).join('')
+    || '<div class="rh-item-sub">Nenhum projeto ativo.</div>';
+
+  const entregues = allProjects.filter(p => p.status === 'CONCLUIDO' && p.finished_at && p.previsao_entrega);
+  const noPrazo = entregues.filter(p => p.finished_at.slice(0, 10) <= p.previsao_entrega).length;
+  const dias = entregues.filter(p => p.started_at)
+    .map(p => Math.round((new Date(p.finished_at) - new Date(p.started_at)) / 86400000));
+  const medioDias = dias.length ? Math.round(dias.reduce((a, b) => a + b, 0) / dias.length) : null;
+
+  el('pj-prazos').innerHTML = `
+    <div class="meurh-linha"><span>Percentual médio de conclusão dos ativos</span><strong>${media}%</strong></div>
+    <div class="meurh-linha"><span>Entregues no prazo</span><strong>${
+      entregues.length ? `${noPrazo} de ${entregues.length}` : '—'}</strong></div>
+    <div class="meurh-linha"><span>Tempo médio de execução</span><strong>${
+      medioDias === null ? '—' : medioDias + ' dias'}</strong></div>
+    <div class="meurh-linha"><span>Aguardando aprovação</span><strong>${
+      allProjects.filter(p => p.status === 'AGUARDANDO_APROVACAO').length}</strong></div>`;
 }
 
-['fp-cliente','fp-tipo','fp-status','fp-de','fp-ate'].forEach(id => {
-  document.getElementById(id).addEventListener('input', renderProjetos);
+/* ══ CADASTRO ══ */
+function montarServicos() {
+  const cat = CATEGORIAS[val('pj-categoria')];
+  el('pj-servico').innerHTML = Object.entries(cat?.servicos || {})
+    .map(([v, nome]) => `<option value="${v}">${nome}</option>`).join('');
+  montarPreviaModelo();
+}
+function montarPreviaModelo() {
+  const modelo = MODELOS[val('pj-servico')] || [];
+  el('pj-modelo-lista').innerHTML = modelo.length
+    ? modelo.map((et, i) => `${i + 1}. ${esc(et.nome)} <span style="opacity:.6">· ${FASES[et.fase].nome}</span>`).join('<br>')
+    : 'Nenhum modelo para este serviço. As etapas serão criadas manualmente.';
+}
+el('pj-categoria').addEventListener('change', montarServicos);
+el('pj-servico').addEventListener('change', montarPreviaModelo);
+el('pj-cliente').addEventListener('change', () => {
+  const cl = clientMap[val('pj-cliente')];
+  el('pj-contato').textContent = cl
+    ? [cl.name, cl.email, cl.phone].filter(Boolean).join(' · ') : '';
 });
-window._limparFiltros = () => {
-  ['fp-cliente','fp-tipo','fp-status','fp-de','fp-ate'].forEach(id => document.getElementById(id).value = '');
-  renderProjetos();
-};
-
-/* ── NOVO / EDITAR PROJETO ── */
-const pjSet = (t, tipo = 'error') => {
-  const m = document.getElementById('pj-msg'); m.textContent = t; m.className = 'form-msg show ' + tipo;
-};
-
-function preencherClientes(selecionado) {
-  const sel = document.getElementById('pj-cliente');
-  sel.innerHTML = allClients.length
-    ? allClients.map(c => `<option value="${c.id}">${esc(c.company || c.name || 'Cliente')}</option>`).join('')
-    : '<option value="">Nenhum cliente cadastrado</option>';
-  if (selecionado) sel.value = selecionado;
-  mostrarContato();
-}
-function mostrarContato() {
-  const c = clientMap[document.getElementById('pj-cliente').value];
-  const tel = [c?.phone, c?.phone2].filter(Boolean).join(' · ');
-  document.getElementById('pj-contato').textContent = c
-    ? [c.name, c.email, tel].filter(Boolean).join(' · ')
-    : 'Cadastre um cliente antes de abrir um projeto.';
-}
-document.getElementById('pj-cliente').addEventListener('change', mostrarContato);
 
 window._novoProjeto = () => {
-  if (!allClients.length) { alert('Cadastre um cliente antes de abrir um projeto.'); return; }
-  projEditId = null;
-  document.getElementById('pj-titulo').textContent = 'Novo projeto';
-  document.getElementById('pj-btn').textContent = 'Cadastrar projeto';
-  document.getElementById('pj-nome').value = '';
-  document.getElementById('pj-descricao').value = '';
-  document.getElementById('pj-data').value = new Date().toISOString().slice(0, 10);
-  document.getElementById('pj-tipo').value = TIPOS_PROJETO[0];
-  document.getElementById('pj-msg').className = 'form-msg';
-  preencherClientes();
+  pjEditId = null;
+  el('pj-titulo').textContent = 'Novo projeto';
+  el('pj-btn').textContent = 'Cadastrar projeto';
+  el('pj-cliente').innerHTML = allClients.map(c =>
+    `<option value="${c.id}">${esc(c.company || c.name)}</option>`).join('');
+  ['pj-nome','pj-descricao','pj-objetivo','pj-equipe','pj-valor','pj-contrato','pj-observacoes',
+   'pj-inicio','pj-entrega'].forEach(id => el(id).value = '');
+  el('pj-codigo').value = '';
+  el('pj-data').value = hojeISO();
+  el('pj-prioridade').value = 'NORMAL';
+  el('pj-categoria').value = 'WEB';
+  el('pj-contratacao').value = '';
+  el('pj-responsavel').value = '';
+  el('pj-aplicar-modelo').checked = true;
+  el('pj-aplicar-modelo').closest('.eq-perm').hidden = false;
+  el('pj-msg').className = 'form-msg';
+  montarServicos();
+  el('pj-cliente').dispatchEvent(new Event('change'));
+  pjmAba('gerais');
   openModal('modal-projeto');
 };
 
-window._editarProjeto = (id) => {
-  const p = allProjects.find(x => x.id === id);
+window._editarProjeto = () => {
+  const p = pjAberto;
   if (!p) return;
-  projEditId = id;
-  document.getElementById('pj-titulo').textContent = 'Editar projeto';
-  document.getElementById('pj-btn').textContent = 'Salvar alterações';
-  document.getElementById('pj-nome').value = p.name || '';
-  document.getElementById('pj-descricao').value = p.description || '';
-  document.getElementById('pj-data').value = (p.requested_at || p.created_at || '').slice(0, 10);
-  document.getElementById('pj-tipo').value = p.type || TIPOS_PROJETO[0];
-  document.getElementById('pj-msg').className = 'form-msg';
-  preencherClientes(p.client_id);
+  window._novoProjeto();
+  pjEditId = p.id;
+  el('pj-titulo').textContent = 'Editar ' + (p.codigo || p.name);
+  el('pj-btn').textContent = 'Salvar alterações';
+  el('pj-cliente').value = p.client_id || '';
+  el('pj-codigo').value = p.codigo || '';
+  el('pj-nome').value = p.name || '';
+  el('pj-data').value = (p.requested_at || '').slice(0, 10);
+  el('pj-prioridade').value = p.prioridade || 'NORMAL';
+  el('pj-descricao').value = p.description || '';
+  el('pj-objetivo').value = p.objetivo || '';
+  if (p.categoria) { el('pj-categoria').value = p.categoria; montarServicos(); }
+  if (p.servico) { el('pj-servico').value = p.servico; montarPreviaModelo(); }
+  el('pj-responsavel').value = p.responsavel_id || '';
+  el('pj-equipe').value = p.equipe || '';
+  el('pj-inicio').value = p.previsao_inicio || '';
+  el('pj-entrega').value = p.previsao_entrega || '';
+  el('pj-valor').value = p.valor ?? '';
+  el('pj-contratacao').value = p.contratacao || '';
+  el('pj-contrato').value = p.contrato_link || '';
+  el('pj-observacoes').value = p.observacoes_internas || '';
+  // Reaplicar o modelo numa edição duplicaria as etapas que já existem.
+  el('pj-aplicar-modelo').checked = false;
+  el('pj-aplicar-modelo').closest('.eq-perm').hidden = true;
+  el('pj-cliente').dispatchEvent(new Event('change'));
   openModal('modal-projeto');
 };
 
 window._salvarProjeto = async () => {
-  const btn = document.getElementById('pj-btn'), orig = btn.textContent;
-  const clientId  = document.getElementById('pj-cliente').value;
-  const nome      = document.getElementById('pj-nome').value.trim();
-  const tipo      = document.getElementById('pj-tipo').value;
-  const data      = document.getElementById('pj-data').value;
-  const descricao = document.getElementById('pj-descricao').value.trim();
+  const btn = el('pj-btn'), orig = btn.textContent;
+  if (!val('pj-cliente')) { pjmAba('gerais'); return pjSet('pj-msg', 'Escolha o cliente.'); }
+  if (!val('pj-nome'))    { pjmAba('gerais'); return pjSet('pj-msg', 'Informe o nome do projeto.'); }
+  if (!val('pj-descricao')) { pjmAba('gerais'); return pjSet('pj-msg', 'Descreva o que o cliente precisa.'); }
+  if (!val('pj-servico')) { pjmAba('servico'); return pjSet('pj-msg', 'Escolha a categoria e o serviço.'); }
 
-  if (!clientId) return pjSet('Escolha o cliente.');
-  if (!nome)     return pjSet('Informe o nome do projeto.');
-  if (!data)     return pjSet('Informe a data da solicitação.');
-
-  // A hora vem da abertura do registro; o gestor escolhe apenas o dia.
-  const agora = new Date();
-  const quando = new Date(`${data}T${agora.toTimeString().slice(0, 8)}`).toISOString();
+  const inicio = val('pj-inicio'), entrega = val('pj-entrega');
+  if (inicio && entrega && entrega < inicio) {
+    pjmAba('planejamento');
+    return pjSet('pj-msg', 'A entrega não pode ser antes do início.');
+  }
 
   btn.textContent = 'Salvando...'; btn.disabled = true;
   const fim = () => { btn.textContent = orig; btn.disabled = false; };
 
-  if (projEditId) {
-    const { error } = await supabase.from('projects')
-      .update({ client_id: clientId, name: nome, type: tipo, description: descricao, requested_at: quando })
-      .eq('id', projEditId);
-    if (error) { fim(); return pjSet('Não foi possível salvar: ' + error.message); }
-  } else {
-    const { data: criado, error } = await supabase.from('projects')
-      .insert({ client_id: clientId, name: nome, type: tipo, description: descricao,
-                requested_at: quando, status: 'cadastrado', progress: 0, created_by: session.user.id })
-      .select('id').single();
-    if (error) { fim(); return pjSet('Não foi possível cadastrar: ' + error.message); }
-    await registrarHistorico(criado.id, 'cadastrado', 'Projeto cadastrado.');
+  const resp = allTeam.find(m => m.id === val('pj-responsavel'));
+  const campos = {
+    client_id: val('pj-cliente'), name: val('pj-nome'),
+    description: val('pj-descricao'), objetivo: val('pj-objetivo') || null,
+    categoria: val('pj-categoria'), servico: val('pj-servico'),
+    prioridade: el('pj-prioridade').value,
+    requested_at: val('pj-data') ? new Date(val('pj-data')).toISOString() : new Date().toISOString(),
+    responsavel_id: resp?.id || null, responsavel_nome: resp ? (resp.name || resp.nickname) : null,
+    equipe: val('pj-equipe') || null,
+    previsao_inicio: inicio || null, previsao_entrega: entrega || null,
+    valor: val('pj-valor') ? Number(val('pj-valor').replace(/\./g, '').replace(',', '.')) : null,
+    contratacao: el('pj-contratacao').value || null,
+    contrato_link: val('pj-contrato') || null,
+    observacoes_internas: val('pj-observacoes') || null,
+    atualizado_em: new Date().toISOString(),
+  };
+
+  if (pjEditId) {
+    const { error } = await supabase.from('projects').update(campos).eq('id', pjEditId);
+    fim();
+    if (error) return pjSet('pj-msg', 'Não foi possível salvar: ' + error.message);
+    await registrarProjeto(pjEditId, 'Cadastro', null, null, 'Cadastro do projeto atualizado');
+    closeModal('modal-projeto');
+    await loadAll();
+    await window._abrirProjeto(pjEditId);
+    return window._aviso('Cadastro do projeto atualizado.');
   }
 
-  await loadAll();
+  campos.status = 'SOLICITACAO';
+  campos.progress = 0;
+  const { data: criado, error } = await supabase.from('projects')
+    .insert(campos).select('*').single();
+  if (error) { fim(); return pjSet('pj-msg', 'Não foi possível cadastrar: ' + error.message); }
+
+  // O modelo entra como ponto de partida; a equipe ajusta depois.
+  if (el('pj-aplicar-modelo').checked) {
+    const modelo = MODELOS[campos.servico] || [];
+    if (modelo.length) {
+      await supabase.from('projeto_etapas').insert(modelo.map((et, i) => ({
+        project_id: criado.id, ordem: i + 1, fase: et.fase, nome: et.nome,
+        peso: et.peso, descricao: FASES[et.fase].descricao,
+      })));
+    }
+  }
+  await registrarProjeto(criado.id, 'Projeto', null, 'SOLICITACAO', 'Projeto cadastrado');
+
   fim();
-  pjSet('Projeto salvo.', 'success');
+  closeModal('modal-projeto');
+  await loadAll();
+  window._aviso(`Projeto ${criado.codigo || criado.name} cadastrado${
+    el('pj-aplicar-modelo').checked ? ' com as etapas do modelo' : ''}. Abra a ficha para acompanhar.`);
 };
 
-/* ── SITUAÇÃO E HISTÓRICO ── */
-async function registrarHistorico(projectId, status, note) {
-  return supabase.from('project_history').insert({
-    project_id: projectId, status, note: note || null,
-    changed_by: session.user.id, changed_by_name: myName,
+/* ══ FICHA ══ */
+window._voltarProjetos = () => {
+  pjAberto = null;
+  el('pj-ficha').hidden = true;
+  el('pj-lista').hidden = false;
+};
+
+window._abrirProjeto = async (id) => {
+  pjAberto = allProjects.find(p => p.id === id);
+  if (!pjAberto) return;
+  el('pj-lista').hidden = true;
+  el('pj-ficha').hidden = false;
+  el('pf-etapas').innerHTML = '<div class="rh-item-sub">Carregando...</div>';
+
+  const [et, ta, at, ap, dc, ms, hi] = await Promise.all([
+    supabase.from('projeto_etapas').select('*').eq('project_id', id).order('ordem'),
+    supabase.from('projeto_tarefas').select('*').eq('project_id', id).order('created_at'),
+    supabase.from('projeto_atualizacoes').select('*').eq('project_id', id).order('created_at', { ascending: false }),
+    supabase.from('projeto_aprovacoes').select('*').eq('project_id', id).order('created_at', { ascending: false }),
+    supabase.from('projeto_documentos').select('*').eq('project_id', id).order('created_at', { ascending: false }),
+    supabase.from('projeto_mensagens').select('*').eq('project_id', id).order('created_at'),
+    supabase.from('projeto_historico').select('*').eq('project_id', id).order('created_at', { ascending: false }),
+  ]);
+  pjEtapas = et.data || []; pjTarefas = ta.data || []; pjAtualizacoes = at.data || [];
+  pjAprovacoes = ap.data || []; pjDocumentos = dc.data || []; pjMensagens = ms.data || [];
+  pjHistorico = hi.data || [];
+
+  renderFichaProjeto();
+};
+
+function renderFichaProjeto() {
+  const p = pjAberto;
+  const cl = clientMap[p.client_id];
+  const st = PROJETO_STATUS[p.status] || { label: p.status, cls: '', quando: '' };
+  const progresso = progressoGeral(pjEtapas);
+
+  el('pf-nome').textContent = p.name;
+  el('pf-sub').innerHTML = `<span class="ticket-id">${esc(p.codigo || '—')}</span> · ${esc(servicoNome(p))} · ${esc(cl?.company || cl?.name || '—')}`;
+  el('pf-progresso').textContent = progresso + '%';
+  el('pf-barra').style.width = progresso + '%';
+  const feitas = pjEtapas.filter(e => e.status === 'CONCLUIDO').length;
+  const valem = pjEtapas.filter(e => e.status !== 'CANCELADO').length;
+  el('pf-etapas-feitas').textContent = `${feitas} de ${valem} etapas concluídas`;
+
+  el('pf-status').value = p.status;
+  el('pf-status-nota').textContent = st.quando;
+  el('pf-responsavel').value = p.responsavel_id || '';
+  el('pf-entrega').value = p.previsao_entrega || '';
+  el('pf-prazo-nota').textContent = pjAtrasado(p)
+    ? `Atrasado em ${Math.floor((Date.now() - new Date(p.previsao_entrega)) / 86400000)} dias`
+    : p.previsao_entrega ? 'Dentro do prazo' : 'Sem data definida';
+  el('pf-prazo-nota').style.color = pjAtrasado(p) ? 'var(--red)' : '';
+  el('pf-observacoes').value = p.observacoes_internas || '';
+
+  el('pf-dados').innerHTML = `
+    <div class="meurh-linha"><span>Situação</span><strong><span class="status ${st.cls}">${st.label}</span></strong></div>
+    <div class="meurh-linha"><span>Categoria</span><strong>${esc(categoriaNome(p))}</strong></div>
+    <div class="meurh-linha"><span>Serviço</span><strong>${esc(servicoNome(p))}</strong></div>
+    <div class="meurh-linha"><span>Prioridade</span><strong>${PRIORIDADES[p.prioridade] || '—'}</strong></div>
+    <div class="meurh-linha"><span>Solicitado em</span><strong>${fmtDate(p.requested_at)}</strong></div>
+    <div class="meurh-linha"><span>Previsão de início</span><strong>${p.previsao_inicio ? fmtDate(p.previsao_inicio) : '—'}</strong></div>
+    <div class="meurh-linha"><span>Previsão de entrega</span><strong>${p.previsao_entrega ? fmtDate(p.previsao_entrega) : '—'}</strong></div>
+    <div class="meurh-linha"><span>Valor contratado</span><strong>${pjMoeda(p.valor)}</strong></div>
+    <div class="meurh-linha"><span>Contratação</span><strong>${CONTRATACAO[p.contratacao] || '—'}</strong></div>
+    <div class="meurh-linha"><span>Equipe</span><strong>${esc(p.equipe || '—')}</strong></div>
+    ${p.contrato_link ? `<div class="meurh-linha"><span>Contrato</span><strong><a href="${esc(p.contrato_link)}" target="_blank" rel="noopener" class="cbo-link">Abrir</a></strong></div>` : ''}
+    <div style="margin-top:14px;font-size:13px;line-height:1.7">${esc(p.description || '')}</div>
+    ${p.objetivo ? `<div class="rh-bloco" style="margin-top:12px"><div class="rh-bloco-titulo">Objetivo</div>
+      <div class="rh-bloco-texto">${esc(p.objetivo)}</div></div>` : ''}`;
+
+  el('pf-cliente').innerHTML = `
+    <div style="font-weight:600">${esc(cl?.company || cl?.name || '—')}</div>
+    <div class="rh-item-sub">${esc(cl?.name || '')}</div>
+    <div class="meurh-linha"><span>E-mail</span><strong>${esc(cl?.email || '—')}</strong></div>
+    <div class="meurh-linha"><span>Telefone</span><strong>${esc(cl?.phone || '—')}</strong></div>
+    <div class="meurh-linha"><span>Outros projetos</span><strong>${
+      allProjects.filter(x => x.client_id === p.client_id && x.id !== p.id).length}</strong></div>`;
+
+  renderEtapas();
+  renderTarefas();
+  renderCronograma();
+  renderDocumentos();
+  renderAtualizacoes();
+  renderAprovacoes();
+  renderConversaProjeto();
+  renderHistoricoProjeto();
+
+  el('pf-at-etapa').innerHTML = '<option value="">Sem etapa específica</option>'
+    + pjEtapas.map(e => `<option value="${e.id}">${esc(e.nome)}</option>`).join('');
+}
+
+/* ── etapas ── */
+function renderEtapas() {
+  if (!pjEtapas.length) {
+    el('pf-etapas').innerHTML = `<div class="card"><div class="rh-item-sub">
+      Nenhuma etapa cadastrada. Use "Aplicar modelo do serviço" para começar pelo
+      roteiro de ${esc(servicoNome(pjAberto))}, ou crie uma etapa do zero.</div></div>`;
+    return;
+  }
+
+  // Agrupa por fase: é assim que o cliente vê, e manter a mesma ordem na
+  // gestão evita que os dois lados contem histórias diferentes.
+  const porFase = {};
+  pjEtapas.forEach(e => { (porFase[e.fase] ||= []).push(e); });
+
+  el('pf-etapas').innerHTML = Object.entries(FASES)
+    .filter(([f]) => porFase[f])
+    .map(([f, fase]) => {
+      const etapas = porFase[f];
+      const feito = progressoGeral(etapas);
+      return `<div class="card" style="margin-bottom:14px">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+          <div>
+            <div class="card-title" style="margin:0">${fase.ordem}. ${fase.nome}</div>
+            <div class="rh-item-sub">${fase.descricao}</div>
+          </div>
+          <div style="text-align:right;min-width:90px">
+            <div style="font-weight:800;font-size:17px">${feito}%</div>
+            <div class="rh-item-sub">${etapas.filter(e => e.status === 'CONCLUIDO').length} de ${etapas.length}</div>
+          </div>
+        </div>
+        <div class="progress-bar" style="margin:10px 0 14px"><div class="progress-bar-fill" style="width:${feito}%"></div></div>
+        ${etapas.map(linhaEtapa).join('')}
+      </div>`;
+    }).join('');
+}
+
+function linhaEtapa(e) {
+  const st = ETAPA_STATUS[e.status] || { label: e.status, cls: '' };
+  const atrasada = e.prazo && e.prazo < hojeISO() && !['CONCLUIDO','CANCELADO'].includes(e.status);
+  const tarefas = pjTarefas.filter(t => t.etapa_id === e.id);
+  return `<div class="pj-etapa" onclick="window._editarEtapa('${e.id}')">
+    <div class="pj-etapa-topo">
+      <div style="min-width:0">
+        <div style="font-size:13px;font-weight:600">${esc(e.nome)}</div>
+        <div class="rh-item-sub">
+          ${esc(e.responsavel_nome || 'Sem responsável')}
+          ${e.prazo ? ` · prazo ${fmtDate(e.prazo)}` : ''}
+          ${tarefas.length ? ` · ${tarefas.filter(t => t.concluida).length}/${tarefas.length} tarefas` : ''}
+          ${e.peso > 1 ? ` · peso ${e.peso}` : ''}
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
+        ${atrasada ? '<span class="status status-expirado">Atrasada</span>' : ''}
+        <span class="status ${st.cls}">${st.label}</span>
+        <strong style="font-size:13px;min-width:38px;text-align:right">${e.progresso}%</strong>
+      </div>
+    </div>
+    <div class="progress-bar" style="margin-top:9px"><div class="progress-bar-fill" style="width:${e.progresso}%"></div></div>
+  </div>`;
+}
+
+window._aplicarModelo = async () => {
+  const modelo = MODELOS[pjAberto.servico] || [];
+  if (!modelo.length) return alert('Não há modelo de etapas para este serviço.');
+  if (pjEtapas.length && !confirm(
+    `Este projeto já tem ${pjEtapas.length} etapa(s). As etapas do modelo serão acrescentadas ao final. Continuar?`)) return;
+
+  const base = pjEtapas.length ? Math.max(...pjEtapas.map(e => e.ordem)) : 0;
+  const { error } = await supabase.from('projeto_etapas').insert(modelo.map((et, i) => ({
+    project_id: pjAberto.id, ordem: base + i + 1, fase: et.fase,
+    nome: et.nome, peso: et.peso, descricao: FASES[et.fase].descricao,
+  })));
+  if (error) return alert('Não foi possível aplicar: ' + error.message);
+
+  await registrarProjeto(pjAberto.id, 'Etapas', null, null,
+    `Modelo de ${servicoNome(pjAberto)} aplicado: ${modelo.length} etapas`);
+  await window._abrirProjeto(pjAberto.id);
+};
+
+window._novaEtapa = () => {
+  etEditId = null;
+  el('et-titulo').textContent = 'Nova etapa';
+  ['et-nome','et-descricao','et-observacoes','et-inicio','et-prazo','et-conclusao','et-registro']
+    .forEach(id => el(id).value = '');
+  el('et-fase').value = 'DIAGNOSTICO';
+  el('et-status').value = 'NAO_INICIADO';
+  el('et-responsavel').value = '';
+  el('et-progresso').value = 0;
+  el('et-progresso-val').textContent = '0%';
+  el('et-peso').value = 1;
+  el('et-ordem').value = (pjEtapas.length ? Math.max(...pjEtapas.map(e => e.ordem)) : 0) + 1;
+  el('et-excluir').hidden = true;
+  el('et-msg').className = 'form-msg';
+  atualizarNotaProgresso();
+  openModal('modal-etapa');
+};
+
+window._editarEtapa = (id) => {
+  const e = pjEtapas.find(x => x.id === id);
+  if (!e) return;
+  window._novaEtapa();
+  etEditId = id;
+  el('et-titulo').textContent = e.nome;
+  el('et-nome').value = e.nome;
+  el('et-fase').value = e.fase;
+  el('et-status').value = e.status;
+  el('et-responsavel').value = e.responsavel_id || '';
+  el('et-progresso').value = e.progresso;
+  el('et-progresso-val').textContent = e.progresso + '%';
+  el('et-peso').value = e.peso;
+  el('et-ordem').value = e.ordem;
+  el('et-inicio').value = e.inicio || '';
+  el('et-prazo').value = e.prazo || '';
+  el('et-conclusao').value = e.conclusao || '';
+  el('et-descricao').value = e.descricao || '';
+  el('et-observacoes').value = e.observacoes_internas || '';
+  el('et-excluir').hidden = false;
+  atualizarNotaProgresso();
+  openModal('modal-etapa');
+};
+
+// A regra "concluída = 100%" vale no banco; a tela avisa antes para a
+// pessoa não achar que o número dela foi ignorado.
+function atualizarNotaProgresso() {
+  const st = el('et-status').value, pr = Number(el('et-progresso').value);
+  el('et-progresso-nota').textContent =
+    st === 'CONCLUIDO'    ? 'Etapa concluída: o progresso será gravado como 100%.'
+    : st === 'NAO_INICIADO' ? 'Etapa não iniciada: o progresso será gravado como 0%.'
+    : pr === 100          ? 'Com 100% a etapa passa a constar como concluída.'
+    : 'Atualize conforme o trabalho executado.';
+}
+el('et-progresso').addEventListener('input', e => {
+  el('et-progresso-val').textContent = e.target.value + '%';
+  atualizarNotaProgresso();
+});
+el('et-status').addEventListener('change', atualizarNotaProgresso);
+
+window._salvarEtapa = async () => {
+  const btn = el('et-btn'), orig = btn.textContent;
+  if (!val('et-nome')) return pjSet('et-msg', 'Informe o nome da etapa.');
+  const inicio = val('et-inicio'), prazo = val('et-prazo');
+  if (inicio && prazo && prazo < inicio) return pjSet('et-msg', 'O prazo não pode ser antes do início.');
+
+  btn.textContent = 'Salvando...'; btn.disabled = true;
+  const resp = allTeam.find(m => m.id === val('et-responsavel'));
+  const antes = pjEtapas.find(e => e.id === etEditId);
+  const campos = {
+    project_id: pjAberto.id, nome: val('et-nome'), fase: el('et-fase').value,
+    status: el('et-status').value, progresso: Number(el('et-progresso').value),
+    peso: Math.max(1, Number(el('et-peso').value) || 1),
+    ordem: Number(el('et-ordem').value) || pjEtapas.length + 1,
+    responsavel_id: resp?.id || null, responsavel_nome: resp ? (resp.name || resp.nickname) : null,
+    inicio: inicio || null, prazo: prazo || null, conclusao: val('et-conclusao') || null,
+    descricao: val('et-descricao') || null,
+    observacoes_internas: val('et-observacoes') || null,
+  };
+
+  const { error } = etEditId
+    ? await supabase.from('projeto_etapas').update(campos).eq('id', etEditId)
+    : await supabase.from('projeto_etapas').insert(campos);
+
+  btn.textContent = orig; btn.disabled = false;
+  if (error) return pjSet('et-msg', 'Não foi possível salvar: ' + error.message);
+
+  const registro = val('et-registro');
+  if (antes) {
+    if (antes.status !== campos.status) {
+      await registrarProjeto(pjAberto.id, 'Situação da etapa',
+        ETAPA_STATUS[antes.status]?.label, ETAPA_STATUS[campos.status]?.label, registro, etEditId, campos.nome);
+    }
+    if (antes.progresso !== campos.progresso) {
+      await registrarProjeto(pjAberto.id, 'Progresso da etapa',
+        antes.progresso + '%', campos.progresso + '%', registro, etEditId, campos.nome);
+    }
+    if (antes.responsavel_nome !== campos.responsavel_nome) {
+      await registrarProjeto(pjAberto.id, 'Responsável pela etapa',
+        antes.responsavel_nome, campos.responsavel_nome, registro, etEditId, campos.nome);
+    }
+  } else {
+    await registrarProjeto(pjAberto.id, 'Etapa', null, campos.nome, registro || 'Etapa criada');
+  }
+
+  closeModal('modal-etapa');
+  await window._abrirProjeto(pjAberto.id);
+  await sincronizarProgresso();
+};
+
+window._excluirEtapa = async () => {
+  const e = pjEtapas.find(x => x.id === etEditId);
+  if (!e) return;
+  if (!confirm(`Excluir a etapa "${e.nome}"? As tarefas dela vão junto.`)) return;
+  const { error } = await supabase.from('projeto_etapas').delete().eq('id', etEditId);
+  if (error) return pjSet('et-msg', 'Não foi possível excluir: ' + error.message);
+  await registrarProjeto(pjAberto.id, 'Etapa', e.nome, null, 'Etapa excluída');
+  closeModal('modal-etapa');
+  await window._abrirProjeto(pjAberto.id);
+  await sincronizarProgresso();
+};
+
+// O progresso do projeto é derivado das etapas, mas fica gravado em
+// `projects.progress` porque o portal e o dashboard leem de lá.
+async function sincronizarProgresso() {
+  const novo = progressoGeral(pjEtapas);
+  if (novo === (pjAberto.progress || 0)) return;
+  await supabase.from('projects')
+    .update({ progress: novo, atualizado_em: new Date().toISOString() }).eq('id', pjAberto.id);
+  pjAberto.progress = novo;
+  const na = allProjects.find(p => p.id === pjAberto.id);
+  if (na) na.progress = novo;
+  renderProjetos();
+}
+
+/* ── mudanças direto na ficha ── */
+el('pf-status').addEventListener('change', async e => {
+  const antes = pjAberto.status, novo = e.target.value;
+  const campos = { status: novo, atualizado_em: new Date().toISOString() };
+  if (novo === 'ANDAMENTO' && !pjAberto.started_at) campos.started_at = new Date().toISOString();
+  if (['CONCLUIDO','CANCELADO'].includes(novo)) campos.finished_at = new Date().toISOString();
+
+  // Quem depende do cliente precisa dizer por quê: é o que permite cobrar
+  // depois sem o atraso cair na conta da SertCode.
+  if (['AGUARDANDO_CLIENTE','AGUARDANDO_APROVACAO','PAUSADO'].includes(novo)) {
+    const motivo = prompt('Por que o projeto está nesta situação? (fica no histórico)');
+    if (motivo === null) { e.target.value = antes; return; }
+    campos.motivo_espera = motivo || null;
+    campos.espera_desde = hojeISO();
+  } else {
+    campos.motivo_espera = null;
+    campos.espera_desde = null;
+  }
+
+  const { error } = await supabase.from('projects').update(campos).eq('id', pjAberto.id);
+  if (error) { e.target.value = antes; return alert('Não foi possível salvar: ' + error.message); }
+
+  Object.assign(pjAberto, campos);
+  await registrarProjeto(pjAberto.id, 'Situação do projeto',
+    PROJETO_STATUS[antes]?.label, PROJETO_STATUS[novo]?.label, campos.motivo_espera);
+  await loadAll();
+  await window._abrirProjeto(pjAberto.id);
+});
+
+el('pf-responsavel').addEventListener('change', async e => {
+  const m = allTeam.find(x => x.id === e.target.value);
+  const antes = pjAberto.responsavel_nome;
+  const campos = { responsavel_id: m?.id || null, responsavel_nome: m ? (m.name || m.nickname) : null };
+  const { error } = await supabase.from('projects').update(campos).eq('id', pjAberto.id);
+  if (error) return alert('Não foi possível salvar: ' + error.message);
+  Object.assign(pjAberto, campos);
+  await registrarProjeto(pjAberto.id, 'Responsável', antes, campos.responsavel_nome);
+  await loadAll();
+  renderFichaProjeto();
+});
+
+el('pf-entrega').addEventListener('change', async e => {
+  const antes = pjAberto.previsao_entrega;
+  const { error } = await supabase.from('projects')
+    .update({ previsao_entrega: e.target.value || null }).eq('id', pjAberto.id);
+  if (error) return alert('Não foi possível salvar: ' + error.message);
+  pjAberto.previsao_entrega = e.target.value || null;
+  await registrarProjeto(pjAberto.id, 'Previsão de entrega',
+    antes ? fmtDate(antes) : 'sem data', e.target.value ? fmtDate(e.target.value) : 'sem data');
+  await loadAll();
+  renderFichaProjeto();
+});
+
+window._salvarObservacoes = async () => {
+  const { error } = await supabase.from('projects')
+    .update({ observacoes_internas: val('pf-observacoes') || null }).eq('id', pjAberto.id);
+  if (error) return alert('Não foi possível salvar: ' + error.message);
+  pjAberto.observacoes_internas = val('pf-observacoes');
+  window._aviso('Observações internas salvas.');
+};
+
+/* ── tarefas ── */
+function renderTarefas() {
+  if (!pjTarefas.length) {
+    el('pf-tarefas').innerHTML = '<div class="card"><div class="rh-item-sub">Nenhuma tarefa cadastrada.</div></div>';
+    return;
+  }
+  const porEtapa = {};
+  pjTarefas.forEach(t => { (porEtapa[t.etapa_id || 'soltas'] ||= []).push(t); });
+
+  el('pf-tarefas').innerHTML = Object.entries(porEtapa).map(([etapaId, tarefas]) => {
+    const etapa = pjEtapas.find(e => e.id === etapaId);
+    return `<div class="card" style="margin-bottom:14px">
+      <div class="card-title" style="margin-bottom:12px">${esc(etapa?.nome || 'Sem etapa')}</div>
+      ${tarefas.map(t => {
+        const atrasada = t.prazo && t.prazo < hojeISO() && !t.concluida;
+        return `<label class="eq-perm" style="margin-bottom:8px">
+          <input type="checkbox" data-tarefa="${t.id}"${t.concluida ? ' checked' : ''}>
+          <span style="${t.concluida ? 'opacity:.6;text-decoration:line-through' : ''}">${esc(t.titulo)}
+            <span class="rh-item-sub" style="${atrasada ? 'color:var(--red)' : ''}">
+              ${esc(t.responsavel_nome || 'Sem responsável')}${t.prazo ? ' · ' + fmtDate(t.prazo) : ''}</span></span>
+        </label>`;
+      }).join('')}
+    </div>`;
+  }).join('');
+}
+
+el('pf-p-tarefas').addEventListener('change', async e => {
+  if (!e.target.matches('[data-tarefa]')) return;
+  const id = e.target.dataset.tarefa, feita = e.target.checked;
+  const t = pjTarefas.find(x => x.id === id);
+  const { error } = await supabase.from('projeto_tarefas')
+    .update({ concluida: feita, concluida_em: feita ? new Date().toISOString() : null }).eq('id', id);
+  if (error) { e.target.checked = !feita; return alert('Não foi possível salvar: ' + error.message); }
+  t.concluida = feita;
+  await registrarProjeto(pjAberto.id, 'Tarefa', null, null,
+    (feita ? 'Concluída: ' : 'Reaberta: ') + t.titulo);
+  renderTarefas();
+});
+
+window._novaTarefa = async () => {
+  const titulo = prompt('O que precisa ser feito?');
+  if (!titulo) return;
+  const lista = pjEtapas.map((e, i) => `${i + 1}. ${e.nome}`).join('\n');
+  const escolha = pjEtapas.length
+    ? prompt(`Em qual etapa? (número, ou vazio para nenhuma)\n\n${lista}`) : '';
+  const etapa = pjEtapas[Number(escolha) - 1];
+  const prazo = prompt('Prazo (AAAA-MM-DD, ou vazio):') || null;
+
+  const { error } = await supabase.from('projeto_tarefas').insert({
+    project_id: pjAberto.id, etapa_id: etapa?.id || null, titulo,
+    responsavel_nome: etapa?.responsavel_nome || null, prazo,
+  });
+  if (error) return alert('Não foi possível criar: ' + error.message);
+  await registrarProjeto(pjAberto.id, 'Tarefa', null, titulo, 'Tarefa criada');
+  await window._abrirProjeto(pjAberto.id);
+};
+
+/* ── cronograma ── */
+function renderCronograma() {
+  el('pf-cronograma').innerHTML = pjEtapas.length ? pjEtapas.map(e => {
+    const st = ETAPA_STATUS[e.status] || { label: e.status, cls: '' };
+    const atrasada = e.prazo && e.prazo < hojeISO() && !['CONCLUIDO','CANCELADO'].includes(e.status);
+    return `<tr class="rh-linha" onclick="window._editarEtapa('${e.id}')">
+      <td style="font-weight:600">${esc(e.nome)}</td>
+      <td style="color:var(--text-dim)">${FASES[e.fase]?.nome || e.fase}</td>
+      <td style="color:var(--text-dim)">${esc(e.responsavel_nome || '—')}</td>
+      <td style="font-size:12px;color:var(--text-dim)">${e.inicio ? fmtDate(e.inicio) : '—'}</td>
+      <td style="font-size:12px;${atrasada ? 'color:var(--red);font-weight:600' : 'color:var(--text-dim)'}">${e.prazo ? fmtDate(e.prazo) : '—'}</td>
+      <td style="font-size:12px;color:var(--text-dim)">${e.conclusao ? fmtDate(e.conclusao) : '—'}</td>
+      <td><span class="status ${st.cls}">${st.label}</span></td>
+    </tr>`;
+  }).join('') : '<tr><td colspan="7" class="team-empty">Nenhuma etapa cadastrada.</td></tr>';
+}
+
+/* ── documentos ── */
+function renderDocumentos() {
+  if (!pjDocumentos.length) {
+    el('pf-documentos').innerHTML = '<div class="card"><div class="rh-item-sub">Nenhum arquivo enviado.</div></div>';
+    return;
+  }
+  const porPasta = {};
+  pjDocumentos.forEach(d => { (porPasta[d.pasta] ||= []).push(d); });
+
+  el('pf-documentos').innerHTML = Object.entries(PASTAS_DOC)
+    .filter(([p]) => porPasta[p])
+    .map(([p, nome]) => `<div class="card" style="margin-bottom:14px">
+      <div class="card-title" style="margin-bottom:12px">${nome}</div>
+      ${porPasta[p].map(d => `<div class="hist-item" style="margin-bottom:8px">
+        <div class="hist-topo">
+          <span style="font-size:12.5px;font-weight:600">${esc(d.nome)}</span>
+          <span class="hist-data">${fmtDate(d.created_at)}</span>
+        </div>
+        <div class="hist-autor">${esc(d.enviado_por || '—')}
+          ${d.enviado_tipo === 'CLIENTE' ? ' · enviado pelo cliente' : ''}
+          ${d.publico ? '' : ' · <span style="color:var(--orange)">só a equipe vê</span>'}</div>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button class="team-btn" onclick="window._baixarDocumento('${d.caminho}')">Baixar</button>
+          <button class="team-btn danger" onclick="window._excluirDocumento('${d.id}')">Excluir</button>
+        </div>
+      </div>`).join('')}
+    </div>`).join('');
+}
+
+async function enviarArquivoProjeto(input, limiteMb = 20) {
+  const arquivo = input.files[0];
+  if (!arquivo) return { caminho: null };
+  if (arquivo.size > limiteMb * 1024 * 1024) return { erro: `O arquivo precisa ter no máximo ${limiteMb} MB.` };
+  // O caminho começa com o id do projeto: é assim que a regra do bucket
+  // decide se o cliente pode abrir.
+  const caminho = `${pjAberto.id}/${Date.now()}-${arquivo.name.replace(/[^\w.\-]/g, '_')}`;
+  const { error } = await supabase.storage.from('projeto-arquivos').upload(caminho, arquivo);
+  if (error) return { erro: 'Não foi possível enviar: ' + error.message };
+  return { caminho, nome: arquivo.name, tamanho: arquivo.size };
+}
+
+window._enviarDocumento = async () => {
+  const btn = el('pf-doc-btn'), orig = btn.textContent;
+  if (!el('pf-doc-arquivo').files[0]) return pjSet('pf-doc-msg', 'Escolha o arquivo.');
+
+  btn.textContent = 'Enviando...'; btn.disabled = true;
+  const enviado = await enviarArquivoProjeto(el('pf-doc-arquivo'));
+  if (enviado.erro) { btn.textContent = orig; btn.disabled = false; return pjSet('pf-doc-msg', enviado.erro); }
+
+  const { error } = await supabase.from('projeto_documentos').insert({
+    project_id: pjAberto.id, client_id: pjAberto.client_id,
+    pasta: el('pf-doc-pasta').value, nome: enviado.nome, caminho: enviado.caminho,
+    tamanho: enviado.tamanho, publico: el('pf-doc-publico').checked,
+    enviado_por: myName, enviado_tipo: 'EQUIPE',
+  });
+  btn.textContent = orig; btn.disabled = false;
+  if (error) return pjSet('pf-doc-msg', 'Não foi possível registrar: ' + error.message);
+
+  el('pf-doc-arquivo').value = '';
+  await registrarProjeto(pjAberto.id, 'Documento', null, enviado.nome, 'Arquivo enviado');
+  await window._abrirProjeto(pjAberto.id);
+  pjSet('pf-doc-msg', 'Arquivo enviado.', 'success');
+};
+
+window._baixarDocumento = async (caminho) => {
+  const { data, error } = await supabase.storage.from('projeto-arquivos').createSignedUrl(caminho, 60);
+  if (error) return alert('Não foi possível abrir: ' + error.message);
+  window.open(data.signedUrl, '_blank');
+};
+
+window._excluirDocumento = async (id) => {
+  const d = pjDocumentos.find(x => x.id === id);
+  if (!confirm(`Excluir "${d.nome}"? O arquivo sai do portal do cliente também.`)) return;
+  await supabase.storage.from('projeto-arquivos').remove([d.caminho]);
+  const { error } = await supabase.from('projeto_documentos').delete().eq('id', id);
+  if (error) return alert('Não foi possível excluir: ' + error.message);
+  await registrarProjeto(pjAberto.id, 'Documento', d.nome, null, 'Arquivo excluído');
+  await window._abrirProjeto(pjAberto.id);
+};
+
+/* ── atualizações ── */
+function renderAtualizacoes() {
+  el('pf-atualizacoes').innerHTML = pjAtualizacoes.length ? pjAtualizacoes.map(a => `
+    <div class="hist-item${a.publica ? '' : ' sup-nota'}">
+      <div class="hist-topo">
+        <span style="font-size:12.5px;font-weight:600">${esc(a.titulo)}</span>
+        <span class="hist-data">${fmtDateTime(a.created_at)}</span>
+      </div>
+      ${a.descricao ? `<div class="hist-nota">${esc(a.descricao)}</div>` : ''}
+      <div class="hist-autor">${esc(a.autor_nome || '—')}
+        ${a.publica ? '' : ' · <span style="color:var(--orange)">interna</span>'}</div>
+      ${a.anexo ? `<button class="cbo-link" onclick="window._baixarDocumento('${a.anexo}')">Ver anexo</button>` : ''}
+    </div>`).join('')
+    : '<div class="rh-item-sub">Nenhuma atualização registrada.</div>';
+}
+
+window._registrarAtualizacao = async () => {
+  const btn = el('pf-at-btn'), orig = btn.textContent;
+  if (!val('pf-at-titulo')) return pjSet('pf-at-msg', 'Informe o título da atualização.');
+
+  btn.textContent = 'Registrando...'; btn.disabled = true;
+  const anexo = await enviarArquivoProjeto(el('pf-at-anexo'));
+  if (anexo.erro) { btn.textContent = orig; btn.disabled = false; return pjSet('pf-at-msg', anexo.erro); }
+
+  const { error } = await supabase.from('projeto_atualizacoes').insert({
+    project_id: pjAberto.id, etapa_id: val('pf-at-etapa') || null,
+    titulo: val('pf-at-titulo'), descricao: val('pf-at-descricao') || null,
+    publica: el('pf-at-publica').checked, anexo: anexo.caminho, autor_nome: myName,
+  });
+  btn.textContent = orig; btn.disabled = false;
+  if (error) return pjSet('pf-at-msg', 'Não foi possível registrar: ' + error.message);
+
+  ['pf-at-titulo','pf-at-descricao'].forEach(id => el(id).value = '');
+  el('pf-at-anexo').value = '';
+  await window._abrirProjeto(pjAberto.id);
+  pjSet('pf-at-msg', el('pf-at-publica').checked
+    ? 'Atualização registrada e enviada ao cliente.' : 'Atualização registrada só para a equipe.', 'success');
+};
+
+/* ── aprovações ── */
+function renderAprovacoes() {
+  const SIT = {
+    PENDENTE: { label: 'Aguardando o cliente', cls: 'status-pending' },
+    APROVADA: { label: 'Aprovada',             cls: 'status-done' },
+    AJUSTES:  { label: 'Ajustes pedidos',      cls: 'status-expirado' },
+  };
+  el('pf-aprovacoes').innerHTML = pjAprovacoes.length ? pjAprovacoes.map(a => {
+    const s = SIT[a.situacao];
+    const vencida = a.prazo && a.prazo < hojeISO() && a.situacao === 'PENDENTE';
+    return `<div class="hist-item" style="margin-bottom:10px">
+      <div class="hist-topo">
+        <span style="font-size:12.5px;font-weight:600">${TIPOS_APROVACAO[a.tipo] || a.tipo}: ${esc(a.titulo)}</span>
+        <span class="status ${s.cls}">${s.label}</span>
+      </div>
+      ${a.descricao ? `<div class="hist-nota">${esc(a.descricao)}</div>` : ''}
+      <div class="hist-autor">Pedida por ${esc(a.solicitado_por || '—')} em ${fmtDate(a.created_at)}
+        ${a.prazo ? ` · prazo ${fmtDate(a.prazo)}` : ''}
+        ${vencida ? ' · <span style="color:var(--red)">vencida</span>' : ''}</div>
+      ${a.resposta ? `<div class="hist-nota" style="margin-top:8px"><strong>Cliente:</strong> ${esc(a.resposta)}</div>` : ''}
+      ${a.respondido_em ? `<div class="hist-autor">Respondida por ${esc(a.respondido_por || 'cliente')} em ${fmtDateTime(a.respondido_em)}</div>` : ''}
+      ${a.anexo ? `<button class="cbo-link" onclick="window._baixarDocumento('${a.anexo}')">Ver arquivo</button>` : ''}
+    </div>`;
+  }).join('') : '<div class="rh-item-sub">Nenhuma aprovação solicitada.</div>';
+}
+
+window._pedirAprovacao = async () => {
+  const btn = el('pf-ap-btn'), orig = btn.textContent;
+  if (!val('pf-ap-titulo')) return pjSet('pf-ap-msg', 'Informe o título da aprovação.');
+  if (!val('pf-ap-descricao')) return pjSet('pf-ap-msg', 'Explique o que o cliente precisa avaliar.');
+
+  btn.textContent = 'Enviando...'; btn.disabled = true;
+  const anexo = await enviarArquivoProjeto(el('pf-ap-anexo'));
+  if (anexo.erro) { btn.textContent = orig; btn.disabled = false; return pjSet('pf-ap-msg', anexo.erro); }
+
+  const { error } = await supabase.from('projeto_aprovacoes').insert({
+    project_id: pjAberto.id, tipo: el('pf-ap-tipo').value,
+    titulo: val('pf-ap-titulo'), descricao: val('pf-ap-descricao'),
+    prazo: val('pf-ap-prazo') || null, anexo: anexo.caminho,
+    solicitado_por: myName, situacao: 'PENDENTE',
+  });
+  btn.textContent = orig; btn.disabled = false;
+  if (error) return pjSet('pf-ap-msg', 'Não foi possível enviar: ' + error.message);
+
+  ['pf-ap-titulo','pf-ap-descricao','pf-ap-prazo'].forEach(id => el(id).value = '');
+  el('pf-ap-anexo').value = '';
+  await registrarProjeto(pjAberto.id, 'Aprovação', null, val('pf-ap-titulo'), 'Aprovação solicitada ao cliente');
+  await window._abrirProjeto(pjAberto.id);
+  pjSet('pf-ap-msg', 'Aprovação solicitada. O cliente foi avisado no portal.', 'success');
+};
+
+/* ── comunicação ── */
+function renderConversaProjeto() {
+  const cl = clientMap[pjAberto.client_id];
+  el('pf-conversa').innerHTML = pjMensagens.length ? pjMensagens.map(m => `
+    <div class="hist-item${m.autor_tipo === 'CLIENTE' ? '' : ' sup-equipe'}">
+      <div class="hist-topo">
+        <span style="font-size:12.5px;font-weight:600">${
+          m.autor_tipo === 'EQUIPE' ? 'SertCode' : esc(m.autor_nome || cl?.name || 'Cliente')}</span>
+        <span class="hist-data">${fmtDateTime(m.created_at)}</span>
+      </div>
+      <div class="hist-nota">${esc(m.mensagem)}</div>
+      ${m.anexo ? `<button class="cbo-link" onclick="window._baixarDocumento('${m.anexo}')">Ver anexo</button>` : ''}
+    </div>`).join('')
+    : '<div class="rh-item-sub">Nenhuma mensagem ainda.</div>';
+}
+
+window._enviarMensagemProjeto = async () => {
+  const btn = el('pf-msg-btn'), orig = btn.textContent;
+  if (!val('pf-msg-texto')) return pjSet('pf-msg-aviso', 'Escreva a mensagem.');
+
+  btn.textContent = 'Enviando...'; btn.disabled = true;
+  const anexo = await enviarArquivoProjeto(el('pf-msg-anexo'));
+  if (anexo.erro) { btn.textContent = orig; btn.disabled = false; return pjSet('pf-msg-aviso', anexo.erro); }
+
+  const { error } = await supabase.from('projeto_mensagens').insert({
+    project_id: pjAberto.id, autor_id: session.user.id, autor_nome: myName,
+    autor_tipo: 'EQUIPE', mensagem: val('pf-msg-texto'), anexo: anexo.caminho,
+  });
+  btn.textContent = orig; btn.disabled = false;
+  if (error) return pjSet('pf-msg-aviso', 'Não foi possível enviar: ' + error.message);
+
+  el('pf-msg-texto').value = ''; el('pf-msg-anexo').value = '';
+  await window._abrirProjeto(pjAberto.id);
+  el('pf-msg-aviso').className = 'form-msg';
+};
+
+/* ── histórico ── */
+async function registrarProjeto(projetoId, campo, antes, depois, descricao, etapaId = null, etapaNome = null) {
+  await supabase.from('projeto_historico').insert({
+    project_id: projetoId, etapa_id: etapaId, etapa_nome: etapaNome, campo,
+    valor_antes: antes ?? null, valor_depois: depois ?? null,
+    descricao: descricao || null, autor_nome: myName,
   });
 }
 
-window._mudarStatus = (id) => {
-  const p = allProjects.find(x => x.id === id);
-  if (!p) return;
-  stProjId = id;
-  document.getElementById('st-projeto').textContent = `${p.name} · ${nomeCliente(p.client_id)}`;
-  document.getElementById('st-novo').value = p.status || 'cadastrado';
-  document.getElementById('st-nota').value = '';
-  document.getElementById('st-msg').className = 'form-msg';
-  atualizarRotuloNota();
-  openModal('modal-status');
-};
-
-function atualizarRotuloNota() {
-  const novo = document.getElementById('st-novo').value;
-  document.getElementById('st-label-nota').textContent =
-    EXIGE_NOTA.includes(novo) ? 'Justificativa (obrigatória)' : 'Observação (opcional)';
+function renderHistoricoProjeto() {
+  el('pf-historico').innerHTML = pjHistorico.length ? pjHistorico.map(h => `
+    <div class="hist-item">
+      <div class="hist-topo">
+        <span style="font-size:12.5px;font-weight:600">${esc(h.campo)}${
+          h.etapa_nome ? ` · ${esc(h.etapa_nome)}` : ''}</span>
+        <span class="hist-data">${fmtDateTime(h.created_at)}</span>
+      </div>
+      ${h.valor_antes || h.valor_depois
+        ? `<div class="hist-nota">${esc(h.valor_antes || '—')} → <strong>${esc(h.valor_depois || '—')}</strong></div>` : ''}
+      ${h.descricao ? `<div class="hist-nota">${esc(h.descricao)}</div>` : ''}
+      <div class="hist-autor">por ${esc(h.autor_nome || '—')}</div>
+    </div>`).join('')
+    : '<div class="rh-item-sub">Nenhuma alteração registrada.</div>';
 }
-document.getElementById('st-novo').addEventListener('change', atualizarRotuloNota);
 
-window._salvarStatus = async () => {
-  const btn = document.getElementById('st-btn'), orig = btn.textContent;
-  const msg = document.getElementById('st-msg');
-  const set = (t, tipo = 'error') => { msg.textContent = t; msg.className = 'form-msg show ' + tipo; };
-
-  const novo = document.getElementById('st-novo').value;
-  const nota = document.getElementById('st-nota').value.trim();
-  if (EXIGE_NOTA.includes(novo) && !nota) {
-    return set(`Explique o motivo para deixar o projeto como ${PJ_STATUS[novo].label.toLowerCase()}.`);
-  }
-
-  btn.textContent = 'Registrando...'; btn.disabled = true;
-  const fim = () => { btn.textContent = orig; btn.disabled = false; };
-
-  const campos = { status: novo };
-  if (novo === 'andamento') campos.started_at = new Date().toISOString();
-  if (['concluido','cancelado'].includes(novo)) campos.finished_at = new Date().toISOString();
-  if (novo === 'concluido') campos.progress = 100;
-
-  const { error } = await supabase.from('projects').update(campos).eq('id', stProjId);
-  if (error) { fim(); return set('Não foi possível mudar a situação: ' + error.message); }
-
-  const { error: e2 } = await registrarHistorico(stProjId, novo, nota);
-  if (e2) { fim(); return set('Situação alterada, mas o histórico falhou: ' + e2.message); }
-
-  await loadAll();
-  fim();
-  set('Mudança registrada no histórico.', 'success');
-};
-
-window._verHistorico = async (id) => {
-  const p = allProjects.find(x => x.id === id);
-  if (!p) return;
-  histProjId = id;
-  document.getElementById('hist-projeto').textContent = `${p.name} · ${nomeCliente(p.client_id)}`;
-  document.getElementById('hist-lista').innerHTML = '<div style="color:var(--text-dim);font-size:13px">Carregando...</div>';
-  openModal('modal-historico');
-
-  const { data } = await supabase.from('project_history').select('*')
-    .eq('project_id', id).order('changed_at', { ascending: true });
-  projHistorico = data || [];
-
-  document.getElementById('hist-lista').innerHTML = projHistorico.length
-    ? projHistorico.map(h => {
-        const s = PJ_STATUS[h.status] || { label: h.status, cls: '' };
-        return `<div class="hist-item">
-          <div class="hist-topo">
-            <span class="status ${s.cls}">${s.label}</span>
-            <span class="hist-data">${fmtDateTime(h.changed_at)}</span>
-          </div>
-          ${h.note ? `<div class="hist-nota">${esc(h.note)}</div>` : ''}
-          <div class="hist-autor">por ${esc(h.changed_by_name || 'equipe SertCode')}</div>
-        </div>`;
-      }).join('')
-    : '<div style="color:var(--text-dim);font-size:13px">Nenhuma mudança registrada ainda.</div>';
-};
-
-// O PDF sai pela impressão do navegador: abre uma página já formatada e o
-// próprio "Salvar como PDF" gera o arquivo, sem depender de biblioteca.
-window._baixarPdf = () => {
-  const p = allProjects.find(x => x.id === histProjId);
-  if (!p) return;
-  const cl = clientMap[p.client_id];
-  const s = PJ_STATUS[p.status] || { label: p.status };
-
-  const linhas = projHistorico.map(h => `
-    <tr>
-      <td>${fmtDateTime(h.changed_at)}</td>
-      <td>${(PJ_STATUS[h.status] || { label: h.status }).label}</td>
-      <td>${esc(h.note || '—')}</td>
-      <td>${esc(h.changed_by_name || 'Equipe SertCode')}</td>
-    </tr>`).join('') || '<tr><td colspan="4">Nenhuma mudança registrada.</td></tr>';
+/* ── PDF ── */
+window._baixarProjetoPdf = () => {
+  const p = pjAberto, cl = clientMap[p.client_id];
+  const progresso = progressoGeral(pjEtapas);
+  const linha = (r, v) => `<div><strong>${r}:</strong> ${v}</div>`;
 
   const doc = `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="utf-8">
-<title>Projeto ${esc(p.name)} — SertCode</title>
+<title>${esc(p.codigo || p.name)} — SertCode</title>
 <style>
   body { font-family: Arial, Helvetica, sans-serif; color:#111; margin:32px; }
-  h1 { font-size:20px; margin:0 0 4px; }
-  .sub { color:#666; font-size:12px; margin-bottom:22px; }
-  .ficha { border:1px solid #ddd; border-radius:8px; padding:14px 16px; margin-bottom:22px; font-size:13px; }
+  h1 { font-size:19px; margin:0 0 4px; }
+  h2 { font-size:14px; margin:22px 0 8px; }
+  .sub { color:#666; font-size:12px; margin-bottom:20px; }
+  .ficha { border:1px solid #ddd; border-radius:8px; padding:14px 16px; font-size:12.5px; }
   .ficha div { margin-bottom:5px; }
-  table { width:100%; border-collapse:collapse; font-size:12px; }
-  th, td { border-bottom:1px solid #e5e5e5; padding:8px 6px; text-align:left; vertical-align:top; }
-  th { background:#f5f5f5; }
-  .rodape { margin-top:26px; font-size:11px; color:#888; }
+  table { width:100%; border-collapse:collapse; font-size:11.5px; }
+  th, td { border-bottom:1px solid #eee; padding:6px 4px; text-align:left; }
+  th { color:#666; font-size:10.5px; text-transform:uppercase; }
+  .rodape { margin-top:24px; font-size:11px; color:#888; }
 </style></head><body>
   <h1>${esc(p.name)}</h1>
-  <div class="sub">Histórico do projeto · SertCode</div>
+  <div class="sub">${esc(p.codigo || '')} · ${esc(cl?.company || cl?.name || '')}</div>
   <div class="ficha">
-    <div><strong>Cliente:</strong> ${esc(cl?.company || cl?.name || '—')}</div>
-    <div><strong>Responsável:</strong> ${esc(cl?.name || '—')}</div>
-    <div><strong>Contato:</strong> ${esc([cl?.email, cl?.phone, cl?.phone2].filter(Boolean).join(' · ') || '—')}</div>
-    <div><strong>Tipo:</strong> ${esc(p.type || '—')}</div>
-    <div><strong>Solicitado em:</strong> ${fmtDateTime(p.requested_at || p.created_at)}</div>
-    <div><strong>Início:</strong> ${fmtDateTime(p.started_at)}</div>
-    <div><strong>Encerramento:</strong> ${fmtDateTime(p.finished_at)}</div>
-    <div><strong>Situação atual:</strong> ${s.label} · ${p.progress || 0}% concluído</div>
-    ${p.description ? `<div><strong>Descrição:</strong> ${esc(p.description)}</div>` : ''}
+    ${linha('Serviço', esc(servicoNome(p)))}
+    ${linha('Situação', (PROJETO_STATUS[p.status] || {}).label || p.status)}
+    ${linha('Progresso', progresso + '%')}
+    ${linha('Responsável', esc(p.responsavel_nome || '—'))}
+    ${linha('Solicitado em', fmtDate(p.requested_at))}
+    ${linha('Previsão de entrega', p.previsao_entrega ? fmtDate(p.previsao_entrega) : '—')}
+    ${linha('Valor contratado', pjMoeda(p.valor))}
   </div>
+  <h2>Etapas</h2>
   <table>
-    <thead><tr><th>Data e hora</th><th>Situação</th><th>Descrição</th><th>Registrado por</th></tr></thead>
-    <tbody>${linhas}</tbody>
+    <thead><tr><th>Etapa</th><th>Fase</th><th>Responsável</th><th>Prazo</th><th>Progresso</th><th>Situação</th></tr></thead>
+    <tbody>${pjEtapas.map(e => `<tr>
+      <td>${esc(e.nome)}</td>
+      <td>${FASES[e.fase]?.nome || e.fase}</td>
+      <td>${esc(e.responsavel_nome || '—')}</td>
+      <td>${e.prazo ? fmtDate(e.prazo) : '—'}</td>
+      <td>${e.progresso}%</td>
+      <td>${(ETAPA_STATUS[e.status] || {}).label || e.status}</td>
+    </tr>`).join('')}</tbody>
   </table>
-  <div class="rodape">Emitido em ${fmtDateTime(new Date())} — SertCode</div>
+  <h2>Atualizações compartilhadas com o cliente</h2>
+  <table>
+    <thead><tr><th>Data</th><th>Atualização</th></tr></thead>
+    <tbody>${pjAtualizacoes.filter(a => a.publica).map(a => `<tr>
+      <td>${fmtDate(a.created_at)}</td>
+      <td><strong>${esc(a.titulo)}</strong>${a.descricao ? '<br>' + esc(a.descricao) : ''}</td>
+    </tr>`).join('') || '<tr><td colspan="2">Nenhuma.</td></tr>'}</tbody>
+  </table>
+  <div class="rodape">Emitido em ${fmtDateTime(new Date())} por ${esc(myName)} — SertCode</div>
 </body></html>`;
 
   const janela = window.open('', '_blank');
-  if (!janela) { alert('Libere as janelas pop-up para gerar o PDF.'); return; }
+  if (!janela) return alert('Libere as janelas pop-up para gerar o PDF.');
   janela.document.write(doc);
   janela.document.close();
   janela.focus();
@@ -7028,22 +7971,6 @@ function renderFeedbacks() {
 /* ── GLOBAL HANDLERS (chamados pelo onclick no HTML renderizado) ── */
 let _currentProjId = '';
 
-window._openProgress = (id, name, val) => {
-  _currentProjId = id;
-  document.getElementById('prog-modal-name').textContent = name;
-  document.getElementById('prog-slider').value = val;
-  document.getElementById('prog-display').textContent = val + '%';
-  document.getElementById('modal-progress').classList.add('open');
-};
-
-window._openActivity = (projId, name) => {
-  _currentProjId = projId;
-  document.getElementById('act-modal-name').textContent = name;
-  document.getElementById('act-text').value = '';
-  document.getElementById('act-success').style.display = 'none';
-  document.getElementById('modal-activity').classList.add('open');
-};
-
 window._showCred = async (name, clientId) => {
   document.getElementById('cred-info').innerHTML =
     rowBox('Cliente', name) + rowBox('ID Supabase', clientId) +
@@ -7070,29 +7997,6 @@ window._rejectTesti = async (id) => {
   }
 };
 
-/* ── SAVE PROGRESS ── */
-// Progresso e situação andam separados: chegar a 100% não conclui o projeto
-// sozinho, porque concluir é uma decisão que precisa ficar no histórico.
-window.saveProgress = async () => {
-  const val   = +document.getElementById('prog-slider').value;
-  const phase = document.getElementById('prog-phase').value;
-  const { error } = await supabase.from('projects')
-    .update({ progress: val, current_phase: phase }).eq('id', _currentProjId);
-  if (error) { alert('Não foi possível salvar o progresso: ' + error.message); return; }
-  closeModal('modal-progress');
-  await loadAll();
-};
-
-/* ── SAVE ACTIVITY (kanban_items) ── */
-window.saveActivity = async () => {
-  const t = document.getElementById('act-text').value.trim();
-  if (!t) { document.getElementById('act-text').focus(); return; }
-  await supabase.from('kanban_items').insert({ project_id: _currentProjId, title: t, status: 'done' });
-  const msg = document.getElementById('act-success');
-  msg.style.display = 'block';
-  setTimeout(() => { closeModal('modal-activity'); msg.style.display='none'; }, 2000);
-};
-
 /* ── MODALS / TABS ── */
 window.closeModal = id => document.getElementById(id).classList.remove('open');
 window.openModal  = id => document.getElementById(id).classList.add('open');
@@ -7102,10 +8006,6 @@ document.querySelectorAll('.modal-overlay').forEach(m => {
 document.addEventListener('keydown', e => {
   if (e.key==='Escape') document.querySelectorAll('.modal-overlay.open').forEach(m=>m.classList.remove('open'));
 });
-document.getElementById('prog-slider').addEventListener('input', function() {
-  document.getElementById('prog-display').textContent = this.value+'%';
-});
-
 // Abrir a Gestão de Pessoas expõe salários: a LGPD pede registro de quem viu.
 document.querySelector('.sidebar-nav a[data-tab="pessoas"]')?.addEventListener('click', () => {
   registrarRh('VISUALIZOU', 'Gestão de Pessoas', 'Abriu a Gestão de Pessoas com salários');

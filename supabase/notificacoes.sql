@@ -141,17 +141,97 @@ create trigger notifica_fatura
 -- Projeto andou → avisa o cliente.
 create or replace function public.notifica_projeto()
 returns trigger language plpgsql security definer set search_path = public as $$
+declare
+  rotulo text := case new.status
+    when 'SOLICITACAO'          then 'Solicitação recebida'
+    when 'DIAGNOSTICO'          then 'Em diagnóstico'
+    when 'AGUARDANDO_APROVACAO' then 'Aguardando sua aprovação'
+    when 'AGUARDANDO_INICIO'    then 'Aguardando início'
+    when 'ANDAMENTO'            then 'Em andamento'
+    when 'AGUARDANDO_CLIENTE'   then 'Aguardando você'
+    when 'PAUSADO'              then 'Pausado'
+    when 'HOMOLOGACAO'          then 'Em homologação'
+    when 'CONCLUIDO'            then 'Concluído'
+    when 'CANCELADO'            then 'Cancelado'
+    else new.status end;
 begin
   if new.status is distinct from old.status then
     perform public.notificar('CLIENTE', new.client_id, 'PROJETO',
-      'Projeto ' || new.name || ': ' || new.status, null, 'projeto', new.id);
+      'Projeto ' || new.name || ': ' || rotulo, null, 'projetos', new.id);
   elsif coalesce(new.progress, 0) is distinct from coalesce(old.progress, 0) then
     perform public.notificar('CLIENTE', new.client_id, 'PROJETO',
       'Projeto ' || new.name || ' em ' || new.progress || '%',
-      coalesce(new.current_phase, ''), 'projeto', new.id);
+      coalesce(new.current_phase, ''), 'projetos', new.id);
   end if;
   return new;
 end $$;
+
+-- Etapa concluída e aprovação pedida são o que o cliente mais espera ver.
+create or replace function public.notifica_etapa()
+returns trigger language plpgsql security definer set search_path = public as $$
+declare
+  p public.projects;
+begin
+  if new.status is distinct from old.status and new.status = 'CONCLUIDO' then
+    select * into p from public.projects where id = new.project_id;
+    perform public.notificar('CLIENTE', p.client_id, 'PROJETO',
+      'Etapa concluída: ' || new.nome, p.name, 'projetos', new.project_id);
+  end if;
+  return new;
+end $$;
+
+drop trigger if exists notifica_etapa on public.projeto_etapas;
+create trigger notifica_etapa
+  after update on public.projeto_etapas
+  for each row execute function public.notifica_etapa();
+
+create or replace function public.notifica_aprovacao()
+returns trigger language plpgsql security definer set search_path = public as $$
+declare
+  p public.projects;
+begin
+  select * into p from public.projects where id = new.project_id;
+
+  if tg_op = 'INSERT' then
+    perform public.notificar('CLIENTE', p.client_id, 'PROJETO',
+      'Aprovação pendente: ' || new.titulo, p.name, 'aprovacoes', new.project_id);
+  elsif new.situacao is distinct from old.situacao and new.situacao <> 'PENDENTE' then
+    perform public.notificar('EQUIPE', null, 'PROJETO',
+      case when new.situacao = 'APROVADA'
+        then 'Cliente aprovou: ' || new.titulo
+        else 'Cliente pediu ajustes: ' || new.titulo end,
+      p.name, 'projetos', new.project_id);
+  end if;
+  return new;
+end $$;
+
+drop trigger if exists notifica_aprovacao on public.projeto_aprovacoes;
+create trigger notifica_aprovacao
+  after insert or update on public.projeto_aprovacoes
+  for each row execute function public.notifica_aprovacao();
+
+-- Mensagem no projeto avisa o outro lado, como no suporte.
+create or replace function public.notifica_mensagem_projeto()
+returns trigger language plpgsql security definer set search_path = public as $$
+declare
+  p public.projects;
+begin
+  select * into p from public.projects where id = new.project_id;
+  if new.autor_tipo = 'CLIENTE' then
+    perform public.notificar('EQUIPE', null, 'PROJETO',
+      'Mensagem de ' || coalesce(new.autor_nome, 'cliente') || ' em ' || p.name,
+      new.mensagem, 'projetos', new.project_id);
+  else
+    perform public.notificar('CLIENTE', p.client_id, 'PROJETO',
+      'Nova mensagem da SertCode em ' || p.name, new.mensagem, 'comunicacao', new.project_id);
+  end if;
+  return new;
+end $$;
+
+drop trigger if exists notifica_mensagem_projeto on public.projeto_mensagens;
+create trigger notifica_mensagem_projeto
+  after insert on public.projeto_mensagens
+  for each row execute function public.notifica_mensagem_projeto();
 
 drop trigger if exists notifica_projeto on public.projects;
 create trigger notifica_projeto

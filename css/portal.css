@@ -1237,6 +1237,22 @@ button { font-family: var(--font); }
 }
 
 /* ══════════════════════════════════════
+   PROJETOS: ETAPAS
+══════════════════════════════════════ */
+.pj-etapa {
+  padding: 11px 13px; margin-bottom: 8px; border-radius: 10px; cursor: pointer;
+  background: var(--fill); border: 1px solid var(--border); transition: var(--tr);
+}
+.pj-etapa:last-child { margin-bottom: 0; }
+.pj-etapa:hover { border-color: rgba(255,106,0,0.32); background: var(--fill-forte); }
+.pj-etapa-topo {
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
+}
+@media (max-width: 620px) {
+  .pj-etapa-topo { flex-direction: column; align-items: stretch; gap: 8px; }
+}
+
+/* ══════════════════════════════════════
    NOTIFICAÇÕES
 ══════════════════════════════════════ */
 .notif-btn { position: relative; }
