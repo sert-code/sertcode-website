@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/portal.css?v=19">
+  <link rel="stylesheet" href="css/portal.css?v=20">
 <script>
   // Lido antes da tela aparecer, para não piscar o tema errado ao abrir.
   try { if (localStorage.getItem('sertcode_theme') === 'light') document.documentElement.setAttribute('data-theme', 'light'); } catch (e) {}
@@ -774,10 +774,12 @@ async function loadPortalData() {
     .order('due_date');
 
   if (invoices?.length) {
-    const paid = invoices.filter(i => i.status === 'paid').reduce((s, i) => s + Number(i.amount), 0);
-    const pending = invoices.filter(i => i.status !== 'paid').reduce((s, i) => s + Number(i.amount), 0);
-    const paidCount = invoices.filter(i => i.status === 'paid').length;
-    const pendCount = invoices.filter(i => i.status !== 'paid').length;
+    const liquido = i => Number(i.amount || 0) - Number(i.desconto || 0);
+    const emAberto = i => i.status !== 'pago' && i.status !== 'cancelado';
+    const paid = invoices.filter(i => i.status === 'pago').reduce((s, i) => s + liquido(i), 0);
+    const pending = invoices.filter(emAberto).reduce((s, i) => s + liquido(i), 0);
+    const paidCount = invoices.filter(i => i.status === 'pago').length;
+    const pendCount = invoices.filter(emAberto).length;
 
     const statCards = document.querySelectorAll('#tab-financeiro .stat-card');
     if (statCards[0]) {
@@ -801,7 +803,7 @@ async function loadPortalData() {
         </div>
         <div class="invoice-amount">
           <div class="invoice-value">R$ ${Number(inv.amount).toLocaleString('pt-BR', {minimumFractionDigits:2})}</div>
-          <div style="margin-top:5px"><span class="status ${inv.status === 'paid' ? 'status-paid' : 'status-pending'}">${inv.status === 'paid' ? 'Pago' : 'Pendente'}</span></div>
+          <div style="margin-top:5px"><span class="status ${PORTAL_FATURA[inv.status]?.cls || 'status-pending'}">${PORTAL_FATURA[inv.status]?.label || inv.status}</span></div>
         </div>
       </div>
     `).join('');
@@ -851,6 +853,13 @@ async function loadPortalData() {
 }
 
 /* ── HELPERS ── */
+const PORTAL_FATURA = {
+  pendente:    { label: 'Pendente',    cls: 'status-pending' },
+  pago:        { label: 'Pago',        cls: 'status-paid' },
+  atrasado:    { label: 'Em atraso',   cls: 'status-expirado' },
+  cancelado:   { label: 'Cancelado',   cls: 'status-cancelado' },
+  reembolsado: { label: 'Reembolsado', cls: 'status-analysis' },
+};
 function escapeHtml(v) {
   return String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
