@@ -1237,6 +1237,59 @@ button { font-family: var(--font); }
 }
 
 /* ══════════════════════════════════════
+   NOTIFICAÇÕES
+══════════════════════════════════════ */
+.notif-btn { position: relative; }
+.notif-btn.tem-aviso::after {
+  content: attr(data-contagem);
+  position: absolute; top: -5px; right: -5px;
+  min-width: 15px; height: 15px; padding: 0 4px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 99px; background: var(--orange); color: #fff;
+  font-size: 9.5px; font-weight: 800; line-height: 1;
+}
+.notif-painel {
+  position: absolute; top: calc(100% + 10px); right: 0; z-index: 60;
+  width: min(340px, calc(100vw - 32px));
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; overflow: hidden; cursor: default;
+  box-shadow: 0 18px 44px rgba(0,0,0,0.38);
+}
+[data-theme="light"] .notif-painel { box-shadow: 0 18px 44px rgba(0,0,0,0.14); }
+.notif-topo {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  padding: 12px 14px; border-bottom: 1px solid var(--border);
+  font-size: 13px; color: var(--text);
+}
+.notif-limpar {
+  border: 0; background: none; padding: 0; cursor: pointer;
+  color: var(--orange); font: 600 11.5px var(--font);
+}
+.notif-limpar:hover { text-decoration: underline; }
+.notif-lista { max-height: 380px; overflow-y: auto; }
+.notif-item {
+  display: flex; gap: 11px; width: 100%; text-align: left;
+  padding: 12px 14px; border: 0; border-bottom: 1px solid var(--border);
+  background: transparent; cursor: pointer; transition: var(--tr);
+}
+.notif-item:hover { background: var(--fill); }
+/* A não lida fica marcada na lateral; o resto continua legível. */
+.notif-item.nao-lida { background: rgba(255,106,0,0.05); box-shadow: inset 2px 0 0 var(--orange); }
+.notif-icone {
+  width: 28px; height: 28px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 8px; background: var(--fill-forte); color: var(--orange);
+}
+.notif-texto { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.notif-titulo { font-size: 12.5px; font-weight: 600; color: var(--text); line-height: 1.45; }
+.notif-desc {
+  font-size: 11.5px; color: var(--text-dim); line-height: 1.5;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.notif-quando { font-size: 10.5px; color: var(--text-dim); }
+.notif-vazio { padding: 26px 14px; text-align: center; font-size: 12.5px; color: var(--text-dim); }
+
+/* ══════════════════════════════════════
    FINANCEIRO: EVOLUÇÃO DA RECEITA
 ══════════════════════════════════════ */
 .fin-grafico {

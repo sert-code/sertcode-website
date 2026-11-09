@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/portal.css?v=20">
+  <link rel="stylesheet" href="css/portal.css?v=21">
   <style>
     .admin-badge {
       font-size: 9px; font-weight: 800;
@@ -142,7 +142,7 @@
       <a href="#" data-tab="chamados">
         <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
         Chamados
-        <span class="sidebar-badge">2</span>
+        <span class="sidebar-badge" style="display:none"></span>
       </a>
       <a href="#" data-tab="arquivos">
         <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
@@ -2208,6 +2208,7 @@
 <script type="module">
 import { supabase, createSignupClient } from './js/supabase.js'
 import { calcularItem, somarFolha, porExtenso } from './js/folha.js'
+import { ligarNotificacoes } from './js/notificacoes.js'
 
 /* ── VERIFICAR SESSÃO E PAPEL ── */
 const { data: { session } } = await supabase.auth.getSession();
@@ -5878,6 +5879,21 @@ window._baixarPdf = () => {
   setTimeout(() => janela.print(), 400);
 };
 
+/* ── NOTIFICAÇÕES ── */
+// Clicar no aviso leva à aba de onde ele veio; chamado e fatura abrem a
+// ficha direto, que é onde a pessoa ia parar de qualquer jeito.
+const notif = await ligarNotificacoes({
+  supabase, profileId: session.user.id,
+  destinos: ['EQUIPE', 'COLABORADOR'],
+  abrir: (aba, referencia) => {
+    const link = document.querySelector(`.sidebar-nav a[data-tab="${aba}"]`);
+    if (!link) return;
+    link.click();
+    if (aba === 'chamados' && referencia) window._abrirChamado(referencia);
+    if (aba === 'financeiro' && referencia) window._editarFatura(referencia);
+  },
+});
+
 /* ── AVISO FLUTUANTE ── */
 // Fica até ser fechado: a mensagem de cadastro traz a senha provisória, e
 // sumir sozinha faria o gestor perder o que precisa repassar ao cliente.
@@ -6052,7 +6068,9 @@ const diasDesde = d => Math.floor((Date.now() - new Date(d)) / 86400000);
 const supSet = (t, tipo = 'error') => { const m = el('sf-msg'); m.textContent = t; m.className = 'form-msg show ' + tipo; };
 
 async function loadSuporte() {
-  if (!isEquipe) return;
+  // Quem chega ao painel já é da equipe; a variável isEquipe nunca existiu
+  // aqui e derrubava a aba inteira com ReferenceError.
+  if (!session) return;
   const { data } = await supabase.from('tickets').select('*').order('created_at', { ascending: false });
   supChamados = data || [];
 
@@ -6377,6 +6395,7 @@ window._responderChamado = async () => {
   fim();
   await window._abrirChamado(supAberto.id);
   await loadSuporte();
+  notif.recarregar();
 };
 
 window._baixarAnexoSuporte = async (caminho) => {

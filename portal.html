@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/portal.css?v=20">
+  <link rel="stylesheet" href="css/portal.css?v=21">
 <script>
   // Lido antes da tela aparecer, para não piscar o tema errado ao abrir.
   try { if (localStorage.getItem('sertcode_theme') === 'light') document.documentElement.setAttribute('data-theme', 'light'); } catch (e) {}
@@ -56,7 +56,7 @@
       <a href="#" data-tab="suporte">
         <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
         Suporte / SLA
-        <span class="sidebar-badge">1</span>
+        <span class="sidebar-badge" style="display:none"></span>
       </a>
       <a href="#" data-tab="arquivos">
         <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
@@ -713,6 +713,7 @@
 
 <script type="module">
 import { supabase } from './js/supabase.js'
+import { ligarNotificacoes } from './js/notificacoes.js'
 
 /* ── VERIFICAR SESSÃO ── */
 const { data: { session } } = await supabase.auth.getSession();
@@ -855,6 +856,35 @@ async function loadPortalData() {
     });
   }
 }
+
+/* ── AVISO FLUTUANTE ── */
+// Fica até a pessoa fechar: some sozinho ela perderia o número do chamado.
+window._aviso = (texto, tipo = 'success') => {
+  let caixa = document.getElementById('avisos');
+  if (!caixa) {
+    caixa = document.createElement('div');
+    caixa.id = 'avisos';
+    caixa.className = 'avisos';
+    document.body.appendChild(caixa);
+  }
+  const item = document.createElement('div');
+  item.className = 'aviso-item aviso-' + tipo;
+  item.innerHTML = `<div>${escapeHtml(texto)}</div>
+    <button class="aviso-fechar" aria-label="Fechar">&times;</button>`;
+  item.querySelector('.aviso-fechar').addEventListener('click', () => item.remove());
+  caixa.appendChild(item);
+};
+
+/* ── NOTIFICAÇÕES ── */
+const notif = await ligarNotificacoes({
+  supabase, profileId: userId, destinos: ['CLIENTE'],
+  abrir: (aba, referencia) => {
+    const link = document.querySelector(`.sidebar-nav a[data-tab="${aba}"]`);
+    if (!link) return;
+    link.click();
+    if (aba === 'suporte' && referencia) window._abrirChamadoCliente(referencia);
+  },
+});
 
 /* ── HELPERS ── */
 const PORTAL_FATURA = {
@@ -1147,6 +1177,7 @@ window._responderComoCliente = async () => {
   csEl('cf-arquivo').value = '';
   fim();
   csMsg('Mensagem enviada. A equipe foi avisada no painel.', 'success');
+  notif.recarregar();
   await carregarChamados();
   await window._abrirChamadoCliente(csAberto.id);
 };
@@ -1182,12 +1213,18 @@ document.getElementById('ticket-submit').addEventListener('click', async () => {
   if (error) { fim(); return aviso('Não foi possível abrir o chamado: ' + error.message); }
 
   fim();
-  aviso('Chamado aberto. A equipe responde conforme o SLA.', 'success');
+  csEl('modal-ticket').classList.remove('open');
+  csEl('nt-msg').className = 'form-msg';
   await carregarChamados();
-  setTimeout(() => {
-    csEl('modal-ticket').classList.remove('open');
-    csEl('nt-msg').className = 'form-msg';
-  }, 2200);
+  notif.recarregar();
+
+  // O número sai do chamado recém-criado: é por ele que o cliente cobra
+  // depois, então a mensagem precisa carregá-lo.
+  const criado = csChamados[0];
+  window._aviso(criado
+    ? `Chamado ${csNumero(criado)} registrado. A equipe da SertCode responde em até ${
+        CS_SLA_TEXTO(CS_SLA[criado.type])}.`
+    : 'Chamado registrado. A equipe da SertCode vai responder conforme o SLA.');
 });
 
 /* ── MODAL ── */
