@@ -764,143 +764,180 @@
         <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:14px;margin-bottom:18px">
           <div>
             <div class="section-title">Financeiro</div>
-            <div class="section-sub" style="margin-bottom:0">Receita dos contratos, cobranças, inadimplência e as despesas com a equipe.</div>
+            <div class="section-sub" style="margin-bottom:0">Contratos, cobranças, recebimentos, despesas e assinaturas.</div>
           </div>
           <div class="team-actions">
-            <button class="team-btn" onclick="window._baixarFinanceiroPdf()">Baixar PDF</button>
-            <button class="btn btn-primary" onclick="window._novaFatura()">+ Nova fatura</button>
+            <button class="team-btn" onclick="window._novaMovimentacao()">+ Movimentação</button>
+            <button class="btn btn-primary" onclick="window._novaFatura()">+ Nova cobrança</button>
           </div>
         </div>
 
         <nav class="rh-abas" id="fin-abas">
           <button class="rh-aba active" data-fin="visao">Visão geral</button>
-          <button class="rh-aba" data-fin="receitas">Receitas</button>
-          <button class="rh-aba" data-fin="recebimentos">Recebimentos</button>
-          <button class="rh-aba" data-fin="faturas">Faturas</button>
-          <button class="rh-aba" data-fin="pendencias">Pendências</button>
-          <button class="rh-aba" data-fin="reembolsos">Reembolsos</button>
+          <button class="rh-aba" data-fin="receber">Contas a receber</button>
+          <button class="rh-aba" data-fin="projetos">Financeiro dos projetos</button>
+          <button class="rh-aba" data-fin="assinaturas">Assinaturas SaaS</button>
+          <button class="rh-aba" data-fin="movimentacoes">Movimentações</button>
+          <button class="rh-aba" data-fin="clientes">Clientes e cobranças</button>
+          <button class="rh-aba" data-fin="relatorios">Relatórios</button>
+          <button class="rh-aba" data-fin="config">Configurações</button>
           <button class="rh-aba" data-fin="pessoal">Pessoal (SertCode)</button>
         </nav>
 
-        <div class="card" style="margin-bottom:18px">
-          <div class="sup-filtros" style="grid-template-columns:1fr 1fr 2fr">
+        <div class="card" style="margin-bottom:18px" id="fin-filtros-card">
+          <div class="sup-filtros">
             <div class="form-group" style="margin:0"><label>De</label><input type="date" id="fin-de"></div>
             <div class="form-group" style="margin:0"><label>Até</label><input type="date" id="fin-ate"></div>
+            <div class="form-group" style="margin:0"><label>Cliente</label>
+              <select id="fin-f-cliente"><option value="">Todos</option></select></div>
+            <div class="form-group" style="margin:0"><label>Projeto</label>
+              <select id="fin-f-projeto"><option value="">Todos</option></select></div>
+            <div class="form-group" style="margin:0"><label>Categoria de serviço</label>
+              <select id="fin-f-categoria"><option value="">Todas</option></select></div>
+            <div class="form-group" style="margin:0"><label>Contratação</label>
+              <select id="fin-f-contratacao"><option value="">Todas</option></select></div>
+            <div class="form-group" style="margin:0"><label>Situação</label>
+              <select id="fin-f-situacao"><option value="">Todas</option></select></div>
             <div class="form-group" style="margin:0"><label>Pesquisar</label>
-              <input type="text" id="fin-busca" placeholder="Número da fatura, cliente ou descrição"></div>
+              <input type="text" id="fin-busca" placeholder="Número, cliente ou descrição"></div>
           </div>
-          <div class="rh-bloco-texto" style="margin-top:10px">O período vale para todas as abas.</div>
+          <div class="rh-bloco-texto" style="margin-top:10px">O período corta pelo vencimento e vale para todas as abas.</div>
         </div>
 
-        <!-- ── Visão geral ── -->
+        <!-- ── 1.1 Visão geral ── -->
         <div class="rh-painel active" id="fin-visao">
+          <div class="sup-contadores" id="fin-resumo-topo" style="grid-template-columns:repeat(4,1fr);margin-bottom:18px"></div>
           <div class="sup-contadores" id="fin-indicadores" style="margin-bottom:18px"></div>
           <div class="grid-2" style="align-items:start">
             <div class="card">
-              <div class="card-title" style="margin-bottom:4px">Evolução da receita</div>
-              <div class="card-sub">Recebido por mês, últimos 12 meses</div>
+              <div class="card-title" style="margin-bottom:4px">Entradas e saídas</div>
+              <div class="card-sub">Por competência, últimos 12 meses</div>
               <div class="fin-grafico" id="fin-grafico"></div>
+              <div class="fin-legenda">
+                <span><i style="background:linear-gradient(180deg,#22C55E,#15803D)"></i> Entradas</span>
+                <span><i style="background:linear-gradient(180deg,#EF4444,#B91C1C)"></i> Saídas</span>
+              </div>
             </div>
             <div class="card">
-              <div class="card-title" style="margin-bottom:10px">Situação das faturas</div>
+              <div class="card-title" style="margin-bottom:10px">Situação das cobranças</div>
               <div id="fin-situacoes"></div>
             </div>
           </div>
+          <div class="rh-aviso" style="margin-top:18px">
+            Faturado e recebido são números diferentes de propósito: contrato fechado não
+            significa dinheiro em conta.
+          </div>
         </div>
 
-        <!-- ── Receitas ── -->
-        <div class="rh-painel" id="fin-receitas">
+        <!-- ── 1.2 Contas a receber ── -->
+        <div class="rh-painel" id="fin-receber">
+          <div class="card">
+            <div class="table-scroll">
+              <table class="data-table">
+                <thead><tr><th>Cobrança</th><th>Cliente</th><th>Descrição</th><th>Parcela</th><th>Valor atualizado</th><th>Recebido</th><th>Emissão</th><th>Vencimento</th><th>Situação</th><th>Ações</th></tr></thead>
+                <tbody id="fin-receber-body"></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="rh-bloco-texto" style="margin-top:12px">
+            Valor atualizado = valor original − desconto + juros + multa. Linhas destacadas têm
+            comprovante enviado pelo cliente aguardando validação.
+          </div>
+        </div>
+
+        <!-- ── 1.3 Financeiro dos projetos ── -->
+        <div class="rh-painel" id="fin-projetos">
           <div class="rh-aviso">
-            A SertCode fatura contrato, não assinatura por plano: a receita é separada por tipo de
-            contrato e por cliente.
+            Pagamento e andamento do projeto andam separados: uma etapa pode estar concluída
+            com a parcela em aberto, e o contrário também.
           </div>
-          <div class="card" style="margin-bottom:18px">
-            <div class="card-title" style="margin-bottom:10px">Por tipo de contrato</div>
-            <div class="table-scroll">
-              <table class="data-table">
-                <thead><tr><th>Tipo</th><th>Faturas</th><th>Faturado</th><th>Recebido</th><th>Reembolsado</th><th>Receita líquida</th></tr></thead>
-                <tbody id="fin-por-tipo"></tbody>
-              </table>
-            </div>
-          </div>
-          <div class="card">
-            <div class="card-title" style="margin-bottom:10px">Por cliente</div>
-            <div class="table-scroll">
-              <table class="data-table">
-                <thead><tr><th>Cliente</th><th>Faturas</th><th>Faturado</th><th>Recebido</th><th>Em aberto</th></tr></thead>
-                <tbody id="fin-por-cliente"></tbody>
-              </table>
-            </div>
-          </div>
+          <div id="fin-projetos-lista"></div>
         </div>
 
-        <!-- ── Recebimentos ── -->
-        <div class="rh-painel" id="fin-recebimentos">
-          <div class="card" style="margin-bottom:18px">
-            <div class="card-title" style="margin-bottom:10px">Por forma de pagamento</div>
-            <div class="table-scroll">
-              <table class="data-table">
-                <thead><tr><th>Forma</th><th>Recebimentos</th><th>Valor</th><th>Participação</th></tr></thead>
-                <tbody id="fin-por-forma"></tbody>
-              </table>
-            </div>
-          </div>
-          <div class="card">
-            <div class="card-title" style="margin-bottom:10px">Por vencimento</div>
-            <div class="table-scroll">
-              <table class="data-table">
-                <thead><tr><th>Competência</th><th>Recebido</th><th>Pendente</th><th>Em atraso</th></tr></thead>
-                <tbody id="fin-por-competencia"></tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-
-        <!-- ── Faturas ── -->
-        <div class="rh-painel" id="fin-faturas">
-          <div class="sup-filtros" style="margin-bottom:16px">
-            <div class="form-group" style="margin:0"><label>Tipo</label>
-              <select id="fin-f-tipo"><option value="">Todos</option></select></div>
-            <div class="form-group" style="margin:0"><label>Situação</label>
-              <select id="fin-f-situacao"><option value="">Todas</option></select></div>
-            <div class="form-group" style="margin:0"><label>Cliente</label>
-              <select id="fin-f-cliente"><option value="">Todos</option></select></div>
-          </div>
-          <div class="card">
-            <div class="table-scroll">
-              <table class="data-table">
-                <thead><tr><th>Fatura</th><th>Cliente</th><th>Descrição</th><th>Competência</th><th>Vencimento</th><th>Valor final</th><th>Pagamento</th><th>Situação</th><th>Ações</th></tr></thead>
-                <tbody id="fin-faturas-body"></tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-
-        <!-- ── Pendências ── -->
-        <div class="rh-painel" id="fin-pendencias">
-          <div class="sup-contadores" id="fin-pend-resumo" style="grid-template-columns:repeat(3,1fr);margin-bottom:18px"></div>
-          <div class="card">
-            <div class="table-scroll">
-              <table class="data-table">
-                <thead><tr><th>Cliente</th><th>Fatura</th><th>Valor</th><th>Dias em atraso</th><th>Última cobrança</th><th>Próxima ação</th><th>Ações</th></tr></thead>
-                <tbody id="fin-pendencias-body"></tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-
-        <!-- ── Reembolsos ── -->
-        <div class="rh-painel" id="fin-reembolsos">
+        <!-- ── 1.4 Assinaturas SaaS ── -->
+        <div class="rh-painel" id="fin-assinaturas">
+          <div class="sup-contadores" id="fin-saas-numeros" style="grid-template-columns:repeat(3,1fr);margin-bottom:18px"></div>
           <div style="display:flex;justify-content:flex-end;margin-bottom:14px">
-            <button class="btn btn-primary" onclick="window._novoReembolso()">+ Registrar reembolso</button>
+            <button class="btn btn-primary" onclick="window._novaAssinatura()">+ Nova assinatura</button>
           </div>
           <div class="card">
             <div class="table-scroll">
               <table class="data-table">
-                <thead><tr><th>Cliente</th><th>Valor</th><th>Motivo</th><th>Data</th><th>Responsável</th><th>Situação</th><th>Ações</th></tr></thead>
-                <tbody id="fin-reembolsos-body"></tbody>
+                <thead><tr><th>Cliente</th><th>Produto / plano</th><th>Valor</th><th>Periodicidade</th><th>Contratada</th><th>Próxima cobrança</th><th>Situação</th><th>Ações</th></tr></thead>
+                <tbody id="fin-saas-body"></tbody>
               </table>
             </div>
+          </div>
+        </div>
+
+        <!-- ── 1.5 Movimentações ── -->
+        <div class="rh-painel" id="fin-movimentacoes">
+          <div class="sup-contadores" id="fin-mov-numeros" style="grid-template-columns:repeat(3,1fr);margin-bottom:18px"></div>
+          <div class="card">
+            <div class="table-scroll">
+              <table class="data-table">
+                <thead><tr><th>Competência</th><th>Caixa</th><th>Tipo</th><th>Categoria</th><th>Descrição</th><th>Conta</th><th>Valor</th><th>Ações</th></tr></thead>
+                <tbody id="fin-mov-body"></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="rh-bloco-texto" style="margin-top:12px">
+            <strong>Competência</strong> é o mês a que o valor pertence. <strong>Caixa</strong> é
+            quando o dinheiro entrou ou saiu. Recebimentos entram aqui sozinhos.
+          </div>
+        </div>
+
+        <!-- ── 1.6 Clientes e cobranças ── -->
+        <div class="rh-painel" id="fin-clientes">
+          <div class="form-group" style="max-width:420px"><label>Cliente</label>
+            <select id="fin-ficha-cliente"></select></div>
+          <div id="fin-ficha"></div>
+        </div>
+
+        <!-- ── 1.7 Relatórios ── -->
+        <div class="rh-painel" id="fin-relatorios">
+          <div class="rh-aviso">Os relatórios usam o período e os filtros acima.</div>
+          <div class="sup-cartoes" id="fin-relatorios-lista"></div>
+        </div>
+
+        <!-- ── 1.8 Configurações ── -->
+        <div class="rh-painel" id="fin-config">
+          <div class="grid-2" style="align-items:start">
+            <div class="card">
+              <div class="card-title" style="margin-bottom:12px">Regras e prazos</div>
+              <div class="form-row-2">
+                <div class="form-group"><label>Moeda</label><input type="text" id="cfg-moeda" value="BRL" disabled></div>
+                <div class="form-group"><label>Prazo padrão (dias)</label><input type="number" id="cfg-prazo" min="0" max="180"></div>
+              </div>
+              <div class="form-row-2">
+                <div class="form-group"><label>Juros por mês (%)</label><input type="text" id="cfg-juros" inputmode="decimal"></div>
+                <div class="form-group"><label>Multa por atraso (%)</label><input type="text" id="cfg-multa" inputmode="decimal"></div>
+              </div>
+              <div class="form-group"><label>Condições de pagamento padrão</label>
+                <textarea id="cfg-condicoes" placeholder="Ex.: 30% na contratação, 40% na aprovação do desenvolvimento, 30% na entrega."></textarea></div>
+              <button class="btn btn-primary" id="cfg-btn" onclick="window._salvarConfigFin()">Salvar</button>
+              <div class="form-msg" id="cfg-msg" role="alert"></div>
+            </div>
+            <div>
+              <div class="card" style="margin-bottom:18px">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px">
+                  <div class="card-title" style="margin:0">Contas financeiras</div>
+                  <button class="team-btn" onclick="window._novaConta()">+ Conta</button>
+                </div>
+                <div id="cfg-contas"></div>
+              </div>
+              <div class="card">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px">
+                  <div class="card-title" style="margin:0">Categorias</div>
+                  <button class="team-btn" onclick="window._novaCategoria()">+ Categoria</button>
+                </div>
+                <div id="cfg-categorias"></div>
+              </div>
+            </div>
+          </div>
+          <div class="rh-aviso" style="margin-top:18px">
+            Quem vê e edita valores é definido em <strong>Equipe → Permissões</strong>, nos itens
+            do grupo Financeiro. Integração com gateway de pagamento ainda não existe.
           </div>
         </div>
 
@@ -2222,38 +2259,200 @@
 
 <!-- ══ MODAL: Fatura ══ -->
 <div class="modal-overlay" id="modal-fatura">
-  <div class="modal-box" style="max-width:520px">
+  <div class="modal-box" style="max-width:600px">
     <button class="modal-close" onclick="closeModal('modal-fatura')">&times;</button>
-    <div class="modal-title" id="fat-titulo">Nova fatura</div>
+    <div class="modal-title" id="fat-titulo">Nova cobrança</div>
     <div class="modal-sub">O cliente vê esta cobrança no portal dele.</div>
 
     <div class="form-row-2">
       <div class="form-group"><label>Cliente</label><select id="fat-cliente"></select></div>
+      <div class="form-group"><label>Projeto</label><select id="fat-projeto"></select></div>
+    </div>
+    <div class="form-row-2">
       <div class="form-group"><label>Tipo de contrato</label><select id="fat-tipo"></select></div>
+      <div class="form-group"><label>Marco de entrega</label>
+        <input type="text" id="fat-marco" maxlength="60" placeholder="Ex.: Aprovação do design"></div>
     </div>
     <div class="form-group"><label>Descrição</label>
       <input type="text" id="fat-descricao" placeholder="Ex.: Parcela 2 de 3" maxlength="120"></div>
-    <div class="form-row-2">
-      <div class="form-group"><label>Valor (R$)</label><input type="text" id="fat-valor" inputmode="decimal" placeholder="0,00"></div>
+
+    <div class="rh-endereco-3">
+      <div class="form-group"><label>Valor original (R$)</label><input type="text" id="fat-valor" inputmode="decimal" placeholder="0,00"></div>
       <div class="form-group"><label>Desconto (R$)</label><input type="text" id="fat-desconto" inputmode="decimal" placeholder="0,00"></div>
+      <div class="form-group"><label>Juros + multa (R$)</label><input type="text" id="fat-juros" inputmode="decimal" placeholder="0,00"></div>
     </div>
-    <div class="form-row-2">
-      <div class="form-group"><label>Vencimento</label><input type="date" id="fat-vencimento"></div>
+    <div class="rh-bloco">
+      <div class="rh-bloco-titulo">Valor atualizado: <span id="fat-atualizado">R$ 0,00</span></div>
+      <div class="rh-bloco-texto">Valor original menos desconto, mais juros e multa. É o que o cliente deve.</div>
+    </div>
+
+    <div class="rh-endereco-3" style="margin-top:14px">
+      <div class="form-group"><label>Parcela nº</label><input type="number" id="fat-parcela" min="1" max="99"></div>
+      <div class="form-group"><label>De um total de</label><input type="number" id="fat-parcelas" min="1" max="99"></div>
       <div class="form-group"><label>Competência</label><input type="month" id="fat-competencia"></div>
     </div>
     <div class="form-row-2">
-      <div class="form-group"><label>Situação</label><select id="fat-situacao"></select></div>
-      <div class="form-group"><label>Forma de pagamento</label><select id="fat-forma"></select></div>
+      <div class="form-group"><label>Data de emissão</label><input type="date" id="fat-emissao"></div>
+      <div class="form-group"><label>Vencimento</label><input type="date" id="fat-vencimento"></div>
     </div>
+    <div class="form-group"><label>Situação</label><select id="fat-situacao"></select>
+      <div style="font-size:11px;color:var(--text-dim);margin-top:6px" id="fat-situacao-nota"></div></div>
     <div class="form-group"><label>Observação interna</label>
       <textarea id="fat-observacao" placeholder="Não aparece para o cliente."></textarea></div>
 
-    <div style="display:flex;gap:10px">
+    <div class="rh-bloco" id="fat-parcelar-bloco">
+      <div class="rh-bloco-titulo">Gerar o parcelamento inteiro</div>
+      <div class="rh-bloco-texto">Cria todas as parcelas de uma vez, com vencimento mês a mês a partir da data acima.</div>
+      <div class="form-row-2" style="margin-top:10px">
+        <div class="form-group" style="margin:0"><label>Quantidade de parcelas</label>
+          <input type="number" id="fat-gerar-qtd" min="1" max="36" placeholder="Ex.: 3"></div>
+        <div class="form-group" style="margin:0"><label>Entrada (R$, opcional)</label>
+          <input type="text" id="fat-entrada" inputmode="decimal" placeholder="0,00"></div>
+      </div>
+      <button class="team-btn" style="margin-top:10px" onclick="window._gerarParcelas()">Gerar parcelas</button>
+    </div>
+
+    <div style="display:flex;gap:10px;margin-top:14px">
       <button class="btn btn-primary" style="flex:1;justify-content:center" id="fat-btn" onclick="window._salvarFatura()">Salvar</button>
       <button class="btn btn-outline" onclick="closeModal('modal-fatura')">Cancelar</button>
       <button class="team-btn danger" id="fat-excluir" hidden onclick="window._excluirFatura()">Excluir</button>
     </div>
     <div class="form-msg" id="fat-msg" role="alert"></div>
+  </div>
+</div>
+
+<!-- ══ MODAL: Registrar recebimento ══ -->
+<div class="modal-overlay" id="modal-pagamento">
+  <div class="modal-box" style="max-width:480px">
+    <button class="modal-close" onclick="closeModal('modal-pagamento')">&times;</button>
+    <div class="modal-title">Registrar recebimento</div>
+    <div class="modal-sub">O pagamento nunca é editado: corrigir é estornar e lançar de novo.</div>
+
+    <div class="rh-bloco" id="pag-cobranca"></div>
+    <div class="rh-bloco" id="pag-do-cliente" hidden style="border-color:rgba(255,106,0,0.32)"></div>
+
+    <div class="form-group" style="margin-top:14px">
+      <label>Valor recebido (R$) · falta <span id="pag-devido"></span></label>
+      <input type="text" id="pag-valor" inputmode="decimal">
+      <div style="font-size:11px;color:var(--text-dim);margin-top:6px">Pode ser menor que o total: a cobrança fica como parcialmente paga.</div>
+    </div>
+    <div class="form-row-2">
+      <div class="form-group"><label>Data do recebimento</label><input type="date" id="pag-data"></div>
+      <div class="form-group"><label>Competência</label><input type="month" id="pag-competencia"></div>
+    </div>
+    <div class="form-row-2">
+      <div class="form-group"><label>Forma de pagamento</label><select id="pag-forma"></select></div>
+      <div class="form-group"><label>Conta</label><select id="pag-conta"></select></div>
+    </div>
+    <div class="form-group"><label>Comprovante (opcional)</label><input type="file" id="pag-comprovante"></div>
+    <div class="form-group"><label>Observação</label><input type="text" id="pag-observacao" maxlength="160"></div>
+
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-primary" style="flex:1;justify-content:center" id="pag-btn" onclick="window._salvarPagamento()">Registrar</button>
+      <button class="btn btn-outline" onclick="closeModal('modal-pagamento')">Cancelar</button>
+    </div>
+    <div class="form-msg" id="pag-msg" role="alert"></div>
+  </div>
+</div>
+
+<!-- ══ MODAL: Detalhes da cobrança ══ -->
+<div class="modal-overlay" id="modal-cobranca">
+  <div class="modal-box" style="max-width:520px">
+    <button class="modal-close" onclick="closeModal('modal-cobranca')">&times;</button>
+    <div class="modal-title" id="cob-titulo">Cobrança</div>
+    <div class="modal-sub">Histórico completo, sem apagar nada.</div>
+    <div id="cob-corpo"></div>
+  </div>
+</div>
+
+<!-- ══ MODAL: Assinatura SaaS ══ -->
+<div class="modal-overlay" id="modal-assinatura">
+  <div class="modal-box" style="max-width:520px">
+    <button class="modal-close" onclick="closeModal('modal-assinatura')">&times;</button>
+    <div class="modal-title" id="asn-titulo">Nova assinatura</div>
+    <div class="modal-sub">Receita recorrente, separada dos projetos sob medida.</div>
+
+    <div class="form-group"><label>Cliente</label><select id="asn-cliente"></select></div>
+    <div class="form-row-2">
+      <div class="form-group"><label>Produto</label><input type="text" id="asn-produto" maxlength="60"></div>
+      <div class="form-group"><label>Plano</label><input type="text" id="asn-plano" maxlength="60" placeholder="Ex.: Profissional"></div>
+    </div>
+    <div class="form-row-2">
+      <div class="form-group"><label>Valor (R$)</label><input type="text" id="asn-valor" inputmode="decimal"></div>
+      <div class="form-group"><label>Desconto (R$)</label><input type="text" id="asn-desconto" inputmode="decimal"></div>
+    </div>
+    <div class="form-row-2">
+      <div class="form-group"><label>Periodicidade</label><select id="asn-periodicidade"></select></div>
+      <div class="form-group"><label>Dia do vencimento</label><input type="number" id="asn-dia" min="1" max="31"></div>
+    </div>
+    <div class="form-row-2">
+      <div class="form-group"><label>Contratada em</label><input type="date" id="asn-contratada"></div>
+      <div class="form-group"><label>Próxima cobrança</label><input type="date" id="asn-proxima"></div>
+    </div>
+    <div class="form-group"><label>Situação</label><select id="asn-situacao"></select></div>
+    <div class="form-group"><label>Descontos e condições especiais</label>
+      <textarea id="asn-condicoes" placeholder="Ex.: três primeiros meses com 20% de desconto."></textarea></div>
+
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-primary" style="flex:1;justify-content:center" id="asn-btn" onclick="window._salvarAssinatura()">Salvar</button>
+      <button class="btn btn-outline" onclick="closeModal('modal-assinatura')">Cancelar</button>
+      <button class="team-btn danger" id="asn-excluir" hidden onclick="window._excluirAssinatura()">Excluir</button>
+    </div>
+    <div class="form-msg" id="asn-msg" role="alert"></div>
+  </div>
+</div>
+
+<!-- ══ MODAL: Movimentação ══ -->
+<div class="modal-overlay" id="modal-movimentacao">
+  <div class="modal-box" style="max-width:480px">
+    <button class="modal-close" onclick="closeModal('modal-movimentacao')">&times;</button>
+    <div class="modal-title">Nova movimentação</div>
+    <div class="modal-sub">Entradas e saídas da própria SertCode.</div>
+
+    <div class="form-row-2">
+      <div class="form-group"><label>Tipo</label>
+        <select id="mov-tipo"><option value="SAIDA">Saída</option><option value="ENTRADA">Entrada</option></select></div>
+      <div class="form-group"><label>Categoria</label><select id="mov-categoria"></select></div>
+    </div>
+    <div class="form-group"><label>Descrição</label><input type="text" id="mov-descricao" maxlength="120"></div>
+    <div class="form-row-2">
+      <div class="form-group"><label>Valor (R$)</label><input type="text" id="mov-valor" inputmode="decimal"></div>
+      <div class="form-group"><label>Competência</label><input type="month" id="mov-competencia"></div>
+    </div>
+    <div class="form-row-2">
+      <div class="form-group"><label>Data do caixa</label><input type="date" id="mov-caixa">
+        <div style="font-size:11px;color:var(--text-dim);margin-top:6px">Deixe vazio se ainda não foi liquidada.</div></div>
+      <div class="form-group"><label>Conta</label><select id="mov-conta"></select></div>
+    </div>
+    <div class="form-row-2">
+      <div class="form-group"><label>Forma</label><select id="mov-forma"></select></div>
+      <div class="form-group"><label>Documento</label><input type="text" id="mov-documento" maxlength="60" placeholder="Nota, recibo"></div>
+    </div>
+
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-primary" style="flex:1;justify-content:center" id="mov-btn" onclick="window._salvarMovimentacao()">Salvar</button>
+      <button class="btn btn-outline" onclick="closeModal('modal-movimentacao')">Cancelar</button>
+    </div>
+    <div class="form-msg" id="mov-msg" role="alert"></div>
+  </div>
+</div>
+
+<!-- ══ MODAL: Documento financeiro ══ -->
+<div class="modal-overlay" id="modal-doc-fin">
+  <div class="modal-box" style="max-width:420px">
+    <button class="modal-close" onclick="closeModal('modal-doc-fin')">&times;</button>
+    <div class="modal-title">Enviar documento financeiro</div>
+    <div class="modal-sub" id="doc-cliente"></div>
+
+    <div class="form-group"><label>Tipo</label><select id="doc-tipo"></select></div>
+    <div class="form-group"><label>Arquivo</label><input type="file" id="doc-arquivo"></div>
+    <div class="rh-bloco-texto">O cliente consegue baixar pelo portal dele.</div>
+
+    <div style="display:flex;gap:10px;margin-top:14px">
+      <button class="btn btn-primary" style="flex:1;justify-content:center" id="doc-btn" onclick="window._salvarDocumentoFin()">Enviar</button>
+      <button class="btn btn-outline" onclick="closeModal('modal-doc-fin')">Cancelar</button>
+    </div>
+    <div class="form-msg" id="doc-msg" role="alert"></div>
   </div>
 </div>
 
@@ -5487,10 +5686,9 @@ function fmtMoney(v) { return 'R$ ' + Number(v||0).toLocaleString('pt-BR',{minim
 /* ── DASHBOARD ── */
 function renderDashboard() {
   const openTickets = allTickets.filter(t => !['CONCLUIDO','CANCELADO'].includes(t.status)).length;
-  const valida    = i => i.status !== 'cancelado';
-  const liquido   = i => Number(i.amount || 0) - Number(i.desconto || 0);
-  const received  = allInvoices.filter(i => i.status === 'pago').reduce((s,i) => s+liquido(i),0);
-  const pending   = allInvoices.filter(i => valida(i) && i.status !== 'pago').reduce((s,i) => s+liquido(i),0);
+  const received  = allInvoices.reduce((s,i) => s + Number(i.recebido || 0), 0);
+  const pending   = allInvoices.filter(i => VALEM.includes(i.status))
+    .reduce((s,i) => s + Math.max(0, valorAtual(i) - Number(i.recebido || 0)), 0);
   const inDev    = allProjects.filter(p => !['CONCLUIDO','CANCELADO'].includes(p.status)).length;
   const done     = allProjects.filter(p => p.status === 'CONCLUIDO').length;
 
@@ -7349,68 +7547,124 @@ window._baixarChamadoPdf = () => {
 /* ── FINANCEIRO ── */
 const FIN_TIPO = {
   PROJETO:'Projeto sob medida', SUPORTE:'Suporte mensal',
-  HOSPEDAGEM:'Hospedagem', AVULSO:'Serviço avulso',
+  HOSPEDAGEM:'Hospedagem', AVULSO:'Serviço avulso', ASSINATURA:'Assinatura SaaS',
 };
 const FIN_SITUACAO = {
-  pendente:    { label: 'Pendente',    cls: 'status-pending' },
-  pago:        { label: 'Pago',        cls: 'status-paid' },
-  atrasado:    { label: 'Em atraso',   cls: 'status-expirado' },
-  cancelado:   { label: 'Cancelado',   cls: 'status-cancelado' },
-  reembolsado: { label: 'Reembolsado', cls: 'status-analysis' },
+  AGUARDANDO: { label: 'Aguardando pagamento', cls: 'status-pending' },
+  PARCIAL:    { label: 'Parcialmente pago',    cls: 'status-analysis' },
+  PAGO:       { label: 'Pago',                 cls: 'status-paid' },
+  ATRASADO:   { label: 'Em atraso',            cls: 'status-expirado' },
+  CANCELADO:  { label: 'Cancelado',            cls: 'status-cancelado' },
+  ESTORNADO:  { label: 'Estornado',            cls: 'status-cancelado' },
 };
 const FIN_FORMA = {
   PIX:'Pix', BOLETO:'Boleto', TRANSFERENCIA:'Transferência',
   CARTAO:'Cartão', DINHEIRO:'Dinheiro', OUTRO:'Outro',
 };
-const FIN_REEMB = {
-  SOLICITADO: { label: 'Solicitado', cls: 'status-pending' },
-  PAGO:       { label: 'Pago',       cls: 'status-paid' },
-  RECUSADO:   { label: 'Recusado',   cls: 'status-cancelado' },
+const SAAS_SITUACAO = {
+  ATIVA:      { label: 'Ativa',               cls: 'status-done' },
+  AGUARDANDO: { label: 'Aguardando pagamento',cls: 'status-pending' },
+  ATRASADA:   { label: 'Em atraso',           cls: 'status-expirado' },
+  SUSPENSA:   { label: 'Suspensa',            cls: 'status-analysis' },
+  CANCELADA:  { label: 'Cancelada',           cls: 'status-cancelado' },
+  TESTE:      { label: 'Em período de teste', cls: 'status-analysis' },
 };
-const EM_ABERTO = ['pendente', 'atrasado'];
+const PERIODICIDADE = { MENSAL:'Mensal', TRIMESTRAL:'Trimestral', SEMESTRAL:'Semestral', ANUAL:'Anual' };
+const MESES_POR_ANO = { MENSAL: 12, TRIMESTRAL: 4, SEMESTRAL: 2, ANUAL: 1 };
+const EM_ABERTO = ['AGUARDANDO', 'PARCIAL', 'ATRASADO'];
+const VALEM = ['AGUARDANDO', 'PARCIAL', 'PAGO', 'ATRASADO'];   // fora canceladas e estornadas
 
-let finReembolsos = [], finCobrancas = [], fatEditId = null;
+let finNotas = {};
+let finPagamentos = [], finAssinaturas = [], finMovimentacoes = [], finReembolsos = [],
+    finDocumentos = [], finHistorico = [], finContas = [], finCategorias = [], finConfig = null,
+    fatEditId = null, finFichaId = null;
 
-const valorFinal = i => Number(i.amount || 0) - Number(i.desconto || 0);
+// Valor atualizado: o que o cliente deve hoje, com desconto, juros e multa.
+const valorAtual = i => Number(i.amount || 0) - Number(i.desconto || 0)
+                      + Number(i.juros || 0) + Number(i.multa || 0);
+const emAberto = i => Math.max(0, valorAtual(i) - Number(i.recebido || 0));
 const competenciaDe = i => i.competencia || (i.due_date || '').slice(0, 7);
 const mesLabel = c => c ? c.slice(5) + '/' + c.slice(0, 4) : '—';
-const diasAtraso = i => Math.max(0, Math.floor((Date.now() - new Date(i.due_date)) / 86400000));
+const parcelaLabel = i => i.parcela_num
+  ? String(i.parcela_num).padStart(2, '0') + '/' + String(i.parcela_total || i.parcela_num).padStart(2, '0')
+  : '—';
+const numeroCobranca = i => '#' + String(i.numero ?? 0).padStart(5, '0');
+const finSet = (id, t, tipo = 'error') => { const m = el(id); m.textContent = t; m.className = 'form-msg show ' + tipo; };
 
 async function loadFinanceiro() {
   if (!isGestor) return;
-  const [re, co] = await Promise.all([
+  const [pg, asn, mov, re, doc, hist, ct, cat, cfg, notas] = await Promise.all([
+    supabase.from('fin_pagamentos').select('*').order('data', { ascending: false }),
+    supabase.from('fin_assinaturas').select('*').order('created_at', { ascending: false }),
+    supabase.from('fin_movimentacoes').select('*').order('competencia', { ascending: false }),
     supabase.from('fin_reembolsos').select('*').order('data', { ascending: false }),
-    supabase.from('fin_cobrancas').select('*').order('created_at', { ascending: false }),
+    supabase.from('fin_documentos').select('*').order('created_at', { ascending: false }),
+    supabase.from('fin_historico').select('*').order('created_at', { ascending: false }).limit(300),
+    supabase.from('fin_contas').select('*').order('nome'),
+    supabase.from('fin_categorias').select('*').order('natureza').order('nome'),
+    supabase.from('fin_config').select('*').eq('id', 1).maybeSingle(),
+    supabase.from('fin_cliente_notas').select('*'),
   ]);
-  finReembolsos = re.data || [];
-  finCobrancas  = co.data || [];
+  finPagamentos = pg.data || []; finAssinaturas = asn.data || [];
+  finMovimentacoes = mov.data || []; finReembolsos = re.data || [];
+  finDocumentos = doc.data || []; finHistorico = hist.data || [];
+  finContas = ct.data || []; finCategorias = cat.data || []; finConfig = cfg.data || null;
+  finNotas = {};
+  (notas.data || []).forEach(n => { finNotas[n.client_id] = n.texto; });
 
-  const ops = obj => Object.entries(obj).map(([v, l]) =>
-    `<option value="${v}">${l.label || l}</option>`).join('');
-  el('fin-f-tipo').innerHTML     = '<option value="">Todos</option>' + ops(FIN_TIPO);
-  el('fin-f-situacao').innerHTML = '<option value="">Todas</option>' + ops(FIN_SITUACAO);
-  el('fin-f-cliente').innerHTML  = '<option value="">Todos</option>'
-    + allClients.map(c => `<option value="${c.id}">${esc(c.company || c.name)}</option>`).join('');
+  const ops = obj => Object.entries(obj).map(([v, o]) =>
+    `<option value="${v}">${typeof o === 'string' ? o : o.label}</option>`).join('');
+  const clientes = allClients.map(c => `<option value="${c.id}">${esc(c.company || c.name)}</option>`).join('');
+
+  el('fin-f-cliente').innerHTML   = '<option value="">Todos</option>' + clientes;
+  el('fin-ficha-cliente').innerHTML = clientes || '<option value="">Nenhum cliente</option>';
+  el('fin-f-projeto').innerHTML   = '<option value="">Todos</option>'
+    + allProjects.map(p => `<option value="${p.id}">${esc(p.codigo || '')} ${esc(p.name)}</option>`).join('');
+  el('fin-f-categoria').innerHTML = '<option value="">Todas</option>'
+    + Object.entries(CATEGORIAS).map(([v, c]) => `<option value="${v}">${c.nome}</option>`).join('');
+  el('fin-f-contratacao').innerHTML = '<option value="">Todas</option>' + ops(CONTRATACAO);
+  el('fin-f-situacao').innerHTML  = '<option value="">Todas</option>' + ops(FIN_SITUACAO);
 
   if (!val('fin-de')) {
     const hoje = new Date();
     el('fin-de').value  = `${hoje.getFullYear()}-01-01`;
     el('fin-ate').value = hoje.toISOString().slice(0, 10);
   }
+  if (!finFichaId) finFichaId = allClients[0]?.id || null;
+  if (finFichaId) el('fin-ficha-cliente').value = finFichaId;
+
+  if (finConfig) {
+    el('cfg-prazo').value = finConfig.prazo_padrao;
+    el('cfg-juros').value = finConfig.juros_mes;
+    el('cfg-multa').value = finConfig.multa_atraso;
+    el('cfg-condicoes').value = finConfig.condicoes || '';
+  }
   renderFinanceiro();
 }
 
 // O período corta pelo vencimento: é a data que o gestor tem em mente ao
-// perguntar "quanto entrou neste mês".
+// perguntar quanto entra neste mês.
 function finNoPeriodo() {
-  const de = val('fin-de'), ate = val('fin-ate'), busca = val('fin-busca').toLowerCase();
+  const de = val('fin-de'), ate = val('fin-ate');
+  const cliente = val('fin-f-cliente'), projeto = val('fin-f-projeto');
+  const categoria = val('fin-f-categoria'), contratacao = val('fin-f-contratacao');
+  const situacao = val('fin-f-situacao'), busca = val('fin-busca').toLowerCase();
+
   return allInvoices.filter(i => {
     const d = i.due_date || '';
     if (de && d < de) return false;
     if (ate && d > ate) return false;
+    if (cliente && i.client_id !== cliente) return false;
+    if (projeto && i.project_id !== projeto) return false;
+    if (situacao && i.status !== situacao) return false;
+    if (categoria || contratacao) {
+      const p = allProjects.find(x => x.id === i.project_id);
+      if (categoria && p?.categoria !== categoria) return false;
+      if (contratacao && p?.contratacao !== contratacao) return false;
+    }
     if (busca) {
       const cl = clientMap[i.client_id];
-      const alvo = `#${i.numero} ${i.description || ''} ${cl?.company || ''} ${cl?.name || ''}`;
+      const alvo = `${numeroCobranca(i)} ${i.description || ''} ${cl?.company || ''} ${cl?.name || ''}`;
       if (!alvo.toLowerCase().includes(busca)) return false;
     }
     return true;
@@ -7418,404 +7672,889 @@ function finNoPeriodo() {
 }
 
 function renderFinanceiro() {
-  const faturas = finNoPeriodo();
-  renderFinVisao(faturas);
-  renderFinReceitas(faturas);
-  renderFinRecebimentos(faturas);
-  renderFinFaturas(faturas);
-  renderFinPendencias(faturas);
-  renderFinReembolsos();
+  const cobrancas = finNoPeriodo();
+  renderFinVisao(cobrancas);
+  renderContasReceber(cobrancas);
+  renderFinProjetos();
+  renderAssinaturas();
+  renderMovimentacoes();
+  renderFichaCliente();
+  renderRelatorios();
+  renderConfigFin();
 }
 ['fin-de','fin-ate','fin-busca'].forEach(id => el(id).addEventListener('input', renderFinanceiro));
-['fin-f-tipo','fin-f-situacao','fin-f-cliente'].forEach(id =>
-  el(id).addEventListener('change', () => renderFinFaturas(finNoPeriodo())));
+['fin-f-cliente','fin-f-projeto','fin-f-categoria','fin-f-contratacao','fin-f-situacao']
+  .forEach(id => el(id).addEventListener('change', renderFinanceiro));
+el('fin-ficha-cliente').addEventListener('change', e => { finFichaId = e.target.value; renderFichaCliente(); });
 
-/* ── visão geral ── */
-function renderFinVisao(faturas) {
-  const soma = lista => lista.reduce((s, i) => s + valorFinal(i), 0);
-  const validas   = faturas.filter(i => i.status !== 'cancelado');
-  const faturado  = soma(validas);
-  const recebido  = soma(validas.filter(i => i.status === 'pago'));
-  const atrasado  = soma(validas.filter(i => i.status === 'atrasado'));
-  const reemb     = finReembolsos.filter(r => r.situacao === 'PAGO')
-                      .reduce((s, r) => s + Number(r.valor), 0);
+const cartoes = (lista) => lista.map(c => `<div class="resumo-card" style="text-align:left">
+    <div class="resumo-label" style="margin:0 0 6px">${c.label}</div>
+    <div class="resumo-valor" style="color:${c.cor || 'var(--text)'};font-size:19px">${c.valor}</div>
+    ${c.nota ? `<div class="rh-item-sub">${c.nota}</div>` : ''}
+  </div>`).join('');
+
+/* ── 1.1 visão geral ── */
+function renderFinVisao(cobrancas) {
+  const validas = cobrancas.filter(i => VALEM.includes(i.status));
+  const faturado = validas.reduce((s, i) => s + valorAtual(i), 0);
+  const recebido = validas.reduce((s, i) => s + Number(i.recebido || 0), 0);
+  const aberto   = validas.reduce((s, i) => s + emAberto(i), 0);
+  const atraso   = validas.filter(i => i.status === 'ATRASADO').reduce((s, i) => s + emAberto(i), 0);
+
+  const de = val('fin-de'), ate = val('fin-ate');
+  const noPeriodo = m => (!de || (m.data_caixa || m.competencia + '-01') >= de)
+                      && (!ate || (m.data_caixa || m.competencia + '-28') <= ate);
+  const despesas = finMovimentacoes.filter(m => m.tipo === 'SAIDA' && noPeriodo(m))
+    .reduce((s, m) => s + Number(m.valor), 0);
+
+  el('fin-resumo-topo').innerHTML = cartoes([
+    { label: 'Receita recebida', valor: fmtMoney(recebido), cor: 'var(--green)' },
+    { label: 'A receber',        valor: fmtMoney(aberto - atraso), cor: 'var(--text)' },
+    { label: 'Em atraso',        valor: fmtMoney(atraso), cor: atraso ? 'var(--red)' : 'var(--text)' },
+    { label: 'Despesas',         valor: fmtMoney(despesas), cor: 'var(--text)' },
+  ]);
 
   const mesAtual = new Date().toISOString().slice(0, 7);
-  const doMes = soma(allInvoices.filter(i => i.status === 'pago' && competenciaDe(i) === mesAtual));
-  // Recorrente = o que se repete todo mês por contrato, não o total do mês.
-  const recorrente = soma(allInvoices.filter(i =>
-    i.tipo === 'SUPORTE' && competenciaDe(i) === mesAtual && i.status !== 'cancelado'));
-  const clientesComFatura = new Set(validas.map(i => i.client_id)).size;
+  const doMes = allInvoices.filter(i => VALEM.includes(i.status) && competenciaDe(i) === mesAtual);
+  const saasAtivas = finAssinaturas.filter(a => ['ATIVA','TESTE'].includes(a.situacao));
+  const projetosPendentes = new Set(validas.filter(i => EM_ABERTO.includes(i.status) && i.project_id)
+    .map(i => i.project_id)).size;
 
-  const cartoes = [
-    { label: 'Recebido no mês',    valor: fmtMoney(doMes), cor: 'var(--green)' },
-    { label: 'Receita recorrente', valor: fmtMoney(recorrente), cor: 'var(--text)' },
-    { label: 'Projeção anual',     valor: fmtMoney(recorrente * 12), cor: 'var(--text)' },
-    { label: 'Média por cliente',  valor: fmtMoney(clientesComFatura ? faturado / clientesComFatura : 0), cor: 'var(--text)' },
-    { label: 'Taxa de recebimento',valor: (faturado ? Math.round(recebido / faturado * 100) : 0) + '%', cor: 'var(--text)' },
-    { label: 'Inadimplência',      valor: (faturado ? Math.round(atrasado / faturado * 100) : 0) + '%', cor: atrasado ? 'var(--red)' : 'var(--text)' },
-  ];
-  el('fin-indicadores').innerHTML = cartoes.map(c => `<div class="resumo-card" style="text-align:left">
-      <div class="resumo-label" style="margin:0 0 6px">${c.label}</div>
-      <div class="resumo-valor" style="color:${c.cor};font-size:19px">${c.valor}</div>
-    </div>`).join('');
+  el('fin-indicadores').innerHTML = cartoes([
+    { label: 'Receita prevista no mês',  valor: fmtMoney(doMes.reduce((s, i) => s + valorAtual(i), 0)) },
+    { label: 'Recebida no mês',          valor: fmtMoney(doMes.reduce((s, i) => s + Number(i.recebido || 0), 0)), cor: 'var(--green)' },
+    { label: 'Contratos ativos',         valor: allProjects.filter(p => !['CONCLUIDO','CANCELADO'].includes(p.status)).length },
+    { label: 'Projetos com pendência',   valor: projetosPendentes, cor: projetosPendentes ? 'var(--orange)' : 'var(--text)' },
+    { label: 'Assinaturas ativas',       valor: saasAtivas.length },
+    { label: 'Inadimplência',            valor: (faturado ? Math.round(atraso / faturado * 100) : 0) + '%',
+      cor: atraso ? 'var(--red)' : 'var(--text)' },
+    { label: 'Resultado do período',     valor: fmtMoney(recebido - despesas),
+      cor: recebido - despesas >= 0 ? 'var(--green)' : 'var(--red)',
+      nota: 'Recebido menos despesas' },
+    { label: 'Taxa de recebimento',      valor: (faturado ? Math.round(recebido / faturado * 100) : 0) + '%' },
+  ]);
 
-  // Doze meses em barras: o suficiente para ver tendência sem biblioteca.
+  // Doze meses de entradas e saídas, lado a lado.
   const meses = [];
   for (let n = 11; n >= 0; n--) {
     const d = new Date(); d.setDate(1); d.setMonth(d.getMonth() - n);
     const c = d.toISOString().slice(0, 7);
-    meses.push({ c, valor: soma(allInvoices.filter(i => i.status === 'pago' && competenciaDe(i) === c)) });
+    const doMesMov = finMovimentacoes.filter(m => m.competencia === c);
+    meses.push({
+      c,
+      entrada: doMesMov.filter(m => m.tipo === 'ENTRADA').reduce((s, m) => s + Number(m.valor), 0),
+      saida:   doMesMov.filter(m => m.tipo === 'SAIDA').reduce((s, m) => s + Number(m.valor), 0),
+    });
   }
-  const teto = Math.max(...meses.map(m => m.valor), 1);
+  const teto = Math.max(...meses.flatMap(m => [m.entrada, m.saida]), 1);
   el('fin-grafico').innerHTML = meses.map(m => `
-    <div class="fin-barra" title="${mesLabel(m.c)}: ${fmtMoney(m.valor)}">
-      <div class="fin-barra-tubo"><div class="fin-barra-cheia" style="height:${Math.round(m.valor / teto * 100)}%"></div></div>
+    <div class="fin-barra" title="${mesLabel(m.c)} · entradas ${fmtMoney(m.entrada)} · saídas ${fmtMoney(m.saida)}">
+      <div class="fin-barra-par">
+        <div class="fin-barra-tubo"><div class="fin-barra-cheia entrada" style="height:${Math.round(m.entrada / teto * 100)}%"></div></div>
+        <div class="fin-barra-tubo"><div class="fin-barra-cheia saida" style="height:${Math.round(m.saida / teto * 100)}%"></div></div>
+      </div>
       <div class="fin-barra-rotulo">${m.c.slice(5)}</div>
     </div>`).join('');
 
   el('fin-situacoes').innerHTML = Object.entries(FIN_SITUACAO).map(([v, s]) => {
-    const lista = faturas.filter(i => i.status === v);
+    const lista = cobrancas.filter(i => i.status === v);
     return `<div class="meurh-linha">
       <span><span class="status ${s.cls}">${s.label}</span></span>
-      <strong>${lista.length} · ${fmtMoney(soma(lista))}</strong></div>`;
-  }).join('')
-  + `<div class="meurh-linha"><span>Reembolsado</span><strong>${fmtMoney(reemb)}</strong></div>`;
-}
-
-/* ── receitas ── */
-function renderFinReceitas(faturas) {
-  const soma = lista => lista.reduce((s, i) => s + valorFinal(i), 0);
-
-  el('fin-por-tipo').innerHTML = Object.entries(FIN_TIPO).map(([v, l]) => {
-    const lista = faturas.filter(i => i.tipo === v && i.status !== 'cancelado');
-    const recebido = soma(lista.filter(i => i.status === 'pago'));
-    const devolvido = finReembolsos.filter(r => r.situacao === 'PAGO'
-      && lista.some(i => i.id === r.invoice_id)).reduce((s, r) => s + Number(r.valor), 0);
-    return `<tr>
-      <td style="font-weight:600">${l}</td>
-      <td style="color:var(--text-dim)">${lista.length}</td>
-      <td>${fmtMoney(soma(lista))}</td>
-      <td style="color:var(--green)">${fmtMoney(recebido)}</td>
-      <td style="color:${devolvido ? 'var(--red)' : 'var(--text-dim)'}">${fmtMoney(devolvido)}</td>
-      <td style="font-weight:700">${fmtMoney(recebido - devolvido)}</td>
-    </tr>`;
+      <strong>${lista.length} · ${fmtMoney(lista.reduce((t, i) => t + valorAtual(i), 0))}</strong></div>`;
   }).join('');
-
-  const porCliente = {};
-  faturas.filter(i => i.status !== 'cancelado').forEach(i => {
-    (porCliente[i.client_id] ||= []).push(i);
-  });
-  const linhas = Object.entries(porCliente)
-    .map(([id, lista]) => ({ id, lista, total: soma(lista) }))
-    .sort((a, b) => b.total - a.total);
-
-  el('fin-por-cliente').innerHTML = linhas.length ? linhas.map(({ id, lista, total }) => {
-    const cl = clientMap[id];
-    const recebido = soma(lista.filter(i => i.status === 'pago'));
-    return `<tr>
-      <td style="font-weight:600">${esc(cl?.company || cl?.name || '—')}</td>
-      <td style="color:var(--text-dim)">${lista.length}</td>
-      <td>${fmtMoney(total)}</td>
-      <td style="color:var(--green)">${fmtMoney(recebido)}</td>
-      <td style="color:${total - recebido ? 'var(--orange)' : 'var(--text-dim)'}">${fmtMoney(total - recebido)}</td>
-    </tr>`;
-  }).join('') : '<tr><td colspan="5" class="team-empty">Nenhuma fatura no período.</td></tr>';
 }
 
-/* ── recebimentos ── */
-function renderFinRecebimentos(faturas) {
-  const pagas = faturas.filter(i => i.status === 'pago');
-  const total = pagas.reduce((s, i) => s + valorFinal(i), 0);
-
-  el('fin-por-forma').innerHTML = Object.entries(FIN_FORMA).map(([v, l]) => {
-    const lista = pagas.filter(i => i.forma_pagamento === v);
-    const valor = lista.reduce((s, i) => s + valorFinal(i), 0);
-    return { l, n: lista.length, valor };
-  }).concat([{
-    l: 'Não informada',
-    n: pagas.filter(i => !i.forma_pagamento).length,
-    valor: pagas.filter(i => !i.forma_pagamento).reduce((s, i) => s + valorFinal(i), 0),
-  }]).filter(f => f.n).map(f => `<tr>
-      <td style="font-weight:600">${f.l}</td>
-      <td style="color:var(--text-dim)">${f.n}</td>
-      <td>${fmtMoney(f.valor)}</td>
-      <td style="color:var(--text-dim)">${total ? Math.round(f.valor / total * 100) : 0}%</td>
-    </tr>`).join('') || '<tr><td colspan="4" class="team-empty">Nenhum recebimento no período.</td></tr>';
-
-  const comps = [...new Set(faturas.map(competenciaDe).filter(Boolean))].sort().reverse();
-  el('fin-por-competencia').innerHTML = comps.length ? comps.map(c => {
-    const lista = faturas.filter(i => competenciaDe(i) === c && i.status !== 'cancelado');
-    const por = st => fmtMoney(lista.filter(i => i.status === st).reduce((s, i) => s + valorFinal(i), 0));
-    return `<tr>
-      <td style="font-weight:600">${mesLabel(c)}</td>
-      <td style="color:var(--green)">${por('pago')}</td>
-      <td>${por('pendente')}</td>
-      <td style="color:var(--red)">${por('atrasado')}</td>
-    </tr>`;
-  }).join('') : '<tr><td colspan="4" class="team-empty">Nenhuma fatura no período.</td></tr>';
-}
-
-/* ── faturas ── */
-function renderFinFaturas(faturas) {
-  const tipo = val('fin-f-tipo'), situacao = val('fin-f-situacao'), cliente = val('fin-f-cliente');
-  const lista = faturas.filter(i =>
-    (!tipo || i.tipo === tipo) && (!situacao || i.status === situacao) && (!cliente || i.client_id === cliente));
-
-  el('fin-faturas-body').innerHTML = lista.length ? lista.map(i => {
+/* ── 1.2 contas a receber ── */
+function renderContasReceber(cobrancas) {
+  el('fin-receber-body').innerHTML = cobrancas.length ? cobrancas.map(i => {
     const cl = clientMap[i.client_id];
     const s = FIN_SITUACAO[i.status] || { label: i.status, cls: '' };
-    return `<tr class="rh-linha" onclick="window._editarFatura('${i.id}')">
-      <td><span class="ticket-id">#${String(i.numero ?? 0).padStart(5, '0')}</span></td>
+    const aguardaValidacao = i.comprovante && !i.comprovante_validado;
+    return `<tr class="rh-linha${aguardaValidacao ? ' sup-espera' : ''}" onclick="window._editarFatura('${i.id}')">
+      <td><span class="ticket-id">${numeroCobranca(i)}</span></td>
       <td style="font-weight:600">${esc(cl?.company || cl?.name || '—')}</td>
       <td>${esc(i.description || FIN_TIPO[i.tipo] || '—')}
-        <div class="rh-item-sub">${FIN_TIPO[i.tipo] || ''}</div></td>
-      <td style="color:var(--text-dim)">${mesLabel(competenciaDe(i))}</td>
+        <div class="rh-item-sub">${FIN_TIPO[i.tipo] || ''}${i.marco ? ' · ' + esc(i.marco) : ''}</div></td>
+      <td style="color:var(--text-dim)">${parcelaLabel(i)}</td>
+      <td style="font-weight:700">${fmtMoney(valorAtual(i))}
+        ${Number(i.desconto) ? `<div class="rh-item-sub">desconto ${fmtMoney(i.desconto)}</div>` : ''}
+        ${Number(i.juros) + Number(i.multa) ? `<div class="rh-item-sub" style="color:var(--orange)">+ juros/multa ${fmtMoney(Number(i.juros) + Number(i.multa))}</div>` : ''}</td>
+      <td style="color:${Number(i.recebido) ? 'var(--green)' : 'var(--text-dim)'}">${fmtMoney(i.recebido)}
+        ${i.status === 'PARCIAL' ? `<div class="rh-item-sub">falta ${fmtMoney(emAberto(i))}</div>` : ''}</td>
+      <td style="color:var(--text-dim);font-size:12px">${i.emitida_em ? fmtDate(i.emitida_em) : '—'}</td>
       <td style="color:var(--text-dim);font-size:12px">${fmtDate(i.due_date)}</td>
-      <td style="font-weight:700">${fmtMoney(valorFinal(i))}
-        ${Number(i.desconto) ? `<div class="rh-item-sub">desconto ${fmtMoney(i.desconto)}</div>` : ''}</td>
-      <td style="color:var(--text-dim);font-size:12px">${i.paid_at ? fmtDate(i.paid_at) : '—'}
-        ${i.forma_pagamento ? `<div class="rh-item-sub">${FIN_FORMA[i.forma_pagamento]}</div>` : ''}</td>
-      <td><span class="status ${s.cls}">${s.label}</span></td>
+      <td><span class="status ${s.cls}">${s.label}</span>
+        ${aguardaValidacao ? '<div class="rh-item-sub" style="color:var(--orange)">comprovante a validar</div>' : ''}</td>
       <td><div class="team-actions">${EM_ABERTO.includes(i.status)
-        ? `<button class="team-btn approve" onclick="event.stopPropagation();window._marcarPaga('${i.id}')">Marcar paga</button>
-           <button class="team-btn" onclick="event.stopPropagation();window._cobrar('${i.id}')">Cobrar</button>`
-        : '<span style="font-size:11.5px;color:var(--text-dim)">—</span>'}</div></td>
-    </tr>`;
-  }).join('') : '<tr><td colspan="9" class="team-empty">Nenhuma fatura no filtro escolhido.</td></tr>';
-}
-
-/* ── pendências ── */
-function renderFinPendencias(faturas) {
-  const atrasadas = faturas.filter(i => i.status === 'atrasado')
-    .sort((a, b) => (a.due_date || '').localeCompare(b.due_date || ''));
-  const emAberto = faturas.filter(i => EM_ABERTO.includes(i.status));
-  const soma = lista => lista.reduce((s, i) => s + valorFinal(i), 0);
-
-  el('fin-pend-resumo').innerHTML = [
-    { label: 'Valor em atraso',  valor: fmtMoney(soma(atrasadas)), cor: 'var(--red)' },
-    { label: 'Clientes em atraso', valor: new Set(atrasadas.map(i => i.client_id)).size, cor: 'var(--text)' },
-    { label: 'A receber no período', valor: fmtMoney(soma(emAberto)), cor: 'var(--orange)' },
-  ].map(c => `<div class="resumo-card" style="text-align:left">
-      <div class="resumo-label" style="margin:0 0 6px">${c.label}</div>
-      <div class="resumo-valor" style="color:${c.cor};font-size:19px">${c.valor}</div>
-    </div>`).join('');
-
-  el('fin-pendencias-body').innerHTML = atrasadas.length ? atrasadas.map(i => {
-    const cl = clientMap[i.client_id];
-    const ultima = finCobrancas.find(c => c.invoice_id === i.id);
-    const dias = diasAtraso(i);
-    return `<tr class="rh-linha${dias > 30 ? ' sup-espera' : ''}" onclick="window._editarFatura('${i.id}')">
-      <td style="font-weight:600">${esc(cl?.company || cl?.name || '—')}
-        <div class="rh-item-sub">${esc(cl?.email || '')}</div></td>
-      <td><span class="ticket-id">#${String(i.numero ?? 0).padStart(5, '0')}</span></td>
-      <td style="font-weight:700">${fmtMoney(valorFinal(i))}</td>
-      <td style="color:var(--red);font-weight:600">${dias} dias</td>
-      <td style="color:var(--text-dim);font-size:12px">${ultima ? fmtDateTime(ultima.created_at) : 'Nunca cobrada'}
-        ${ultima ? `<div class="rh-item-sub">${esc(ultima.canal || '')} · ${esc(ultima.por || '')}</div>` : ''}</td>
-      <td style="color:var(--text-dim);font-size:12px">${esc(i.proxima_acao || '—')}</td>
-      <td><div class="team-actions">
-        <button class="team-btn" onclick="event.stopPropagation();window._cobrar('${i.id}')">Registrar cobrança</button>
-        <button class="team-btn approve" onclick="event.stopPropagation();window._marcarPaga('${i.id}')">Marcar paga</button>
+        ? `<button class="team-btn approve" onclick="event.stopPropagation();window._registrarPagamento('${i.id}')">Receber</button>`
+        : ''}
+        <button class="team-btn" onclick="event.stopPropagation();window._verCobranca('${i.id}')">Detalhes</button>
       </div></td>
     </tr>`;
-  }).join('') : '<tr><td colspan="7" class="team-empty">Nenhuma fatura em atraso no período.</td></tr>';
+  }).join('') : '<tr><td colspan="10" class="team-empty">Nenhuma cobrança no filtro escolhido.</td></tr>';
 }
 
-/* ── reembolsos ── */
-function renderFinReembolsos() {
-  el('fin-reembolsos-body').innerHTML = finReembolsos.length ? finReembolsos.map(r => {
-    const cl = clientMap[r.client_id];
-    const s = FIN_REEMB[r.situacao] || { label: r.situacao, cls: '' };
-    return `<tr>
+/* ── 1.3 financeiro dos projetos ── */
+function renderFinProjetos() {
+  const comCobranca = allProjects.filter(p =>
+    allInvoices.some(i => i.project_id === p.id) || p.valor);
+
+  el('fin-projetos-lista').innerHTML = comCobranca.length ? comCobranca.map(p => {
+    const cl = clientMap[p.client_id];
+    const parcelas = allInvoices.filter(i => i.project_id === p.id && VALEM.includes(i.status))
+      .sort((a, b) => (a.parcela_num || 0) - (b.parcela_num || 0));
+    const contratado = Number(p.valor) || parcelas.reduce((s, i) => s + valorAtual(i), 0);
+    const recebido = parcelas.reduce((s, i) => s + Number(i.recebido || 0), 0);
+    const restante = Math.max(0, contratado - recebido);
+    const pct = contratado ? Math.round(recebido / contratado * 100) : 0;
+
+    return `<div class="card" style="margin-bottom:14px">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap">
+        <div style="min-width:0">
+          <div style="font-size:14px;font-weight:700">${esc(p.name)}</div>
+          <div class="rh-item-sub">${esc(cl?.company || cl?.name || '')} · ${esc(p.codigo || '')}
+            ${p.contratacao ? ' · ' + CONTRATACAO[p.contratacao] : ''}</div>
+        </div>
+        <button class="team-btn" onclick="window._abrirProjeto('${p.id}')">Abrir projeto</button>
+      </div>
+      <div class="sup-contadores" style="grid-template-columns:repeat(3,1fr);margin:14px 0 10px">
+        ${cartoes([
+          { label: 'Valor contratado', valor: fmtMoney(contratado) },
+          { label: 'Recebido',  valor: fmtMoney(recebido), cor: 'var(--green)' },
+          { label: 'Restante',  valor: fmtMoney(restante), cor: restante ? 'var(--orange)' : 'var(--text-dim)' },
+        ])}
+      </div>
+      <div class="progress-bar"><div class="progress-bar-fill" style="width:${pct}%"></div></div>
+      <div class="rh-item-sub">${pct}% do valor contratado recebido · andamento do projeto em ${p.progress || 0}%</div>
+
+      ${parcelas.length ? `<div class="table-scroll" style="margin-top:14px">
+        <table class="data-table">
+          <thead><tr><th>Parcela</th><th>Marco</th><th>Vencimento</th><th>Valor</th><th>Situação</th></tr></thead>
+          <tbody>${parcelas.map(i => {
+            const s = FIN_SITUACAO[i.status];
+            return `<tr class="rh-linha" onclick="window._editarFatura('${i.id}')">
+              <td style="font-weight:600">${parcelaLabel(i)}</td>
+              <td style="color:var(--text-dim)">${esc(i.marco || '—')}</td>
+              <td style="color:var(--text-dim);font-size:12px">${fmtDate(i.due_date)}</td>
+              <td>${fmtMoney(valorAtual(i))}</td>
+              <td><span class="status ${s.cls}">${s.label}</span></td></tr>`;
+          }).join('')}</tbody>
+        </table></div>`
+      : '<div class="rh-item-sub" style="margin-top:12px">Nenhuma parcela cadastrada.</div>'}
+    </div>`;
+  }).join('') : '<div class="card"><div class="rh-item-sub">Nenhum projeto com valor contratado.</div></div>';
+}
+
+/* ── 1.4 assinaturas ── */
+function renderAssinaturas() {
+  const ativas = finAssinaturas.filter(a => a.situacao === 'ATIVA');
+  // MRR normaliza tudo para o mês: anual dividido por 12, e assim por diante.
+  const mrr = ativas.reduce((s, a) =>
+    s + (Number(a.valor) - Number(a.desconto || 0)) * MESES_POR_ANO[a.periodicidade] / 12, 0);
+  const atrasadas = finAssinaturas.filter(a => a.situacao === 'ATRASADA');
+
+  el('fin-saas-numeros').innerHTML = cartoes([
+    { label: 'MRR', valor: fmtMoney(mrr), nota: 'Receita recorrente mensal' },
+    { label: 'ARR', valor: fmtMoney(mrr * 12), nota: 'Projeção anual' },
+    { label: 'Inadimplência', valor: finAssinaturas.length
+        ? Math.round(atrasadas.length / finAssinaturas.length * 100) + '%' : '0%',
+      cor: atrasadas.length ? 'var(--red)' : 'var(--text)',
+      nota: `${ativas.length} ativas · ${finAssinaturas.filter(a => a.situacao === 'CANCELADA').length} canceladas` },
+  ]);
+
+  el('fin-saas-body').innerHTML = finAssinaturas.length ? finAssinaturas.map(a => {
+    const cl = clientMap[a.client_id];
+    const s = SAAS_SITUACAO[a.situacao] || { label: a.situacao, cls: '' };
+    return `<tr class="rh-linha" onclick="window._editarAssinatura('${a.id}')">
       <td style="font-weight:600">${esc(cl?.company || cl?.name || '—')}</td>
-      <td style="font-weight:700">${fmtMoney(r.valor)}</td>
-      <td>${esc(r.motivo)}</td>
-      <td style="color:var(--text-dim);font-size:12px">${fmtDate(r.data)}</td>
-      <td style="color:var(--text-dim);font-size:12px">${esc(r.responsavel || '—')}</td>
+      <td>${esc(a.produto)}<div class="rh-item-sub">${esc(a.plano)}</div></td>
+      <td style="font-weight:700">${fmtMoney(Number(a.valor) - Number(a.desconto || 0))}
+        ${Number(a.desconto) ? `<div class="rh-item-sub">desconto ${fmtMoney(a.desconto)}</div>` : ''}</td>
+      <td style="color:var(--text-dim)">${PERIODICIDADE[a.periodicidade]}</td>
+      <td style="color:var(--text-dim);font-size:12px">${fmtDate(a.contratada_em)}</td>
+      <td style="color:var(--text-dim);font-size:12px">${a.proxima_cobranca ? fmtDate(a.proxima_cobranca) : '—'}</td>
       <td><span class="status ${s.cls}">${s.label}</span></td>
-      <td><div class="team-actions">${r.situacao === 'SOLICITADO'
-        ? `<button class="team-btn approve" onclick="window._decidirReembolso('${r.id}','PAGO')">Marcar pago</button>
-           <button class="team-btn danger" onclick="window._decidirReembolso('${r.id}','RECUSADO')">Recusar</button>`
-        : `<span style="font-size:11.5px;color:var(--text-dim)">${r.decidido_em ? fmtDate(r.decidido_em) : '—'}</span>`}</div></td>
+      <td><div class="team-actions">
+        <button class="team-btn approve" onclick="event.stopPropagation();window._cobrarAssinatura('${a.id}')">Gerar cobrança</button>
+      </div></td>
     </tr>`;
-  }).join('') : '<tr><td colspan="7" class="team-empty">Nenhum reembolso registrado.</td></tr>';
+  }).join('') : '<tr><td colspan="8" class="team-empty">Nenhuma assinatura cadastrada.</td></tr>';
 }
 
-/* ── ações ── */
-window._marcarPaga = async (id) => {
-  const i = allInvoices.find(x => x.id === id);
-  const forma = prompt('Forma de pagamento: PIX, BOLETO, TRANSFERENCIA, CARTAO, DINHEIRO ou OUTRO', 'PIX');
-  if (forma === null) return;
-  const chave = (forma || 'OUTRO').toUpperCase();
-  if (!FIN_FORMA[chave]) return alert('Forma de pagamento não reconhecida.');
-
-  const { error } = await supabase.from('invoices').update({
-    status: 'pago', paid_at: new Date().toISOString(), forma_pagamento: chave,
-  }).eq('id', id);
-  if (error) return alert('Não foi possível salvar: ' + error.message);
-
-  Object.assign(i, { status: 'pago', paid_at: new Date().toISOString(), forma_pagamento: chave });
-  renderFinanceiro();
-  renderDashboard();
-};
-
-window._cobrar = async (id) => {
-  const canal = prompt('Como a cobrança foi feita? (e-mail, WhatsApp, telefone)', 'e-mail');
-  if (canal === null) return;
-  const nota = prompt('Combinado com o cliente (vira a próxima ação):') || '';
-
-  const { error } = await supabase.from('fin_cobrancas')
-    .insert({ invoice_id: id, canal, nota, por: myName });
-  if (error) return alert('Não foi possível registrar: ' + error.message);
-
-  await supabase.from('invoices').update({
-    cobrado_em: new Date().toISOString(), proxima_acao: nota || null,
-  }).eq('id', id);
-
-  const i = allInvoices.find(x => x.id === id);
-  if (i) Object.assign(i, { cobrado_em: new Date().toISOString(), proxima_acao: nota || null });
-  await loadFinanceiro();
-};
-
-window._novoReembolso = async () => {
-  const numero = prompt('Número da fatura a reembolsar (só os dígitos):');
-  if (numero === null) return;
-  const fatura = allInvoices.find(i => String(i.numero) === String(Number(numero)));
-  if (!fatura) return alert('Fatura não encontrada.');
-
-  const valor = Number((prompt(`Valor a devolver (máximo ${fmtMoney(valorFinal(fatura))}):`,
-    String(valorFinal(fatura))) || '').replace(',', '.'));
-  if (!valor || valor <= 0) return;
-  if (valor > valorFinal(fatura)) return alert('O reembolso não pode passar do valor da fatura.');
-  const motivo = prompt('Motivo do reembolso:');
-  if (!motivo) return;
-
-  const { error } = await supabase.from('fin_reembolsos').insert({
-    invoice_id: fatura.id, client_id: fatura.client_id, valor, motivo,
-    responsavel: myName, situacao: 'SOLICITADO',
+/* ── 1.5 movimentações ── */
+function renderMovimentacoes() {
+  const de = val('fin-de'), ate = val('fin-ate');
+  const lista = finMovimentacoes.filter(m => {
+    const d = m.data_caixa || (m.competencia + '-15');
+    return (!de || d >= de) && (!ate || d <= ate);
   });
-  if (error) return alert('Não foi possível registrar: ' + error.message);
+  const entradas = lista.filter(m => m.tipo === 'ENTRADA').reduce((s, m) => s + Number(m.valor), 0);
+  const saidas   = lista.filter(m => m.tipo === 'SAIDA').reduce((s, m) => s + Number(m.valor), 0);
+
+  el('fin-mov-numeros').innerHTML = cartoes([
+    { label: 'Entradas', valor: fmtMoney(entradas), cor: 'var(--green)' },
+    { label: 'Saídas',   valor: fmtMoney(saidas),   cor: 'var(--red)' },
+    { label: 'Saldo do período', valor: fmtMoney(entradas - saidas),
+      cor: entradas - saidas >= 0 ? 'var(--green)' : 'var(--red)' },
+  ]);
+
+  el('fin-mov-body').innerHTML = lista.length ? lista.map(m => {
+    const conta = finContas.find(c => c.id === m.conta_id);
+    const entrada = m.tipo === 'ENTRADA';
+    return `<tr>
+      <td style="font-weight:600">${mesLabel(m.competencia)}</td>
+      <td style="color:var(--text-dim);font-size:12px">${m.data_caixa ? fmtDate(m.data_caixa) : 'não liquidado'}</td>
+      <td><span class="status ${entrada ? 'status-paid' : 'status-expirado'}">${entrada ? 'Entrada' : 'Saída'}</span></td>
+      <td style="color:var(--text-dim)">${esc(m.categoria_nome || '—')}</td>
+      <td>${esc(m.descricao)}</td>
+      <td style="color:var(--text-dim);font-size:12px">${esc(conta?.nome || '—')}</td>
+      <td style="font-weight:700;color:${entrada ? 'var(--green)' : 'var(--red)'}">${entrada ? '+' : '−'} ${fmtMoney(m.valor)}</td>
+      <td><div class="team-actions">${m.invoice_id
+        ? '<span style="font-size:11.5px;color:var(--text-dim)">do recebimento</span>'
+        : `<button class="team-btn danger" onclick="window._excluirMovimentacao('${m.id}')">Excluir</button>`}</div></td>
+    </tr>`;
+  }).join('') : '<tr><td colspan="8" class="team-empty">Nenhuma movimentação no período.</td></tr>';
+}
+
+/* ── 1.6 ficha financeira do cliente ── */
+function renderFichaCliente() {
+  const cl = clientMap[finFichaId];
+  if (!cl) { el('fin-ficha').innerHTML = '<div class="card"><div class="rh-item-sub">Nenhum cliente cadastrado.</div></div>'; return; }
+
+  const cobrancas = allInvoices.filter(i => i.client_id === finFichaId && VALEM.includes(i.status));
+  const contratado = cobrancas.reduce((s, i) => s + valorAtual(i), 0);
+  const recebido = cobrancas.reduce((s, i) => s + Number(i.recebido || 0), 0);
+  const atraso = cobrancas.filter(i => i.status === 'ATRASADO').reduce((s, i) => s + emAberto(i), 0);
+  const projetos = allProjects.filter(p => p.client_id === finFichaId);
+  const assinaturas = finAssinaturas.filter(a => a.client_id === finFichaId);
+  const pagamentos = finPagamentos.filter(p => p.client_id === finFichaId);
+  const docs = finDocumentos.filter(d => d.client_id === finFichaId);
+
+  el('fin-ficha').innerHTML = `
+    <div class="sup-contadores" style="grid-template-columns:repeat(4,1fr);margin-bottom:18px">
+      ${cartoes([
+        { label: 'Total contratado', valor: fmtMoney(contratado) },
+        { label: 'Total recebido',   valor: fmtMoney(recebido), cor: 'var(--green)' },
+        { label: 'Em aberto',        valor: fmtMoney(contratado - recebido), cor: 'var(--orange)' },
+        { label: 'Em atraso',        valor: fmtMoney(atraso), cor: atraso ? 'var(--red)' : 'var(--text)' },
+      ])}
+    </div>
+
+    <div class="grid-2" style="align-items:start">
+      <div class="card">
+        <div class="card-title" style="margin-bottom:10px">Contratações</div>
+        ${projetos.map(p => `<div class="meurh-linha">
+          <span>${esc(p.name)}<span class="rh-item-sub">${esc(p.codigo || '')}</span></span>
+          <strong>${p.valor ? fmtMoney(p.valor) : '—'}</strong></div>`).join('')
+          || '<div class="rh-item-sub">Nenhum projeto.</div>'}
+        ${assinaturas.map(a => `<div class="meurh-linha">
+          <span>${esc(a.produto)} · ${esc(a.plano)}<span class="rh-item-sub">${PERIODICIDADE[a.periodicidade]}</span></span>
+          <strong>${fmtMoney(a.valor)}</strong></div>`).join('')}
+      </div>
+      <div class="card">
+        <div class="card-title" style="margin-bottom:10px">Histórico de pagamentos</div>
+        ${pagamentos.length ? pagamentos.slice(0, 12).map(p => `<div class="meurh-linha">
+          <span>${fmtDate(p.data)}<span class="rh-item-sub">${esc(FIN_FORMA[p.forma] || p.forma || '')}
+            ${p.estorno_de ? ' · estorno' : ''}</span></span>
+          <strong style="color:${Number(p.valor) < 0 ? 'var(--red)' : 'var(--green)'}">${fmtMoney(p.valor)}</strong></div>`).join('')
+          : '<div class="rh-item-sub">Nenhum pagamento registrado.</div>'}
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:18px">
+      <div class="card-title" style="margin-bottom:10px">Cobranças</div>
+      <div class="table-scroll">
+        <table class="data-table">
+          <thead><tr><th>Cobrança</th><th>Descrição</th><th>Vencimento</th><th>Valor</th><th>Recebido</th><th>Situação</th></tr></thead>
+          <tbody>${allInvoices.filter(i => i.client_id === finFichaId).map(i => {
+            const s = FIN_SITUACAO[i.status] || { label: i.status, cls: '' };
+            return `<tr class="rh-linha" onclick="window._editarFatura('${i.id}')">
+              <td><span class="ticket-id">${numeroCobranca(i)}</span></td>
+              <td>${esc(i.description || '—')}</td>
+              <td style="color:var(--text-dim);font-size:12px">${fmtDate(i.due_date)}</td>
+              <td>${fmtMoney(valorAtual(i))}</td>
+              <td style="color:var(--text-dim)">${fmtMoney(i.recebido)}</td>
+              <td><span class="status ${s.cls}">${s.label}</span></td></tr>`;
+          }).join('') || '<tr><td colspan="6" class="team-empty">Nenhuma cobrança.</td></tr>'}</tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:18px">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px">
+        <div class="card-title" style="margin:0">Documentos financeiros</div>
+        <button class="team-btn" onclick="window._enviarDocumentoFin()">+ Enviar</button>
+      </div>
+      ${docs.length ? docs.map(d => `<div class="meurh-linha">
+        <span>${esc(d.nome)}<span class="rh-item-sub">${d.tipo} · ${fmtDate(d.created_at)}
+          ${d.enviado_tipo === 'CLIENTE' ? ' · enviado pelo cliente' : ''}</span></span>
+        <button class="team-btn" onclick="window._baixarFin('${d.caminho}')">Baixar</button></div>`).join('')
+        : '<div class="rh-item-sub">Nenhum documento.</div>'}
+    </div>
+
+    <div class="card" style="margin-top:18px">
+      <div class="card-title" style="margin-bottom:6px">Observações internas</div>
+      <div class="rh-bloco-texto">O cliente não vê este campo.</div>
+      <div class="form-group" style="margin-top:10px">
+        <textarea id="fin-obs-cliente" placeholder="Anotações sobre a situação financeira deste cliente.">${esc(finNotas[finFichaId] || '')}</textarea></div>
+      <button class="team-btn" onclick="window._salvarObsFinanceira()">Salvar observações</button>
+    </div>`;
+}
+
+/* ── 1.7 relatórios ── */
+const RELATORIOS = [
+  { id: 'receitas',    nome: 'Receitas por período',  para: 'Acompanhar recebimentos' },
+  { id: 'receber',     nome: 'Contas a receber',      para: 'Consultar valores pendentes' },
+  { id: 'inadimplencia', nome: 'Inadimplência',       para: 'Identificar atrasos' },
+  { id: 'projetos',    nome: 'Receitas por projeto',  para: 'Avaliar contratos' },
+  { id: 'servicos',    nome: 'Receitas por serviço',  para: 'Identificar serviços mais rentáveis' },
+  { id: 'saas',        nome: 'Receitas de assinaturas', para: 'Acompanhar assinaturas' },
+  { id: 'despesas',    nome: 'Despesas',              para: 'Controlar custos' },
+  { id: 'caixa',       nome: 'Fluxo de caixa',        para: 'Analisar entradas e saídas' },
+  { id: 'resultado',   nome: 'Resultado financeiro',  para: 'Comparar receitas e despesas' },
+];
+
+function renderRelatorios() {
+  el('fin-relatorios-lista').innerHTML = RELATORIOS.map(r => `
+    <div class="card">
+      <div class="card-title" style="margin-bottom:4px">${r.nome}</div>
+      <div class="rh-item-sub">${r.para}</div>
+      <div class="team-actions" style="margin-top:12px">
+        <button class="team-btn" onclick="window._relatorioFin('${r.id}','pdf')">PDF</button>
+        <button class="team-btn" onclick="window._relatorioFin('${r.id}','excel')">Excel</button>
+      </div>
+    </div>`).join('');
+}
+
+/* ── 1.8 configurações ── */
+function renderConfigFin() {
+  el('cfg-contas').innerHTML = finContas.length ? finContas.map(c => `
+    <div class="meurh-linha">
+      <span>${esc(c.nome)}<span class="rh-item-sub">${c.tipo}${c.banco ? ' · ' + esc(c.banco) : ''}</span></span>
+      <button class="team-btn danger" onclick="window._excluirConta('${c.id}')">Excluir</button>
+    </div>`).join('') : '<div class="rh-item-sub">Nenhuma conta cadastrada.</div>';
+
+  const porNatureza = { RECEITA: [], DESPESA: [] };
+  finCategorias.forEach(c => porNatureza[c.natureza]?.push(c));
+  el('cfg-categorias').innerHTML = ['RECEITA', 'DESPESA'].map(n => `
+    <div class="rh-bloco-titulo" style="margin-top:10px">${n === 'RECEITA' ? 'Receitas' : 'Despesas'}</div>
+    ${porNatureza[n].map(c => `<div class="meurh-linha">
+      <span>${esc(c.nome)}</span>
+      <button class="team-btn danger" onclick="window._excluirCategoria('${c.id}')">Excluir</button>
+    </div>`).join('') || '<div class="rh-item-sub">Nenhuma.</div>'}`).join('');
+}
+
+window._salvarConfigFin = async () => {
+  const btn = el('cfg-btn'), orig = btn.textContent;
+  btn.textContent = 'Salvando...'; btn.disabled = true;
+  const { error } = await supabase.from('fin_config').update({
+    prazo_padrao: Number(val('cfg-prazo')) || 30,
+    juros_mes: Number(val('cfg-juros').replace(',', '.')) || 0,
+    multa_atraso: Number(val('cfg-multa').replace(',', '.')) || 0,
+    condicoes: val('cfg-condicoes') || null,
+    updated_at: new Date().toISOString(),
+  }).eq('id', 1);
+  btn.textContent = orig; btn.disabled = false;
+  if (error) return finSet('cfg-msg', 'Não foi possível salvar: ' + error.message);
+  await loadFinanceiro();
+  finSet('cfg-msg', 'Parâmetros salvos.', 'success');
+};
+
+window._novaConta = async () => {
+  const nome = prompt('Nome da conta (ex.: Banco Inter, Caixa):');
+  if (!nome) return;
+  const tipo = (prompt('Tipo: BANCO, CAIXA ou GATEWAY', 'BANCO') || 'BANCO').toUpperCase();
+  const { error } = await supabase.from('fin_contas').insert({ nome, tipo });
+  if (error) return alert('Não foi possível criar: ' + error.message);
   await loadFinanceiro();
 };
 
-window._decidirReembolso = async (id, situacao) => {
-  const r = finReembolsos.find(x => x.id === id);
-  if (!confirm(situacao === 'PAGO'
-    ? `Confirmar a devolução de ${fmtMoney(r.valor)}?`
-    : 'Recusar este reembolso?')) return;
-
-  const { error } = await supabase.from('fin_reembolsos')
-    .update({ situacao, decidido_em: new Date().toISOString(), responsavel: myName }).eq('id', id);
-  if (error) return alert('Não foi possível salvar: ' + error.message);
-
-  // A fatura devolvida por inteiro deixa de ser receita.
-  if (situacao === 'PAGO' && r.invoice_id) {
-    const fatura = allInvoices.find(i => i.id === r.invoice_id);
-    if (fatura && Number(r.valor) >= valorFinal(fatura)) {
-      await supabase.from('invoices').update({ status: 'reembolsado' }).eq('id', fatura.id);
-      fatura.status = 'reembolsado';
-    }
-  }
+window._excluirConta = async (id) => {
+  if (!confirm('Excluir esta conta? As movimentações já lançadas ficam sem conta.')) return;
+  const { error } = await supabase.from('fin_contas').delete().eq('id', id);
+  if (error) return alert('Não foi possível excluir: ' + error.message);
   await loadFinanceiro();
-  renderDashboard();
 };
 
-/* ── cadastro da fatura ── */
-window._novaFatura = () => {
-  fatEditId = null;
-  el('fat-titulo').textContent = 'Nova fatura';
-  el('fat-cliente').innerHTML = allClients.map(c =>
-    `<option value="${c.id}">${esc(c.company || c.name)}</option>`).join('');
-  el('fat-tipo').innerHTML = Object.entries(FIN_TIPO).map(([v, l]) => `<option value="${v}">${l}</option>`).join('');
-  el('fat-situacao').innerHTML = Object.entries(FIN_SITUACAO).map(([v, s]) => `<option value="${v}">${s.label}</option>`).join('');
-  el('fat-forma').innerHTML = '<option value="">Não informada</option>'
-    + Object.entries(FIN_FORMA).map(([v, l]) => `<option value="${v}">${l}</option>`).join('');
-
-  ['fat-descricao','fat-valor','fat-desconto','fat-observacao'].forEach(id => el(id).value = '');
-  el('fat-valor').value = '';
-  el('fat-vencimento').value = new Date().toISOString().slice(0, 10);
-  el('fat-competencia').value = new Date().toISOString().slice(0, 7);
-  el('fat-situacao').value = 'pendente';
-  el('fat-excluir').hidden = true;
-  el('fat-msg').className = 'form-msg';
-  openModal('modal-fatura');
+window._novaCategoria = async () => {
+  const nome = prompt('Nome da categoria:');
+  if (!nome) return;
+  const natureza = (prompt('É RECEITA ou DESPESA?', 'DESPESA') || '').toUpperCase();
+  if (!['RECEITA', 'DESPESA'].includes(natureza)) return alert('Informe RECEITA ou DESPESA.');
+  const { error } = await supabase.from('fin_categorias').insert({ nome, natureza });
+  if (error) return alert('Não foi possível criar: ' + error.message);
+  await loadFinanceiro();
 };
 
-window._editarFatura = (id) => {
+window._excluirCategoria = async (id) => {
+  if (!confirm('Excluir esta categoria?')) return;
+  const { error } = await supabase.from('fin_categorias').delete().eq('id', id);
+  if (error) return alert('Não foi possível excluir: ' + error.message);
+  await loadFinanceiro();
+};
+
+/* ── pagamentos ── */
+// O pagamento é sempre um registro novo. Nada é editado: corrigir é
+// estornar e lançar de novo, e as duas linhas ficam no histórico.
+window._registrarPagamento = (id) => {
   const i = allInvoices.find(x => x.id === id);
   if (!i) return;
-  window._novaFatura();
   fatEditId = id;
-  el('fat-titulo').textContent = 'Fatura #' + String(i.numero ?? 0).padStart(5, '0');
-  el('fat-cliente').value = i.client_id || '';
-  el('fat-tipo').value = i.tipo || 'PROJETO';
-  el('fat-descricao').value = i.description || '';
-  el('fat-valor').value = i.amount ?? '';
-  el('fat-desconto').value = i.desconto || '';
-  el('fat-vencimento').value = i.due_date || '';
-  el('fat-competencia').value = competenciaDe(i) || '';
-  el('fat-situacao').value = i.status;
-  el('fat-forma').value = i.forma_pagamento || '';
-  el('fat-observacao').value = i.observacao || '';
-  el('fat-excluir').hidden = false;
-  openModal('modal-fatura');
+  const cl = clientMap[i.client_id];
+  el('pag-cobranca').innerHTML = `<strong>${numeroCobranca(i)}</strong> · ${esc(cl?.company || cl?.name || '')}
+    <div class="rh-item-sub">${esc(i.description || '')} · vence ${fmtDate(i.due_date)}</div>`;
+  el('pag-devido').textContent = fmtMoney(emAberto(i));
+  el('pag-valor').value = emAberto(i).toFixed(2);
+  el('pag-data').value = new Date().toISOString().slice(0, 10);
+  el('pag-competencia').value = competenciaDe(i) || new Date().toISOString().slice(0, 7);
+  el('pag-forma').innerHTML = Object.entries(FIN_FORMA).map(([v, l]) => `<option value="${v}">${l}</option>`).join('');
+  el('pag-conta').innerHTML = '<option value="">Não informada</option>'
+    + finContas.map(c => `<option value="${c.id}">${esc(c.nome)}</option>`).join('');
+  el('pag-observacao').value = '';
+  el('pag-comprovante').value = '';
+  el('pag-msg').className = 'form-msg';
+
+  // Comprovante que o cliente mandou aparece aqui para a gestão conferir.
+  el('pag-do-cliente').hidden = !i.comprovante || i.comprovante_validado;
+  if (i.comprovante && !i.comprovante_validado) {
+    el('pag-do-cliente').innerHTML = `<div class="rh-bloco-titulo">O cliente enviou um comprovante</div>
+      <div class="rh-bloco-texto">Enviado em ${fmtDateTime(i.comprovante_em)}. Confira antes de dar o recebimento por confirmado.</div>
+      <button class="team-btn" onclick="window._baixarFin('${i.comprovante}')">Ver comprovante</button>`;
+  }
+  openModal('modal-pagamento');
 };
 
-window._salvarFatura = async () => {
-  const btn = el('fat-btn'), orig = btn.textContent;
-  const msg = (t, tipo = 'error') => { const m = el('fat-msg'); m.textContent = t; m.className = 'form-msg show ' + tipo; };
+window._salvarPagamento = async () => {
+  const btn = el('pag-btn'), orig = btn.textContent;
+  const i = allInvoices.find(x => x.id === fatEditId);
+  const valor = Number(val('pag-valor').replace(/\./g, '').replace(',', '.'));
+  if (!valor || valor <= 0) return finSet('pag-msg', 'Informe o valor recebido.');
+  if (valor > emAberto(i) + 0.005) {
+    return finSet('pag-msg', `O valor passa do que falta (${fmtMoney(emAberto(i))}). Ajuste a cobrança antes.`);
+  }
 
-  const valor = Number(val('fat-valor').replace(',', '.'));
-  const desconto = Number(val('fat-desconto').replace(',', '.') || 0);
-  if (!val('fat-cliente'))        return msg('Escolha o cliente.');
-  if (!valor || valor <= 0)       return msg('Informe o valor da fatura.');
-  if (desconto > valor)           return msg('O desconto não pode passar do valor.');
-  if (!val('fat-vencimento'))     return msg('Informe o vencimento.');
+  btn.textContent = 'Registrando...'; btn.disabled = true;
+  const fim = () => { btn.textContent = orig; btn.disabled = false; };
+
+  let comprovante = null;
+  const arquivo = el('pag-comprovante').files[0];
+  if (arquivo) {
+    const enviado = await enviarArquivoFin(el('pag-comprovante'), i.client_id);
+    if (enviado.erro) { fim(); return finSet('pag-msg', enviado.erro); }
+    comprovante = enviado.caminho;
+  }
+
+  const { error } = await supabase.from('fin_pagamentos').insert({
+    invoice_id: i.id, client_id: i.client_id, valor,
+    data: val('pag-data') || new Date().toISOString().slice(0, 10),
+    competencia: val('pag-competencia') || null,
+    forma: el('pag-forma').value, conta_id: el('pag-conta').value || null,
+    comprovante, observacao: val('pag-observacao') || null, registrado_por: myName,
+  });
+  fim();
+  if (error) return finSet('pag-msg', 'Não foi possível registrar: ' + error.message);
+
+  // Recebido pela gestão: o comprovante do cliente fica validado.
+  if (i.comprovante && !i.comprovante_validado) {
+    await supabase.from('invoices').update({ comprovante_validado: true }).eq('id', i.id);
+  }
+  closeModal('modal-pagamento');
+  await loadAll();
+  window._aviso(`Recebimento de ${fmtMoney(valor)} registrado em ${numeroCobranca(i)}.`);
+};
+
+window._verCobranca = async (id) => {
+  const i = allInvoices.find(x => x.id === id);
+  if (!i) return;
+  fatEditId = id;
+  const cl = clientMap[i.client_id];
+  const pagos = finPagamentos.filter(p => p.invoice_id === id);
+  const proj = allProjects.find(p => p.id === i.project_id);
+  const s = FIN_SITUACAO[i.status] || { label: i.status, cls: '' };
+  const linha = (r, v) => `<div class="meurh-linha"><span>${r}</span><strong>${v}</strong></div>`;
+
+  el('cob-titulo').textContent = 'Cobrança ' + numeroCobranca(i);
+  el('cob-corpo').innerHTML = `
+    ${linha('Cliente', esc(cl?.company || cl?.name || '—'))}
+    ${linha('Projeto', esc(proj?.name || '—'))}
+    ${linha('Descrição', esc(i.description || '—'))}
+    ${linha('Parcela', parcelaLabel(i))}
+    ${i.marco ? linha('Marco de entrega', esc(i.marco)) : ''}
+    ${linha('Valor original', fmtMoney(i.amount))}
+    ${Number(i.desconto) ? linha('Desconto', '− ' + fmtMoney(i.desconto)) : ''}
+    ${Number(i.juros) ? linha('Juros', '+ ' + fmtMoney(i.juros)) : ''}
+    ${Number(i.multa) ? linha('Multa', '+ ' + fmtMoney(i.multa)) : ''}
+    ${linha('Valor atualizado', '<span style="font-size:15px">' + fmtMoney(valorAtual(i)) + '</span>')}
+    ${linha('Recebido', fmtMoney(i.recebido))}
+    ${linha('Em aberto', fmtMoney(emAberto(i)))}
+    ${linha('Emissão', i.emitida_em ? fmtDate(i.emitida_em) : '—')}
+    ${linha('Vencimento', fmtDate(i.due_date))}
+    ${linha('Situação', `<span class="status ${s.cls}">${s.label}</span>`)}
+
+    <div class="card-title" style="margin:18px 0 10px">Pagamentos</div>
+    ${pagos.length ? pagos.map(p => `<div class="hist-item" style="margin-bottom:8px">
+      <div class="hist-topo">
+        <span style="font-size:12.5px;font-weight:600;color:${Number(p.valor) < 0 ? 'var(--red)' : 'var(--green)'}">
+          ${fmtMoney(p.valor)}${p.estorno_de ? ' · estorno' : ''}</span>
+        <span class="hist-data">${fmtDate(p.data)}</span>
+      </div>
+      <div class="hist-autor">${esc(FIN_FORMA[p.forma] || p.forma || '—')} · ${esc(p.registrado_por || '')}</div>
+      ${p.observacao ? `<div class="hist-nota">${esc(p.observacao)}</div>` : ''}
+      ${p.comprovante ? `<button class="cbo-link" onclick="window._baixarFin('${p.comprovante}')">Ver comprovante</button>` : ''}
+      ${!p.estorno_de && Number(p.valor) > 0
+        ? `<button class="team-btn danger" style="margin-top:8px" onclick="window._estornar('${p.id}')">Estornar</button>` : ''}
+    </div>`).join('') : '<div class="rh-item-sub">Nenhum pagamento registrado.</div>'}
+
+    <div class="team-actions" style="margin-top:16px">
+      ${EM_ABERTO.includes(i.status)
+        ? `<button class="team-btn approve" onclick="closeModal('modal-cobranca');window._registrarPagamento('${i.id}')">Registrar recebimento</button>` : ''}
+      <button class="team-btn" onclick="closeModal('modal-cobranca');window._editarFatura('${i.id}')">Editar cobrança</button>
+      ${EM_ABERTO.includes(i.status)
+        ? `<button class="team-btn danger" onclick="window._cancelarCobranca('${i.id}')">Cancelar cobrança</button>` : ''}
+    </div>`;
+  openModal('modal-cobranca');
+};
+
+window._estornar = async (pagamentoId) => {
+  const p = finPagamentos.find(x => x.id === pagamentoId);
+  if (!p) return;
+  const motivo = prompt(`Estornar ${fmtMoney(p.valor)}? Informe o motivo (fica no histórico):`);
+  if (!motivo) return;
+
+  // Estorno não apaga: entra como valor negativo, e a soma reabre a cobrança.
+  const { error } = await supabase.from('fin_pagamentos').insert({
+    invoice_id: p.invoice_id, client_id: p.client_id, valor: -Math.abs(Number(p.valor)),
+    data: new Date().toISOString().slice(0, 10), competencia: p.competencia,
+    forma: p.forma, conta_id: p.conta_id, observacao: 'Estorno: ' + motivo,
+    estorno_de: p.id, registrado_por: myName,
+  });
+  if (error) return alert('Não foi possível estornar: ' + error.message);
+  closeModal('modal-cobranca');
+  await loadAll();
+  window._aviso('Estorno registrado. A cobrança voltou a ficar em aberto.');
+};
+
+window._cancelarCobranca = async (id) => {
+  const i = allInvoices.find(x => x.id === id);
+  if (Number(i.recebido) > 0) {
+    return alert('Esta cobrança já tem pagamento. Estorne o recebimento antes de cancelar.');
+  }
+  const motivo = prompt('Motivo do cancelamento:');
+  if (!motivo) return;
+  const { error } = await supabase.from('invoices')
+    .update({ status: 'CANCELADO', observacao: motivo }).eq('id', id);
+  if (error) return alert('Não foi possível cancelar: ' + error.message);
+  closeModal('modal-cobranca');
+  await loadAll();
+};
+
+/* ── assinaturas ── */
+let asnEditId = null;
+
+window._novaAssinatura = () => {
+  asnEditId = null;
+  el('asn-titulo').textContent = 'Nova assinatura';
+  el('asn-cliente').innerHTML = allClients.map(c =>
+    `<option value="${c.id}">${esc(c.company || c.name)}</option>`).join('');
+  el('asn-periodicidade').innerHTML = Object.entries(PERIODICIDADE)
+    .map(([v, l]) => `<option value="${v}">${l}</option>`).join('');
+  el('asn-situacao').innerHTML = Object.entries(SAAS_SITUACAO)
+    .map(([v, s]) => `<option value="${v}">${s.label}</option>`).join('');
+  el('asn-produto').value = 'SertCode One';
+  ['asn-plano','asn-valor','asn-desconto','asn-condicoes'].forEach(id => el(id).value = '');
+  el('asn-contratada').value = new Date().toISOString().slice(0, 10);
+  el('asn-dia').value = new Date().getDate();
+  el('asn-proxima').value = '';
+  el('asn-situacao').value = 'ATIVA';
+  el('asn-excluir').hidden = true;
+  el('asn-msg').className = 'form-msg';
+  openModal('modal-assinatura');
+};
+
+window._editarAssinatura = (id) => {
+  const a = finAssinaturas.find(x => x.id === id);
+  if (!a) return;
+  window._novaAssinatura();
+  asnEditId = id;
+  el('asn-titulo').textContent = a.produto + ' · ' + a.plano;
+  el('asn-cliente').value = a.client_id || '';
+  el('asn-produto').value = a.produto;
+  el('asn-plano').value = a.plano;
+  el('asn-valor').value = a.valor;
+  el('asn-desconto').value = a.desconto || '';
+  el('asn-periodicidade').value = a.periodicidade;
+  el('asn-contratada').value = a.contratada_em || '';
+  el('asn-dia').value = a.vencimento_dia || '';
+  el('asn-proxima').value = a.proxima_cobranca || '';
+  el('asn-situacao').value = a.situacao;
+  el('asn-condicoes').value = a.condicoes || '';
+  el('asn-excluir').hidden = false;
+  openModal('modal-assinatura');
+};
+
+window._salvarAssinatura = async () => {
+  const btn = el('asn-btn'), orig = btn.textContent;
+  if (!val('asn-plano')) return finSet('asn-msg', 'Informe o plano.');
+  const valor = Number(val('asn-valor').replace(/\./g, '').replace(',', '.'));
+  if (!valor || valor <= 0) return finSet('asn-msg', 'Informe o valor da assinatura.');
 
   btn.textContent = 'Salvando...'; btn.disabled = true;
   const campos = {
-    client_id: val('fat-cliente'), tipo: el('fat-tipo').value,
-    description: val('fat-descricao') || null, amount: valor, desconto,
-    due_date: val('fat-vencimento'), competencia: val('fat-competencia') || null,
-    status: el('fat-situacao').value, forma_pagamento: el('fat-forma').value || null,
-    observacao: val('fat-observacao') || null,
+    client_id: val('asn-cliente') || null, produto: val('asn-produto') || 'SertCode One',
+    plano: val('asn-plano'), valor,
+    desconto: Number(val('asn-desconto').replace(',', '.') || 0),
+    periodicidade: el('asn-periodicidade').value,
+    contratada_em: val('asn-contratada') || new Date().toISOString().slice(0, 10),
+    vencimento_dia: Number(val('asn-dia')) || null,
+    proxima_cobranca: val('asn-proxima') || null,
+    situacao: el('asn-situacao').value,
+    condicoes: val('asn-condicoes') || null,
+    cancelada_em: el('asn-situacao').value === 'CANCELADA' ? new Date().toISOString().slice(0, 10) : null,
+    updated_at: new Date().toISOString(),
   };
-  if (campos.status === 'pago' && !allInvoices.find(i => i.id === fatEditId)?.paid_at) {
-    campos.paid_at = new Date().toISOString();
+  const { error } = asnEditId
+    ? await supabase.from('fin_assinaturas').update(campos).eq('id', asnEditId)
+    : await supabase.from('fin_assinaturas').insert(campos);
+  btn.textContent = orig; btn.disabled = false;
+  if (error) return finSet('asn-msg', 'Não foi possível salvar: ' + error.message);
+
+  closeModal('modal-assinatura');
+  await loadFinanceiro();
+  window._aviso(asnEditId ? 'Assinatura atualizada.' : 'Assinatura cadastrada.');
+};
+
+window._excluirAssinatura = async () => {
+  if (!confirm('Excluir esta assinatura? As cobranças já emitidas continuam.')) return;
+  const { error } = await supabase.from('fin_assinaturas').delete().eq('id', asnEditId);
+  if (error) return finSet('asn-msg', 'Não foi possível excluir: ' + error.message);
+  closeModal('modal-assinatura');
+  await loadFinanceiro();
+};
+
+// Gera a cobrança do ciclo e já empurra a próxima data.
+window._cobrarAssinatura = async (id) => {
+  const a = finAssinaturas.find(x => x.id === id);
+  if (!a) return;
+  const valor = Number(a.valor) - Number(a.desconto || 0);
+  const vence = a.proxima_cobranca || new Date().toISOString().slice(0, 10);
+  if (!confirm(`Emitir cobrança de ${fmtMoney(valor)} com vencimento em ${fmtDate(vence)}?`)) return;
+
+  const { error } = await supabase.from('invoices').insert({
+    client_id: a.client_id, tipo: 'ASSINATURA', assinatura_id: a.id,
+    description: `${a.produto} · ${a.plano} · ${PERIODICIDADE[a.periodicidade]}`,
+    amount: a.valor, desconto: a.desconto || 0,
+    due_date: vence, emitida_em: new Date().toISOString().slice(0, 10),
+    competencia: vence.slice(0, 7), status: 'AGUARDANDO',
+  });
+  if (error) return alert('Não foi possível emitir: ' + error.message);
+
+  const meses = { MENSAL: 1, TRIMESTRAL: 3, SEMESTRAL: 6, ANUAL: 12 }[a.periodicidade];
+  const prox = new Date(vence + 'T12:00:00');
+  prox.setMonth(prox.getMonth() + meses);
+  await supabase.from('fin_assinaturas')
+    .update({ proxima_cobranca: prox.toISOString().slice(0, 10) }).eq('id', a.id);
+
+  await loadAll();
+  window._aviso(`Cobrança emitida. Próxima em ${fmtDate(prox.toISOString().slice(0, 10))}.`);
+};
+
+/* ── movimentações ── */
+window._novaMovimentacao = () => {
+  el('mov-tipo').value = 'SAIDA';
+  el('mov-conta').innerHTML = '<option value="">Não informada</option>'
+    + finContas.map(c => `<option value="${c.id}">${esc(c.nome)}</option>`).join('');
+  el('mov-forma').innerHTML = '<option value="">Não informada</option>'
+    + Object.entries(FIN_FORMA).map(([v, l]) => `<option value="${v}">${l}</option>`).join('');
+  montarCategoriasMov();
+  ['mov-descricao','mov-valor','mov-documento'].forEach(id => el(id).value = '');
+  el('mov-competencia').value = new Date().toISOString().slice(0, 7);
+  el('mov-caixa').value = new Date().toISOString().slice(0, 10);
+  el('mov-msg').className = 'form-msg';
+  openModal('modal-movimentacao');
+};
+
+function montarCategoriasMov() {
+  const natureza = el('mov-tipo').value === 'ENTRADA' ? 'RECEITA' : 'DESPESA';
+  el('mov-categoria').innerHTML = finCategorias.filter(c => c.natureza === natureza && c.ativa)
+    .map(c => `<option value="${c.id}">${esc(c.nome)}</option>`).join('')
+    || '<option value="">Nenhuma categoria</option>';
+}
+el('mov-tipo').addEventListener('change', montarCategoriasMov);
+
+window._salvarMovimentacao = async () => {
+  const btn = el('mov-btn'), orig = btn.textContent;
+  if (!val('mov-descricao')) return finSet('mov-msg', 'Informe a descrição.');
+  const valor = Number(val('mov-valor').replace(/\./g, '').replace(',', '.'));
+  if (!valor || valor <= 0) return finSet('mov-msg', 'Informe o valor.');
+
+  btn.textContent = 'Salvando...'; btn.disabled = true;
+  const cat = finCategorias.find(c => c.id === el('mov-categoria').value);
+  const { error } = await supabase.from('fin_movimentacoes').insert({
+    tipo: el('mov-tipo').value, categoria_id: cat?.id || null, categoria_nome: cat?.nome || null,
+    descricao: val('mov-descricao'), valor,
+    competencia: val('mov-competencia') || new Date().toISOString().slice(0, 7),
+    data_caixa: val('mov-caixa') || null,
+    conta_id: el('mov-conta').value || null, forma: el('mov-forma').value || null,
+    documento: val('mov-documento') || null, registrado_por: myName,
+  });
+  btn.textContent = orig; btn.disabled = false;
+  if (error) return finSet('mov-msg', 'Não foi possível salvar: ' + error.message);
+
+  closeModal('modal-movimentacao');
+  await loadFinanceiro();
+  window._aviso('Movimentação registrada.');
+};
+
+window._excluirMovimentacao = async (id) => {
+  if (!confirm('Excluir esta movimentação?')) return;
+  const { error } = await supabase.from('fin_movimentacoes').delete().eq('id', id);
+  if (error) return alert('Não foi possível excluir: ' + error.message);
+  await loadFinanceiro();
+};
+
+/* ── documentos financeiros ── */
+async function enviarArquivoFin(input, clienteId) {
+  const arquivo = input.files[0];
+  if (!arquivo) return { caminho: null };
+  if (arquivo.size > 10 * 1024 * 1024) return { erro: 'O arquivo precisa ter no máximo 10 MB.' };
+  // O caminho começa com o id do cliente: é assim que a regra do bucket
+  // decide quem pode abrir.
+  const caminho = `${clienteId}/${Date.now()}-${arquivo.name.replace(/[^\w.\-]/g, '_')}`;
+  const { error } = await supabase.storage.from('financeiro').upload(caminho, arquivo);
+  if (error) return { erro: 'Não foi possível enviar: ' + error.message };
+  return { caminho, nome: arquivo.name, tamanho: arquivo.size };
+}
+
+window._baixarFin = async (caminho) => {
+  const { data, error } = await supabase.storage.from('financeiro').createSignedUrl(caminho, 60);
+  if (error) return alert('Não foi possível abrir: ' + error.message);
+  window.open(data.signedUrl, '_blank');
+};
+
+window._enviarDocumentoFin = () => {
+  el('doc-cliente').textContent = clientMap[finFichaId]?.company || clientMap[finFichaId]?.name || '';
+  el('doc-tipo').innerHTML = [['CONTRATO','Contrato'],['PROPOSTA','Proposta comercial'],
+    ['RECIBO','Recibo de pagamento'],['NOTA','Nota fiscal'],['COMPROVANTE','Comprovante'],
+    ['DEMONSTRATIVO','Demonstrativo de cobrança'],['ADITIVO','Aditivo contratual']]
+    .map(([v, l]) => `<option value="${v}">${l}</option>`).join('');
+  el('doc-arquivo').value = '';
+  el('doc-msg').className = 'form-msg';
+  openModal('modal-doc-fin');
+};
+
+window._salvarDocumentoFin = async () => {
+  const btn = el('doc-btn'), orig = btn.textContent;
+  if (!el('doc-arquivo').files[0]) return finSet('doc-msg', 'Escolha o arquivo.');
+
+  btn.textContent = 'Enviando...'; btn.disabled = true;
+  const enviado = await enviarArquivoFin(el('doc-arquivo'), finFichaId);
+  if (enviado.erro) { btn.textContent = orig; btn.disabled = false; return finSet('doc-msg', enviado.erro); }
+
+  const { error } = await supabase.from('fin_documentos').insert({
+    client_id: finFichaId, tipo: el('doc-tipo').value, nome: enviado.nome,
+    caminho: enviado.caminho, tamanho: enviado.tamanho, publico: true,
+    enviado_por: myName, enviado_tipo: 'EQUIPE',
+  });
+  btn.textContent = orig; btn.disabled = false;
+  if (error) return finSet('doc-msg', 'Não foi possível registrar: ' + error.message);
+
+  closeModal('modal-doc-fin');
+  await loadFinanceiro();
+  window._aviso('Documento enviado. O cliente já consegue baixar.');
+};
+
+window._salvarObsFinanceira = async () => {
+  const texto = el('fin-obs-cliente').value.trim() || null;
+  const { error } = await supabase.from('fin_cliente_notas').upsert({
+    client_id: finFichaId, texto, autor_nome: myName, updated_at: new Date().toISOString(),
+  }, { onConflict: 'client_id' });
+  if (error) return alert('Não foi possível salvar: ' + error.message);
+  finNotas[finFichaId] = texto;
+  window._aviso('Observações salvas.');
+};
+
+/* ── relatórios ── */
+window._relatorioFin = (tipo, formato) => {
+  const cobrancas = finNoPeriodo();
+  const de = val('fin-de'), ate = val('fin-ate');
+  const noPeriodo = m => (!de || (m.data_caixa || m.competencia + '-01') >= de)
+                      && (!ate || (m.data_caixa || m.competencia + '-28') <= ate);
+  const movs = finMovimentacoes.filter(noPeriodo);
+  const nomeCliente = id => { const c = clientMap[id]; return c?.company || c?.name || '—'; };
+  const r = RELATORIOS.find(x => x.id === tipo);
+
+  let colunas = [], linhas = [], resumo = [];
+
+  if (tipo === 'receitas' || tipo === 'receber' || tipo === 'inadimplencia') {
+    const base = tipo === 'receitas' ? cobrancas.filter(i => Number(i.recebido) > 0)
+      : tipo === 'receber' ? cobrancas.filter(i => EM_ABERTO.includes(i.status))
+      : cobrancas.filter(i => i.status === 'ATRASADO');
+    colunas = ['Cobrança', 'Cliente', 'Descrição', 'Vencimento', 'Valor', 'Recebido', 'Situação'];
+    linhas = base.map(i => [numeroCobranca(i), nomeCliente(i.client_id), i.description || '',
+      fmtDate(i.due_date), fmtMoney(valorAtual(i)), fmtMoney(i.recebido),
+      (FIN_SITUACAO[i.status] || {}).label || i.status]);
+    resumo = [['Cobranças', base.length],
+      ['Total', fmtMoney(base.reduce((s, i) => s + valorAtual(i), 0))],
+      ['Recebido', fmtMoney(base.reduce((s, i) => s + Number(i.recebido || 0), 0))]];
   }
 
-  const { error } = fatEditId
-    ? await supabase.from('invoices').update(campos).eq('id', fatEditId)
-    : await supabase.from('invoices').insert(campos);
+  if (tipo === 'projetos' || tipo === 'servicos') {
+    const chave = i => {
+      const p = allProjects.find(x => x.id === i.project_id);
+      return tipo === 'projetos' ? (p?.name || 'Sem projeto')
+        : (SERVICOS[p?.servico]?.nome || FIN_TIPO[i.tipo] || 'Outro');
+    };
+    const grupos = {};
+    cobrancas.filter(i => VALEM.includes(i.status)).forEach(i => {
+      const g = grupos[chave(i)] ||= { n: 0, total: 0, recebido: 0 };
+      g.n++; g.total += valorAtual(i); g.recebido += Number(i.recebido || 0);
+    });
+    colunas = [tipo === 'projetos' ? 'Projeto' : 'Serviço', 'Cobranças', 'Faturado', 'Recebido', 'Em aberto'];
+    linhas = Object.entries(grupos).sort((a, b) => b[1].total - a[1].total)
+      .map(([nome, g]) => [nome, g.n, fmtMoney(g.total), fmtMoney(g.recebido), fmtMoney(g.total - g.recebido)]);
+  }
 
-  btn.textContent = orig; btn.disabled = false;
-  if (error) return msg('Não foi possível salvar: ' + error.message);
+  if (tipo === 'saas') {
+    colunas = ['Cliente', 'Produto', 'Plano', 'Valor', 'Periodicidade', 'Próxima cobrança', 'Situação'];
+    linhas = finAssinaturas.map(a => [nomeCliente(a.client_id), a.produto, a.plano,
+      fmtMoney(Number(a.valor) - Number(a.desconto || 0)), PERIODICIDADE[a.periodicidade],
+      a.proxima_cobranca ? fmtDate(a.proxima_cobranca) : '—',
+      (SAAS_SITUACAO[a.situacao] || {}).label || a.situacao]);
+    const ativas = finAssinaturas.filter(a => a.situacao === 'ATIVA');
+    const mrr = ativas.reduce((s, a) =>
+      s + (Number(a.valor) - Number(a.desconto || 0)) * MESES_POR_ANO[a.periodicidade] / 12, 0);
+    resumo = [['Assinaturas ativas', ativas.length], ['MRR', fmtMoney(mrr)], ['ARR', fmtMoney(mrr * 12)]];
+  }
 
-  closeModal('modal-fatura');
-  await loadAll();
-  window._aviso(fatEditId ? 'Fatura atualizada.' : 'Fatura criada.');
-};
+  if (tipo === 'despesas' || tipo === 'caixa') {
+    const base = tipo === 'despesas' ? movs.filter(m => m.tipo === 'SAIDA') : movs;
+    colunas = ['Competência', 'Caixa', 'Tipo', 'Categoria', 'Descrição', 'Valor'];
+    linhas = base.map(m => [mesLabel(m.competencia), m.data_caixa ? fmtDate(m.data_caixa) : '—',
+      m.tipo === 'ENTRADA' ? 'Entrada' : 'Saída', m.categoria_nome || '—', m.descricao, fmtMoney(m.valor)]);
+    const ent = movs.filter(m => m.tipo === 'ENTRADA').reduce((s, m) => s + Number(m.valor), 0);
+    const sai = movs.filter(m => m.tipo === 'SAIDA').reduce((s, m) => s + Number(m.valor), 0);
+    resumo = [['Entradas', fmtMoney(ent)], ['Saídas', fmtMoney(sai)], ['Saldo', fmtMoney(ent - sai)]];
+  }
 
-window._excluirFatura = async () => {
-  const i = allInvoices.find(x => x.id === fatEditId);
-  if (!i) return;
-  if (!confirm(`Excluir a fatura #${String(i.numero ?? 0).padStart(5, '0')}? As cobranças registradas vão junto.`)) return;
+  if (tipo === 'resultado') {
+    const comps = [...new Set(movs.map(m => m.competencia))].sort();
+    colunas = ['Competência', 'Receitas', 'Despesas', 'Resultado'];
+    linhas = comps.map(c => {
+      const ent = movs.filter(m => m.competencia === c && m.tipo === 'ENTRADA').reduce((s, m) => s + Number(m.valor), 0);
+      const sai = movs.filter(m => m.competencia === c && m.tipo === 'SAIDA').reduce((s, m) => s + Number(m.valor), 0);
+      return [mesLabel(c), fmtMoney(ent), fmtMoney(sai), fmtMoney(ent - sai)];
+    });
+    const ent = movs.filter(m => m.tipo === 'ENTRADA').reduce((s, m) => s + Number(m.valor), 0);
+    const sai = movs.filter(m => m.tipo === 'SAIDA').reduce((s, m) => s + Number(m.valor), 0);
+    resumo = [['Receitas', fmtMoney(ent)], ['Despesas', fmtMoney(sai)], ['Resultado', fmtMoney(ent - sai)]];
+  }
 
-  const { error } = await supabase.from('invoices').delete().eq('id', fatEditId);
-  if (error) return alert('Não foi possível excluir: ' + error.message);
-  closeModal('modal-fatura');
-  await loadAll();
-};
+  registrarAcesso('DADOS_CLIENTE', `Relatório financeiro: ${r.nome} (${de} a ${ate})`);
 
-/* ── relatório ── */
-window._baixarFinanceiroPdf = () => {
-  const faturas = finNoPeriodo().filter(i => i.status !== 'cancelado');
-  const soma = lista => lista.reduce((s, i) => s + valorFinal(i), 0);
-  const linha = (rotulo, valor) => `<div><strong>${rotulo}:</strong> ${valor}</div>`;
+  if (formato === 'excel') return baixarCsv(r.nome, colunas, linhas);
 
   const doc = `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="utf-8">
-<title>Financeiro — SertCode</title>
+<title>${r.nome} — SertCode</title>
 <style>
   body { font-family: Arial, Helvetica, sans-serif; color:#111; margin:32px; }
   h1 { font-size:19px; margin:0 0 4px; }
@@ -7827,28 +8566,13 @@ window._baixarFinanceiroPdf = () => {
   th { color:#666; font-size:10.5px; text-transform:uppercase; }
   .rodape { margin-top:24px; font-size:11px; color:#888; }
 </style></head><body>
-  <h1>Financeiro — SertCode</h1>
-  <div class="sub">Vencimentos de ${fmtDate(val('fin-de'))} a ${fmtDate(val('fin-ate'))}</div>
-  <div class="ficha">
-    ${linha('Faturado', fmtMoney(soma(faturas)))}
-    ${linha('Recebido', fmtMoney(soma(faturas.filter(i => i.status === 'pago'))))}
-    ${linha('Em aberto', fmtMoney(soma(faturas.filter(i => EM_ABERTO.includes(i.status)))))}
-    ${linha('Em atraso', fmtMoney(soma(faturas.filter(i => i.status === 'atrasado'))))}
-    ${linha('Faturas', faturas.length)}
-  </div>
+  <h1>${r.nome}</h1>
+  <div class="sub">SertCode · ${fmtDate(de)} a ${fmtDate(ate)}</div>
+  ${resumo.length ? `<div class="ficha">${resumo.map(([a, b]) => `<div><strong>${a}:</strong> ${b}</div>`).join('')}</div>` : ''}
   <table>
-    <thead><tr><th>Fatura</th><th>Cliente</th><th>Descrição</th><th>Vencimento</th><th>Valor</th><th>Situação</th></tr></thead>
-    <tbody>${faturas.map(i => {
-      const cl = clientMap[i.client_id];
-      return `<tr>
-        <td>#${String(i.numero ?? 0).padStart(5, '0')}</td>
-        <td>${esc(cl?.company || cl?.name || '—')}</td>
-        <td>${esc(i.description || FIN_TIPO[i.tipo] || '')}</td>
-        <td>${fmtDate(i.due_date)}</td>
-        <td>${fmtMoney(valorFinal(i))}</td>
-        <td>${(FIN_SITUACAO[i.status] || {}).label || i.status}</td>
-      </tr>`;
-    }).join('')}</tbody>
+    <thead><tr>${colunas.map(c => `<th>${c}</th>`).join('')}</tr></thead>
+    <tbody>${linhas.map(l => `<tr>${l.map(c => `<td>${esc(c)}</td>`).join('')}</tr>`).join('')
+      || `<tr><td colspan="${colunas.length}">Nenhum registro no período.</td></tr>`}</tbody>
   </table>
   <div class="rodape">Emitido em ${fmtDateTime(new Date())} por ${esc(myName)} — SertCode</div>
 </body></html>`;
@@ -7859,7 +8583,215 @@ window._baixarFinanceiroPdf = () => {
   janela.document.close();
   janela.focus();
   setTimeout(() => janela.print(), 400);
-  registrarAcesso('DADOS_CLIENTE', `Relatório financeiro de ${val('fin-de')} a ${val('fin-ate')}`);
+};
+
+// CSV com BOM e ponto e vírgula: é o que o Excel em português abre sem
+// pedir importação.
+function baixarCsv(nome, colunas, linhas) {
+  const escapar = v => '"' + String(v ?? '').replace(/"/g, '""') + '"';
+  const texto = [colunas, ...linhas].map(l => l.map(escapar).join(';')).join('\r\n');
+  const blob = new Blob(['﻿' + texto], { type: 'text/csv;charset=utf-8;' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = nome.toLowerCase().replace(/[^\w]+/g, '-') + '.csv';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+/* ── cadastro da cobrança ── */
+function atualizarValorCobranca() {
+  const n = id => Number(val(id).replace(/\./g, '').replace(',', '.') || 0);
+  el('fat-atualizado').textContent = fmtMoney(n('fat-valor') - n('fat-desconto') + n('fat-juros'));
+}
+['fat-valor','fat-desconto','fat-juros'].forEach(id =>
+  el(id).addEventListener('input', atualizarValorCobranca));
+
+el('fat-situacao').addEventListener('change', () => {
+  const v = el('fat-situacao').value;
+  el('fat-situacao-nota').textContent =
+    v === 'PAGO' ? 'Prefira registrar o recebimento: assim o valor entra no caixa e no histórico.'
+    : v === 'PARCIAL' ? 'A situação parcial vem da soma dos recebimentos, não daqui.'
+    : v === 'ESTORNADO' ? 'Estorno deve sair do recebimento, para gerar a contrapartida no caixa.'
+    : '';
+});
+
+window._novaFatura = () => {
+  fatEditId = null;
+  el('fat-titulo').textContent = 'Nova cobrança';
+  el('fat-cliente').innerHTML = allClients.map(c =>
+    `<option value="${c.id}">${esc(c.company || c.name)}</option>`).join('');
+  el('fat-tipo').innerHTML = Object.entries(FIN_TIPO).map(([v, l]) => `<option value="${v}">${l}</option>`).join('');
+  el('fat-situacao').innerHTML = Object.entries(FIN_SITUACAO)
+    .map(([v, s]) => `<option value="${v}">${s.label}</option>`).join('');
+
+  ['fat-descricao','fat-valor','fat-desconto','fat-juros','fat-observacao','fat-marco',
+   'fat-parcela','fat-parcelas','fat-gerar-qtd','fat-entrada'].forEach(id => el(id).value = '');
+  const hoje = new Date().toISOString().slice(0, 10);
+  el('fat-emissao').value = hoje;
+  el('fat-vencimento').value = somarDias(hoje, finConfig?.prazo_padrao ?? 30);
+  el('fat-competencia').value = hoje.slice(0, 7);
+  el('fat-situacao').value = 'AGUARDANDO';
+  el('fat-excluir').hidden = true;
+  el('fat-parcelar-bloco').hidden = false;
+  el('fat-msg').className = 'form-msg';
+  montarProjetosDaCobranca();
+  atualizarValorCobranca();
+  el('fat-situacao').dispatchEvent(new Event('change'));
+  openModal('modal-fatura');
+};
+
+const somarDias = (iso, dias) => {
+  const d = new Date(iso + 'T12:00:00');
+  d.setDate(d.getDate() + dias);
+  return d.toISOString().slice(0, 10);
+};
+
+// Só os projetos do cliente escolhido: cobrança apontando para projeto de
+// outra empresa é erro que ninguém percebe depois.
+function montarProjetosDaCobranca() {
+  const cliente = el('fat-cliente').value;
+  const lista = allProjects.filter(p => p.client_id === cliente);
+  el('fat-projeto').innerHTML = '<option value="">Sem projeto</option>'
+    + lista.map(p => `<option value="${p.id}">${esc(p.codigo || '')} ${esc(p.name)}</option>`).join('');
+}
+el('fat-cliente').addEventListener('change', montarProjetosDaCobranca);
+
+window._editarFatura = (id) => {
+  const i = allInvoices.find(x => x.id === id);
+  if (!i) return;
+  window._novaFatura();
+  fatEditId = id;
+  el('fat-titulo').textContent = 'Cobrança ' + numeroCobranca(i);
+  el('fat-cliente').value = i.client_id || '';
+  montarProjetosDaCobranca();
+  el('fat-projeto').value = i.project_id || '';
+  el('fat-tipo').value = i.tipo || 'PROJETO';
+  el('fat-marco').value = i.marco || '';
+  el('fat-descricao').value = i.description || '';
+  el('fat-valor').value = i.amount ?? '';
+  el('fat-desconto').value = i.desconto || '';
+  el('fat-juros').value = (Number(i.juros || 0) + Number(i.multa || 0)) || '';
+  el('fat-parcela').value = i.parcela_num || '';
+  el('fat-parcelas').value = i.parcela_total || '';
+  el('fat-competencia').value = competenciaDe(i) || '';
+  el('fat-emissao').value = i.emitida_em || '';
+  el('fat-vencimento').value = i.due_date || '';
+  el('fat-situacao').value = i.status;
+  el('fat-observacao').value = i.observacao || '';
+  el('fat-excluir').hidden = false;
+  // Parcelar uma cobrança que já existe criaria duplicatas.
+  el('fat-parcelar-bloco').hidden = true;
+  atualizarValorCobranca();
+  el('fat-situacao').dispatchEvent(new Event('change'));
+  openModal('modal-fatura');
+};
+
+function camposDaCobranca() {
+  const n = id => Number(val(id).replace(/\./g, '').replace(',', '.') || 0);
+  return {
+    client_id: val('fat-cliente'), project_id: val('fat-projeto') || null,
+    tipo: el('fat-tipo').value, marco: val('fat-marco') || null,
+    description: val('fat-descricao') || null,
+    amount: n('fat-valor'), desconto: n('fat-desconto'),
+    juros: n('fat-juros'), multa: 0,
+    parcela_num: Number(val('fat-parcela')) || null,
+    parcela_total: Number(val('fat-parcelas')) || null,
+    competencia: val('fat-competencia') || null,
+    emitida_em: val('fat-emissao') || null,
+    due_date: val('fat-vencimento'),
+    status: el('fat-situacao').value,
+    observacao: val('fat-observacao') || null,
+  };
+}
+
+window._salvarFatura = async () => {
+  const btn = el('fat-btn'), orig = btn.textContent;
+  const campos = camposDaCobranca();
+  if (!campos.client_id)              return finSet('fat-msg', 'Escolha o cliente.');
+  if (!campos.amount || campos.amount <= 0) return finSet('fat-msg', 'Informe o valor da cobrança.');
+  if (campos.desconto > campos.amount) return finSet('fat-msg', 'O desconto não pode passar do valor.');
+  if (!campos.due_date)              return finSet('fat-msg', 'Informe o vencimento.');
+
+  const atual = allInvoices.find(x => x.id === fatEditId);
+  if (atual && Number(atual.recebido) > 0 && valorAtual(campos) < Number(atual.recebido)) {
+    return finSet('fat-msg',
+      `Esta cobrança já recebeu ${fmtMoney(atual.recebido)}. O valor atualizado não pode ficar abaixo disso.`);
+  }
+
+  btn.textContent = 'Salvando...'; btn.disabled = true;
+  const { error } = fatEditId
+    ? await supabase.from('invoices').update(campos).eq('id', fatEditId)
+    : await supabase.from('invoices').insert(campos);
+  btn.textContent = orig; btn.disabled = false;
+  if (error) return finSet('fat-msg', 'Não foi possível salvar: ' + error.message);
+
+  closeModal('modal-fatura');
+  await loadAll();
+  window._aviso(fatEditId ? 'Cobrança atualizada.' : 'Cobrança criada.');
+};
+
+// Entrada + parcelas mensais de uma vez. É o formato mais comum dos
+// contratos da SertCode, e digitar seis vezes convida ao erro.
+window._gerarParcelas = async () => {
+  const campos = camposDaCobranca();
+  const qtd = Number(val('fat-gerar-qtd'));
+  const entrada = Number(val('fat-entrada').replace(/\./g, '').replace(',', '.') || 0);
+
+  if (!campos.client_id)    return finSet('fat-msg', 'Escolha o cliente.');
+  if (!campos.amount)       return finSet('fat-msg', 'Informe o valor total do contrato.');
+  if (!qtd || qtd < 1)      return finSet('fat-msg', 'Informe quantas parcelas gerar.');
+  if (entrada >= campos.amount) return finSet('fat-msg', 'A entrada não pode ser igual nem maior que o total.');
+  if (!confirm(`Gerar ${qtd} parcela(s)${entrada ? ' mais a entrada' : ''} para este contrato?`)) return;
+
+  const restante = campos.amount - entrada;
+  const porParcela = Math.floor(restante / qtd * 100) / 100;
+  // A diferença dos centavos vai para a última parcela, senão a soma não
+  // fecha com o valor contratado.
+  const ajuste = Number((restante - porParcela * qtd).toFixed(2));
+
+  const linhas = [];
+  const total = qtd + (entrada ? 1 : 0);
+  if (entrada) {
+    linhas.push({ ...campos, amount: entrada, desconto: 0, juros: 0, multa: 0,
+      parcela_num: 1, parcela_total: total, marco: campos.marco || 'Entrada',
+      description: (campos.description || 'Contrato') + ' · entrada',
+      due_date: campos.due_date, competencia: campos.due_date.slice(0, 7), status: 'AGUARDANDO' });
+  }
+  for (let n = 0; n < qtd; n++) {
+    const venc = somarMeses(campos.due_date, n + (entrada ? 1 : 0));
+    const numero = n + 1 + (entrada ? 1 : 0);
+    linhas.push({ ...campos, amount: porParcela + (n === qtd - 1 ? ajuste : 0),
+      desconto: 0, juros: 0, multa: 0,
+      parcela_num: numero, parcela_total: total,
+      description: (campos.description || 'Contrato') + ` · parcela ${numero} de ${total}`,
+      due_date: venc, competencia: venc.slice(0, 7), status: 'AGUARDANDO' });
+  }
+
+  const { error } = await supabase.from('invoices').insert(linhas);
+  if (error) return finSet('fat-msg', 'Não foi possível gerar: ' + error.message);
+
+  closeModal('modal-fatura');
+  await loadAll();
+  window._aviso(`${linhas.length} cobrança(s) criada(s), somando ${fmtMoney(campos.amount)}.`);
+};
+
+const somarMeses = (iso, n) => {
+  const d = new Date(iso + 'T12:00:00');
+  d.setMonth(d.getMonth() + n);
+  return d.toISOString().slice(0, 10);
+};
+
+window._excluirFatura = async () => {
+  const i = allInvoices.find(x => x.id === fatEditId);
+  if (!i) return;
+  if (Number(i.recebido) > 0) {
+    return finSet('fat-msg', 'Esta cobrança tem pagamento registrado. Estorne o recebimento antes, para o caixa não ficar errado.');
+  }
+  if (!confirm(`Excluir a cobrança ${numeroCobranca(i)}?`)) return;
+  const { error } = await supabase.from('invoices').delete().eq('id', fatEditId);
+  if (error) return finSet('fat-msg', 'Não foi possível excluir: ' + error.message);
+  closeModal('modal-fatura');
+  await loadAll();
 };
 
 /* ── DEPOIMENTOS ── */

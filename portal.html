@@ -408,37 +408,62 @@
            TAB: FINANCEIRO
       ════════════════════════ -->
       <section class="tab-section" id="tab-financeiro">
-
         <div class="section-title">Financeiro</div>
-        <div class="section-sub">Parcelas, pagamentos e histórico de contratos</div>
+        <div class="section-sub">O que você contratou, o que já pagou e o que ainda vence.</div>
 
-        <div class="grid-2" style="margin-bottom:20px">
-          <div class="stat-card">
-            <div class="stat-card-top">
-              <span class="stat-card-label">Total pago</span>
-              <div class="stat-icon green">
-                <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-              </div>
-            </div>
-            <div class="stat-value" style="color:var(--green)">R$ 4.200</div>
-            <div class="stat-hint">1 de 3 parcelas</div>
+        <nav class="rh-abas" id="cf-abas" style="margin-top:20px">
+          <button class="rh-aba active" data-cf="resumo">Resumo</button>
+          <button class="rh-aba" data-cf="contratos">Contratos e projetos</button>
+          <button class="rh-aba" data-cf="pagamentos">Pagamentos</button>
+          <button class="rh-aba" data-cf="documentos">Documentos</button>
+          <button class="rh-aba" data-cf="historico">Histórico</button>
+        </nav>
+
+        <!-- 2.1 Resumo -->
+        <div class="rh-painel active" id="cf-resumo">
+          <div class="sup-contadores" id="cfin-numeros" style="grid-template-columns:repeat(4,1fr)"></div>
+          <div class="card" style="margin-top:18px">
+            <div class="card-title" style="margin-bottom:10px">Próximo pagamento</div>
+            <div id="cfin-proximo"></div>
           </div>
-          <div class="stat-card">
-            <div class="stat-card-top">
-              <span class="stat-card-label">A pagar</span>
-              <div class="stat-icon orange">
-                <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-              </div>
-            </div>
-            <div class="stat-value">R$ 8.400</div>
-            <div class="stat-hint">2 parcelas pendentes</div>
+          <div class="card" style="margin-top:18px">
+            <div class="card-title" style="margin-bottom:6px">Situação financeira</div>
+            <div id="cfin-situacao"></div>
           </div>
         </div>
 
-        <div class="card">
-          <div class="invoice-list"></div>
+        <!-- 2.2 Contratos e projetos -->
+        <div class="rh-painel" id="cf-contratos">
+          <div id="cfin-contratos"></div>
         </div>
 
+        <!-- 2.3 Pagamentos -->
+        <div class="rh-painel" id="cf-pagamentos">
+          <div class="card">
+            <div class="table-scroll">
+              <table class="data-table">
+                <thead><tr><th>Cobrança</th><th>Parcela</th><th>Descrição</th><th>Vencimento</th><th>Valor</th><th>Situação</th><th></th></tr></thead>
+                <tbody id="cfin-cobrancas"></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="sup-aviso" style="margin-top:12px">
+            Clique numa cobrança para ver as instruções de pagamento e enviar o comprovante.
+          </div>
+        </div>
+
+        <!-- 2.4 Documentos -->
+        <div class="rh-painel" id="cf-documentos">
+          <div id="cfin-documentos"></div>
+        </div>
+
+        <!-- 2.5 Histórico -->
+        <div class="rh-painel" id="cf-historico">
+          <div class="card">
+            <div class="card-title" style="margin-bottom:10px">Linha do tempo financeira</div>
+            <div id="cfin-historico" class="hist-lista"></div>
+          </div>
+        </div>
       </section>
 
       <!-- ════════════════════════
@@ -492,6 +517,16 @@
     </div><!-- /portal-content -->
   </main>
 </div><!-- /portal-layout -->
+
+<!-- ══ MODAL: Cobrança ══ -->
+<div class="modal-overlay" id="modal-cobranca-cliente">
+  <div class="modal-box" style="max-width:480px">
+    <button class="modal-close" onclick="document.getElementById('modal-cobranca-cliente').classList.remove('open')">&times;</button>
+    <div class="modal-title" id="cob-cli-titulo">Cobrança</div>
+    <div class="modal-sub">Detalhes, instruções de pagamento e envio de comprovante.</div>
+    <div id="cob-cli-corpo"></div>
+  </div>
+</div>
 
 <!-- ══ MODAL: Abrir Chamado ══ -->
 <div class="modal-overlay" id="modal-ticket">
@@ -563,52 +598,7 @@ async function loadPortalData() {
 
   await carregarChamados();
 
-  // Financeiro
-  const { data: invoices } = await supabase
-    .from('invoices')
-    .select('*')
-    .eq('client_id', userId)
-    .order('due_date');
-
-  {
-    const liquido = i => Number(i.amount || 0) - Number(i.desconto || 0);
-    const emAberto = i => i.status !== 'pago' && i.status !== 'cancelado';
-    const paid = invoices.filter(i => i.status === 'pago').reduce((s, i) => s + liquido(i), 0);
-    const pending = invoices.filter(emAberto).reduce((s, i) => s + liquido(i), 0);
-    const paidCount = invoices.filter(i => i.status === 'pago').length;
-    const pendCount = invoices.filter(emAberto).length;
-
-    const invs = invoices || [];
-    const statCards = document.querySelectorAll('#tab-financeiro .stat-card');
-    if (statCards[0]) {
-      statCards[0].querySelector('.stat-value').textContent = 'R$ ' + paid.toLocaleString('pt-BR');
-      statCards[0].querySelector('.stat-hint').textContent = paidCount + ' de ' + invs.length + ' parcelas';
-    }
-    if (statCards[1]) {
-      statCards[1].querySelector('.stat-value').textContent = 'R$ ' + pending.toLocaleString('pt-BR');
-      statCards[1].querySelector('.stat-hint').textContent = pendCount + ' parcelas pendentes';
-    }
-
-    const list = document.querySelector('.invoice-list');
-    list.innerHTML = !invoices?.length
-      ? '<div style="color:var(--text-dim);font-size:13px;padding:8px 0">Nenhuma cobran\u00e7a emitida ainda.</div>'
-      : invoices.map((inv, i) => `
-      <div class="invoice-card">
-        <div class="invoice-icon">
-          <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-        </div>
-        <div style="flex:1;min-width:0">
-          <div class="invoice-title">${inv.description || 'Parcela ' + (i+1)}</div>
-          <div class="invoice-desc">${escapeHtml(clProjetos.find(p => p.id === inv.project_id)?.name || '')} · Venc. ${formatDate(inv.due_date)}</div>
-        </div>
-        <div class="invoice-amount">
-          <div class="invoice-value">R$ ${Number(inv.amount).toLocaleString('pt-BR', {minimumFractionDigits:2})}</div>
-          <div style="margin-top:5px"><span class="status ${PORTAL_FATURA[inv.status]?.cls || 'status-pending'}">${PORTAL_FATURA[inv.status]?.label || inv.status}</span></div>
-        </div>
-      </div>
-    `).join('');
-  }
-
+  await carregarFinanceiroCliente();
 }
 
 /* ── AVISO FLUTUANTE ── */
@@ -638,6 +628,7 @@ const notif = await ligarNotificacoes({
     link.click();
     if (aba === 'suporte' && referencia) window._abrirChamadoCliente(referencia);
     if (aba === 'projetos' && referencia) window._abrirProjetoCliente(referencia);
+    if (aba === 'financeiro' && referencia) window._verCobrancaCliente(referencia);
   },
 });
 
@@ -1119,14 +1110,260 @@ window._trocarSenhaCliente = async () => {
   window._aviso(`Link enviado para ${clPerfil.email}. Verifique a caixa de entrada.`);
 };
 
-/* ── HELPERS ── */
-const PORTAL_FATURA = {
-  pendente:    { label: 'Pendente',    cls: 'status-pending' },
-  pago:        { label: 'Pago',        cls: 'status-paid' },
-  atrasado:    { label: 'Em atraso',   cls: 'status-expirado' },
-  cancelado:   { label: 'Cancelado',   cls: 'status-cancelado' },
-  reembolsado: { label: 'Reembolsado', cls: 'status-analysis' },
+/* ── FINANCEIRO DO CLIENTE ── */
+const CFIN_SITUACAO = {
+  AGUARDANDO: { label: 'Aguardando pagamento', cls: 'status-pending' },
+  PARCIAL:    { label: 'Parcialmente pago',    cls: 'status-analysis' },
+  PAGO:       { label: 'Pago',                 cls: 'status-paid' },
+  ATRASADO:   { label: 'Em atraso',            cls: 'status-expirado' },
+  CANCELADO:  { label: 'Cancelado',            cls: 'status-cancelado' },
+  ESTORNADO:  { label: 'Estornado',            cls: 'status-cancelado' },
 };
+const CFIN_FORMA = {
+  PIX:'Pix', BOLETO:'Boleto', TRANSFERENCIA:'Transferência',
+  CARTAO:'Cartão', DINHEIRO:'Dinheiro', OUTRO:'Outro',
+};
+const CFIN_PERIODO = { MENSAL:'Mensal', TRIMESTRAL:'Trimestral', SEMESTRAL:'Semestral', ANUAL:'Anual' };
+const CFIN_ABERTO = ['AGUARDANDO', 'PARCIAL', 'ATRASADO'];
+const CFIN_VALEM = ['AGUARDANDO', 'PARCIAL', 'PAGO', 'ATRASADO'];
+
+let clCobrancas = [], clPagamentos = [], clAssinaturas = [], clDocsFin = [], clHistFin = [];
+let cobAberta = null, cfinInstrucoes = '';
+
+const cfValor = i => Number(i.amount || 0) - Number(i.desconto || 0)
+                   + Number(i.juros || 0) + Number(i.multa || 0);
+const cfAberto = i => Math.max(0, cfValor(i) - Number(i.recebido || 0));
+const cfParcela = i => i.parcela_num
+  ? String(i.parcela_num).padStart(2, '0') + '/' + String(i.parcela_total || i.parcela_num).padStart(2, '0')
+  : '—';
+const cfNumero = i => '#' + String(i.numero ?? 0).padStart(5, '0');
+const dinheiro = v => 'R$ ' + Number(v || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+
+async function carregarFinanceiroCliente() {
+  const [inv, pg, asn, doc, hist, cfg] = await Promise.all([
+    supabase.from('invoices').select('*').eq('client_id', userId).order('due_date'),
+    supabase.from('fin_pagamentos').select('*').eq('client_id', userId).order('data', { ascending: false }),
+    supabase.from('fin_assinaturas').select('*').eq('client_id', userId),
+    supabase.from('fin_documentos').select('*').eq('client_id', userId).order('created_at', { ascending: false }),
+    supabase.from('fin_historico').select('*').eq('client_id', userId).order('created_at', { ascending: false }).limit(100),
+    supabase.from('fin_config').select('instrucoes').eq('id', 1).maybeSingle(),
+  ]);
+  clCobrancas = inv.data || []; clPagamentos = pg.data || [];
+  clAssinaturas = asn.data || []; clDocsFin = doc.data || []; clHistFin = hist.data || [];
+  cfinInstrucoes = cfg.data?.instrucoes || '';
+  renderFinanceiroCliente();
+}
+
+document.querySelectorAll('#cf-abas .rh-aba').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('#cf-abas .rh-aba').forEach(x => x.classList.remove('active'));
+  b.classList.add('active');
+  document.querySelectorAll('#tab-financeiro > .rh-painel').forEach(p => p.classList.remove('active'));
+  clEl('cf-' + b.dataset.cf).classList.add('active');
+}));
+
+function renderFinanceiroCliente() {
+  const validas = clCobrancas.filter(i => CFIN_VALEM.includes(i.status));
+  const contratado = validas.reduce((s, i) => s + cfValor(i), 0);
+  const pago = validas.reduce((s, i) => s + Number(i.recebido || 0), 0);
+  const atraso = validas.filter(i => i.status === 'ATRASADO').reduce((s, i) => s + cfAberto(i), 0);
+
+  clEl('cfin-numeros').innerHTML = [
+    { label: 'Total contratado', valor: dinheiro(contratado), cor: 'var(--text)' },
+    { label: 'Total pago',       valor: dinheiro(pago), cor: 'var(--green)' },
+    { label: 'Em aberto',        valor: dinheiro(contratado - pago), cor: 'var(--orange)' },
+    { label: 'Em atraso',        valor: dinheiro(atraso), cor: atraso ? 'var(--red)' : 'var(--text)' },
+  ].map(c => `<div class="resumo-card" style="text-align:left">
+      <div class="resumo-label" style="margin:0 0 6px">${c.label}</div>
+      <div class="resumo-valor" style="color:${c.cor};font-size:22px">${c.valor}</div>
+    </div>`).join('');
+
+  // A próxima que vence, e não a mais antiga em aberto: é a data que o
+  // cliente precisa anotar.
+  const proxima = validas.filter(i => CFIN_ABERTO.includes(i.status))
+    .sort((a, b) => (a.due_date || '').localeCompare(b.due_date || ''))[0];
+  if (proxima) {
+    const projeto = clProjetos.find(p => p.id === proxima.project_id);
+    const dias = Math.ceil((new Date(proxima.due_date) - Date.now()) / 86400000);
+    clEl('cfin-proximo').innerHTML = `
+      <div style="font-size:26px;font-weight:800">${dinheiro(cfAberto(proxima))}</div>
+      <div class="rh-item-sub">${escapeHtml(proxima.description || '')}
+        ${projeto ? ' · ' + escapeHtml(projeto.name) : ''}</div>
+      <div class="meurh-linha" style="margin-top:12px"><span>Vencimento</span>
+        <strong style="${dias < 0 ? 'color:var(--red)' : ''}">${formatDate(proxima.due_date)}
+          ${dias < 0 ? ` · ${Math.abs(dias)} dias em atraso` : dias === 0 ? ' · vence hoje' : ` · em ${dias} dias`}</strong></div>
+      <button class="btn btn-primary" style="margin-top:14px" onclick="window._verCobrancaCliente('${proxima.id}')">Ver como pagar</button>`;
+  } else {
+    clEl('cfin-proximo').innerHTML = '<div class="rh-item-sub">Nenhuma cobrança em aberto. Tudo em dia.</div>';
+  }
+
+  const regular = atraso === 0;
+  clEl('cfin-situacao').innerHTML = `
+    <span class="status ${regular ? 'status-done' : 'status-expirado'}">${regular ? 'Regular' : 'Com pendência'}</span>
+    <div class="rh-item-sub" style="margin-top:8px">${regular
+      ? 'Não há cobranças vencidas em seu nome.'
+      : `Há ${dinheiro(atraso)} em atraso. Se já pagou, envie o comprovante na aba Pagamentos.`}</div>`;
+
+  /* ── contratos e projetos ── */
+  const contratos = clProjetos.map(p => {
+    const parcelas = clCobrancas.filter(i => i.project_id === p.id && CFIN_VALEM.includes(i.status));
+    const total = Number(p.valor) || parcelas.reduce((s, i) => s + cfValor(i), 0);
+    const recebido = parcelas.reduce((s, i) => s + Number(i.recebido || 0), 0);
+    return { nome: p.name, sub: p.codigo, situacao: PROJETO_STATUS[p.status], total, recebido, parcelas };
+  }).concat(clAssinaturas.map(a => ({
+    nome: `${a.produto} · ${a.plano}`,
+    sub: CFIN_PERIODO[a.periodicidade] + ' · desde ' + formatDate(a.contratada_em),
+    situacao: { label: a.situacao === 'ATIVA' ? 'Ativa' : a.situacao, cls: a.situacao === 'ATIVA' ? 'status-done' : 'status-pending' },
+    total: Number(a.valor) - Number(a.desconto || 0),
+    recebido: clCobrancas.filter(i => i.assinatura_id === a.id).reduce((s, i) => s + Number(i.recebido || 0), 0),
+    parcelas: clCobrancas.filter(i => i.assinatura_id === a.id),
+  })));
+
+  clEl('cfin-contratos').innerHTML = contratos.length ? contratos.map(c => {
+    const pct = c.total ? Math.round(c.recebido / c.total * 100) : 0;
+    return `<div class="card" style="margin-bottom:14px">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap">
+        <div style="min-width:0">
+          <div style="font-size:14px;font-weight:700">${escapeHtml(c.nome)}</div>
+          <div class="rh-item-sub">${escapeHtml(c.sub || '')}</div>
+        </div>
+        <span class="status ${c.situacao?.cls || ''}">${c.situacao?.label || ''}</span>
+      </div>
+      <div class="meurh-linha" style="margin-top:12px"><span>Valor contratado</span><strong>${dinheiro(c.total)}</strong></div>
+      <div class="meurh-linha"><span>Já pago</span><strong style="color:var(--green)">${dinheiro(c.recebido)}</strong></div>
+      <div class="meurh-linha"><span>Em aberto</span><strong style="color:var(--orange)">${dinheiro(Math.max(0, c.total - c.recebido))}</strong></div>
+      <div class="progress-bar" style="margin-top:10px"><div class="progress-bar-fill" style="width:${pct}%"></div></div>
+      <div class="rh-item-sub">${pct}% pago${c.parcelas.length ? ` · ${c.parcelas.length} cobrança(s)` : ''}</div>
+    </div>`;
+  }).join('') : '<div class="card"><div class="rh-item-sub">Nenhuma contratação registrada.</div></div>';
+
+  /* ── pagamentos ── */
+  clEl('cfin-cobrancas').innerHTML = clCobrancas.length ? clCobrancas.map(i => {
+    const s = CFIN_SITUACAO[i.status] || { label: i.status, cls: '' };
+    return `<tr class="rh-linha" onclick="window._verCobrancaCliente('${i.id}')">
+      <td><span class="ticket-id">${cfNumero(i)}</span></td>
+      <td style="color:var(--text-dim)">${cfParcela(i)}</td>
+      <td>${escapeHtml(i.description || '—')}</td>
+      <td style="color:var(--text-dim);font-size:12px">${formatDate(i.due_date)}</td>
+      <td style="font-weight:700">${dinheiro(cfValor(i))}
+        ${i.status === 'PARCIAL' ? `<div class="rh-item-sub">falta ${dinheiro(cfAberto(i))}</div>` : ''}</td>
+      <td><span class="status ${s.cls}">${s.label}</span>
+        ${i.comprovante && !i.comprovante_validado
+          ? '<div class="rh-item-sub" style="color:var(--orange)">comprovante em análise</div>' : ''}</td>
+      <td><button class="team-btn">Ver</button></td>
+    </tr>`;
+  }).join('') : '<tr><td colspan="7" class="team-empty">Nenhuma cobrança emitida ainda.</td></tr>';
+
+  /* ── documentos ── */
+  clEl('cfin-documentos').innerHTML = clDocsFin.length
+    ? `<div class="card">${clDocsFin.map(d => `<div class="meurh-linha">
+        <span>${escapeHtml(d.nome)}<span class="rh-item-sub">${d.tipo} · ${formatDate(d.created_at)}
+          ${d.enviado_tipo === 'CLIENTE' ? ' · enviado por você' : ''}</span></span>
+        <button class="team-btn" onclick="window._baixarFinCliente('${d.caminho}')">Baixar</button>
+      </div>`).join('')}</div>`
+    : '<div class="card"><div class="rh-item-sub">Nenhum documento financeiro disponível.</div></div>';
+
+  /* ── histórico ── */
+  clEl('cfin-historico').innerHTML = clHistFin.length ? clHistFin.map(h => `
+    <div class="hist-item">
+      <div class="hist-topo">
+        <span style="font-size:12.5px;font-weight:600">${escapeHtml(h.evento)}</span>
+        <span class="hist-data">${formatDate(h.created_at)}</span>
+      </div>
+      <div class="hist-nota">${escapeHtml(h.descricao || '')}${
+        h.valor != null ? ` · ${dinheiro(h.valor)}` : ''}</div>
+    </div>`).join('') : '<div class="rh-item-sub">Nenhum registro ainda.</div>';
+}
+
+window._baixarFinCliente = async (caminho) => {
+  const { data, error } = await supabase.storage.from('financeiro').createSignedUrl(caminho, 60);
+  if (error) return alert('Não foi possível abrir: ' + error.message);
+  window.open(data.signedUrl, '_blank');
+};
+
+window._verCobrancaCliente = (id) => {
+  const i = clCobrancas.find(x => x.id === id);
+  if (!i) return;
+  cobAberta = id;
+  const projeto = clProjetos.find(p => p.id === i.project_id);
+  const s = CFIN_SITUACAO[i.status] || { label: i.status, cls: '' };
+  const pagos = clPagamentos.filter(p => p.invoice_id === id);
+  const linha = (r, v) => `<div class="meurh-linha"><span>${r}</span><strong>${v}</strong></div>`;
+
+  clEl('cob-cli-titulo').textContent = 'Cobrança ' + cfNumero(i);
+  clEl('cob-cli-corpo').innerHTML = `
+    ${linha('Descrição', escapeHtml(i.description || '—'))}
+    ${projeto ? linha('Projeto', escapeHtml(projeto.name)) : ''}
+    ${linha('Parcela', cfParcela(i))}
+    ${linha('Valor original', dinheiro(i.amount))}
+    ${Number(i.desconto) ? linha('Desconto', '− ' + dinheiro(i.desconto)) : ''}
+    ${Number(i.juros) + Number(i.multa) ? linha('Juros e multa', '+ ' + dinheiro(Number(i.juros) + Number(i.multa))) : ''}
+    ${linha('Valor atualizado', '<span style="font-size:15px">' + dinheiro(cfValor(i)) + '</span>')}
+    ${Number(i.recebido) ? linha('Já pago', dinheiro(i.recebido)) : ''}
+    ${CFIN_ABERTO.includes(i.status) ? linha('Falta pagar', dinheiro(cfAberto(i))) : ''}
+    ${linha('Vencimento', formatDate(i.due_date))}
+    ${linha('Situação', `<span class="status ${s.cls}">${s.label}</span>`)}
+
+    ${pagos.length ? `<div class="card-title" style="margin:18px 0 10px">Pagamentos registrados</div>
+      ${pagos.map(p => `<div class="meurh-linha">
+        <span>${formatDate(p.data)}<span class="rh-item-sub">${escapeHtml(CFIN_FORMA[p.forma] || p.forma || '')}
+          ${p.estorno_de ? ' · estorno' : ''}</span></span>
+        <strong style="color:${Number(p.valor) < 0 ? 'var(--red)' : 'var(--green)'}">${dinheiro(p.valor)}</strong>
+      </div>`).join('')}` : ''}
+
+    ${CFIN_ABERTO.includes(i.status) ? `
+      <div class="rh-bloco" style="margin-top:18px">
+        <div class="rh-bloco-titulo">Como pagar</div>
+        <div class="rh-bloco-texto">${escapeHtml(cfinInstrucoes || 'Fale com a equipe da SertCode pela aba Comunicação para receber os dados de pagamento.')}</div>
+      </div>
+
+      <div class="form-group" style="margin-top:14px">
+        <label>Já pagou? Envie o comprovante</label>
+        <input type="file" id="cob-comprovante">
+        <div style="font-size:11px;color:var(--text-dim);margin-top:6px">
+          O envio avisa a SertCode. A baixa só acontece depois que a equipe confere o recebimento.</div>
+      </div>
+      ${i.comprovante ? `<div class="sup-aviso">Você já enviou um comprovante em ${formatDate(i.comprovante_em)}.
+        ${i.comprovante_validado ? 'Ele foi validado.' : 'Está em análise.'}</div>` : ''}
+      <button class="btn btn-primary" id="cob-btn" style="margin-top:12px" onclick="window._enviarComprovante()">Enviar comprovante</button>
+      <div class="form-msg" id="cob-msg" role="alert"></div>
+    ` : ''}`;
+  clEl('modal-cobranca-cliente').classList.add('open');
+};
+
+window._enviarComprovante = async () => {
+  const btn = clEl('cob-btn'), orig = btn.textContent;
+  const arquivo = clEl('cob-comprovante').files[0];
+  if (!arquivo) return clMsg('cob-msg', 'Escolha o arquivo do comprovante.');
+  if (arquivo.size > 10 * 1024 * 1024) return clMsg('cob-msg', 'O arquivo precisa ter no máximo 10 MB.');
+
+  btn.textContent = 'Enviando...'; btn.disabled = true;
+  const fim = () => { btn.textContent = orig; btn.disabled = false; };
+
+  // O caminho começa com o id do cliente: é assim que a regra do bucket
+  // decide quem pode abrir.
+  const caminho = `${userId}/${Date.now()}-${arquivo.name.replace(/[^\w.\-]/g, '_')}`;
+  const { error: erroUp } = await supabase.storage.from('financeiro').upload(caminho, arquivo);
+  if (erroUp) { fim(); return clMsg('cob-msg', 'Não foi possível enviar: ' + erroUp.message); }
+
+  // Enviar comprovante não dá baixa: marca que chegou, e a gestão valida.
+  const { error } = await supabase.from('invoices')
+    .update({ comprovante: caminho }).eq('id', cobAberta);
+  if (error) { fim(); return clMsg('cob-msg', 'Não foi possível registrar: ' + error.message); }
+
+  await supabase.from('fin_documentos').insert({
+    client_id: userId, invoice_id: cobAberta, tipo: 'COMPROVANTE',
+    nome: arquivo.name, caminho, tamanho: arquivo.size, publico: true,
+    enviado_por: clPerfil?.name || 'Cliente', enviado_tipo: 'CLIENTE',
+  });
+
+  fim();
+  clEl('modal-cobranca-cliente').classList.remove('open');
+  await carregarFinanceiroCliente();
+  notif.recarregar();
+  window._aviso('Comprovante enviado. A SertCode vai conferir e dar a baixa.');
+};
+
+/* ── HELPERS ── */
 function escapeHtml(v) {
   return String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
@@ -1470,7 +1707,11 @@ document.getElementById('modal-ticket').addEventListener('click', e => {
   if (e.target.id === 'modal-ticket') e.target.classList.remove('open');
 });
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') document.getElementById('modal-ticket').classList.remove('open');
+  if (e.key === 'Escape') document.querySelectorAll('.modal-overlay.open')
+    .forEach(m => m.classList.remove('open'));
+});
+document.getElementById('modal-cobranca-cliente').addEventListener('click', e => {
+  if (e.target.id === 'modal-cobranca-cliente') e.target.classList.remove('open');
 });
 </script>
 
