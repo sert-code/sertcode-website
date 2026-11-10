@@ -87,10 +87,10 @@
     </nav>
 
     <div class="sidebar-footer">
-      <div class="sidebar-avatar">CA</div>
+      <div class="sidebar-avatar"></div>
       <div>
-        <div class="sidebar-user-name">Carlos Almeida</div>
-        <div class="sidebar-user-role">Empresa ABC Ltda</div>
+        <div class="sidebar-user-name">—</div>
+        <div class="sidebar-user-role"></div>
       </div>
       <a href="cliente.html" class="sidebar-logout" title="Sair" aria-label="Sair">
         <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
@@ -106,7 +106,7 @@
     <header class="portal-header">
       <div>
         <div class="portal-header-title" id="header-title">Dashboard</div>
-        <div class="portal-header-sub">Bem-vindo de volta, Carlos</div>
+        <div class="portal-header-sub"></div>
       </div>
       <div class="portal-header-right">
         <button class="tema-toggle" id="tema-toggle" aria-label="Alternar tema" title="Modo claro / escuro">
@@ -117,7 +117,7 @@
           <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
           <div class="notif-dot"></div>
         </div>
-        <div class="header-avatar" title="Carlos Almeida">CA</div>
+        <div class="header-avatar"></div>
       </div>
     </header>
 
@@ -435,50 +435,8 @@
           </div>
         </div>
 
-        <div class="invoice-list">
-
-          <div class="invoice-card">
-            <div class="invoice-icon">
-              <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-            </div>
-            <div style="flex:1;min-width:0">
-              <div class="invoice-title">Parcela 1 de 3</div>
-              <div class="invoice-desc">Sistema ERP Comercial · Venc. 03 Mai 2026</div>
-            </div>
-            <div class="invoice-amount">
-              <div class="invoice-value">R$ 4.200,00</div>
-              <div style="margin-top:5px"><span class="status status-paid">Pago</span></div>
-            </div>
-          </div>
-
-          <div class="invoice-card">
-            <div class="invoice-icon">
-              <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-            </div>
-            <div style="flex:1;min-width:0">
-              <div class="invoice-title">Parcela 2 de 3</div>
-              <div class="invoice-desc">Sistema ERP Comercial · Venc. 03 Jun 2026</div>
-            </div>
-            <div class="invoice-amount">
-              <div class="invoice-value">R$ 4.200,00</div>
-              <div style="margin-top:5px"><span class="status status-pending">Pendente</span></div>
-            </div>
-          </div>
-
-          <div class="invoice-card">
-            <div class="invoice-icon">
-              <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-            </div>
-            <div style="flex:1;min-width:0">
-              <div class="invoice-title">Parcela 3 de 3 — Entrega final</div>
-              <div class="invoice-desc">Sistema ERP Comercial · Venc. 10 Jul 2026</div>
-            </div>
-            <div class="invoice-amount">
-              <div class="invoice-value">R$ 4.200,00</div>
-              <div style="margin-top:5px"><span class="status status-pending">Pendente</span></div>
-            </div>
-          </div>
-
+        <div class="card">
+          <div class="invoice-list"></div>
         </div>
 
       </section>
@@ -612,7 +570,7 @@ async function loadPortalData() {
     .eq('client_id', userId)
     .order('due_date');
 
-  if (invoices?.length) {
+  {
     const liquido = i => Number(i.amount || 0) - Number(i.desconto || 0);
     const emAberto = i => i.status !== 'pago' && i.status !== 'cancelado';
     const paid = invoices.filter(i => i.status === 'pago').reduce((s, i) => s + liquido(i), 0);
@@ -620,10 +578,11 @@ async function loadPortalData() {
     const paidCount = invoices.filter(i => i.status === 'pago').length;
     const pendCount = invoices.filter(emAberto).length;
 
+    const invs = invoices || [];
     const statCards = document.querySelectorAll('#tab-financeiro .stat-card');
     if (statCards[0]) {
       statCards[0].querySelector('.stat-value').textContent = 'R$ ' + paid.toLocaleString('pt-BR');
-      statCards[0].querySelector('.stat-hint').textContent = paidCount + ' de ' + invoices.length + ' parcelas';
+      statCards[0].querySelector('.stat-hint').textContent = paidCount + ' de ' + invs.length + ' parcelas';
     }
     if (statCards[1]) {
       statCards[1].querySelector('.stat-value').textContent = 'R$ ' + pending.toLocaleString('pt-BR');
@@ -631,7 +590,9 @@ async function loadPortalData() {
     }
 
     const list = document.querySelector('.invoice-list');
-    list.innerHTML = invoices.map((inv, i) => `
+    list.innerHTML = !invoices?.length
+      ? '<div style="color:var(--text-dim);font-size:13px;padding:8px 0">Nenhuma cobran\u00e7a emitida ainda.</div>'
+      : invoices.map((inv, i) => `
       <div class="invoice-card">
         <div class="invoice-icon">
           <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
