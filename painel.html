@@ -2095,6 +2095,11 @@
         <input type="url" id="pj-contrato" placeholder="https://"></div>
       <div class="form-group"><label>Observações internas</label>
         <textarea id="pj-observacoes" placeholder="O cliente não vê este campo."></textarea></div>
+      <div class="form-row-2">
+        <div class="form-group"><label>Anexar documento</label><input type="file" id="pj-arquivo"></div>
+        <div class="form-group"><label>Pasta do documento</label><select id="pj-arquivo-pasta"></select></div>
+      </div>
+      <div class="rh-bloco-texto" id="pj-arquivo-nota">O arquivo é enviado depois que o projeto é criado, porque ele é guardado dentro da pasta do projeto.</div>
     </div>
 
     <div style="display:flex;gap:10px">
@@ -2145,6 +2150,13 @@
       <textarea id="et-observacoes" placeholder="O cliente não vê este campo."></textarea></div>
     <div class="form-group"><label>Registro desta atualização</label>
       <input type="text" id="et-registro" maxlength="160" placeholder="O que mudou e por quê (entra no histórico)"></div>
+    <div class="form-group"><label>Anexar arquivo a esta etapa</label>
+      <input type="file" id="et-arquivo">
+      <div style="font-size:11px;color:var(--text-dim);margin-top:6px">Aparece também na aba Documentos do projeto e no portal do cliente.</div></div>
+    <div class="rh-bloco" id="et-arquivos-bloco" hidden>
+      <div class="rh-bloco-titulo">Arquivos desta etapa</div>
+      <div id="et-arquivos"></div>
+    </div>
 
     <div style="display:flex;gap:10px">
       <button class="btn btn-primary" style="flex:1;justify-content:center" id="et-btn" onclick="window._salvarEtapa()">Salvar etapa</button>
@@ -5657,6 +5669,7 @@ async function loadProjetos() {
   el('et-fase').innerHTML = Object.entries(FASES).map(([v, f]) => `<option value="${v}">${f.nome}</option>`).join('');
   el('et-status').innerHTML = ops(ETAPA_STATUS);
   el('pf-doc-pasta').innerHTML = ops(PASTAS_DOC);
+  el('pj-arquivo-pasta').innerHTML = ops(PASTAS_DOC);
   el('pf-ap-tipo').innerHTML = ops(TIPOS_APROVACAO);
 
   renderProjetos();
@@ -5836,7 +5849,8 @@ window._novoProjeto = () => {
   el('pj-cliente').innerHTML = allClients.map(c =>
     `<option value="${c.id}">${esc(c.company || c.name)}</option>`).join('');
   ['pj-nome','pj-descricao','pj-objetivo','pj-equipe','pj-valor','pj-contrato','pj-observacoes',
-   'pj-inicio','pj-entrega'].forEach(id => el(id).value = '');
+   'pj-inicio','pj-entrega','pj-arquivo'].forEach(id => el(id).value = '');
+  el('pj-arquivo-pasta').value = 'CONTRATOS';
   el('pj-codigo').value = '';
   el('pj-data').value = hojeISO();
   el('pj-prioridade').value = 'NORMAL';
@@ -5845,6 +5859,8 @@ window._novoProjeto = () => {
   el('pj-responsavel').value = '';
   el('pj-aplicar-modelo').checked = true;
   el('pj-aplicar-modelo').closest('.eq-perm').hidden = false;
+  el('pj-arquivo').closest('.form-row-2').hidden = false;
+  el('pj-arquivo-nota').hidden = false;
   el('pj-msg').className = 'form-msg';
   montarServicos();
   el('pj-cliente').dispatchEvent(new Event('change'));
@@ -5879,6 +5895,8 @@ window._editarProjeto = () => {
   // Reaplicar o modelo numa edição duplicaria as etapas que já existem.
   el('pj-aplicar-modelo').checked = false;
   el('pj-aplicar-modelo').closest('.eq-perm').hidden = true;
+  el('pj-arquivo').closest('.form-row-2').hidden = true;
+  el('pj-arquivo-nota').hidden = true;
   el('pj-cliente').dispatchEvent(new Event('change'));
   openModal('modal-projeto');
 };
@@ -5943,6 +5961,26 @@ window._salvarProjeto = async () => {
       })));
     }
   }
+  // O arquivo só pode subir agora: o caminho no bucket começa com o id do
+  // projeto, que o banco acabou de gerar.
+  const arquivo = el('pj-arquivo').files[0];
+  if (arquivo) {
+    const anterior = pjAberto;
+    pjAberto = criado;
+    const enviado = await enviarArquivoProjeto(el('pj-arquivo'));
+    pjAberto = anterior;
+    if (enviado.erro) {
+      pjSet('pj-msg', 'Projeto criado, mas o anexo falhou: ' + enviado.erro);
+    } else {
+      await supabase.from('projeto_documentos').insert({
+        project_id: criado.id, client_id: criado.client_id,
+        pasta: el('pj-arquivo-pasta').value, nome: enviado.nome,
+        caminho: enviado.caminho, tamanho: enviado.tamanho,
+        publico: true, enviado_por: myName, enviado_tipo: 'EQUIPE',
+      });
+    }
+  }
+
   await registrarProjeto(criado.id, 'Projeto', null, 'SOLICITACAO', 'Projeto cadastrado');
 
   fim();
@@ -6135,6 +6173,8 @@ window._novaEtapa = () => {
   el('et-peso').value = 1;
   el('et-ordem').value = (pjEtapas.length ? Math.max(...pjEtapas.map(e => e.ordem)) : 0) + 1;
   el('et-excluir').hidden = true;
+  el('et-arquivo').value = '';
+  el('et-arquivos-bloco').hidden = true;
   el('et-msg').className = 'form-msg';
   atualizarNotaProgresso();
   openModal('modal-etapa');
@@ -6160,9 +6200,20 @@ window._editarEtapa = (id) => {
   el('et-descricao').value = e.descricao || '';
   el('et-observacoes').value = e.observacoes_internas || '';
   el('et-excluir').hidden = false;
+  renderArquivosEtapa(id);
   atualizarNotaProgresso();
   openModal('modal-etapa');
 };
+
+function renderArquivosEtapa(etapaId) {
+  const lista = pjDocumentos.filter(d => d.etapa_id === etapaId);
+  el('et-arquivos-bloco').hidden = !lista.length;
+  el('et-arquivos').innerHTML = lista.map(d => `
+    <div class="meurh-linha">
+      <span>${esc(d.nome)}<span class="rh-item-sub">${esc(d.enviado_por || '')} · ${fmtDate(d.created_at)}</span></span>
+      <button class="team-btn" onclick="window._baixarDocumento('${d.caminho}')">Baixar</button>
+    </div>`).join('');
+}
 
 // A regra "concluída = 100%" vale no banco; a tela avisa antes para a
 // pessoa não achar que o número dela foi ignorado.
@@ -6225,6 +6276,22 @@ window._salvarEtapa = async () => {
     await registrarProjeto(pjAberto.id, 'Etapa', null, campos.nome, registro || 'Etapa criada');
   }
 
+  // O anexo da etapa entra na biblioteca do projeto, marcado com a etapa.
+  if (el('et-arquivo').files[0]) {
+    const enviado = await enviarArquivoProjeto(el('et-arquivo'));
+    if (enviado.erro) return pjSet('et-msg', 'Etapa salva, mas o anexo falhou: ' + enviado.erro);
+
+    const { data: etapas } = await supabase.from('projeto_etapas')
+      .select('id').eq('project_id', pjAberto.id).eq('nome', campos.nome).limit(1);
+    await supabase.from('projeto_documentos').insert({
+      project_id: pjAberto.id, client_id: pjAberto.client_id,
+      etapa_id: etEditId || etapas?.[0]?.id || null,
+      pasta: 'DESENVOLVIMENTO', nome: enviado.nome, caminho: enviado.caminho,
+      tamanho: enviado.tamanho, publico: true,
+      enviado_por: myName, enviado_tipo: 'EQUIPE',
+    });
+  }
+
   closeModal('modal-etapa');
   await window._abrirProjeto(pjAberto.id);
   await sincronizarProgresso();
@@ -6258,6 +6325,25 @@ async function sincronizarProgresso() {
 /* ── mudanças direto na ficha ── */
 el('pf-status').addEventListener('change', async e => {
   const antes = pjAberto.status, novo = e.target.value;
+
+  // Concluir com etapa em aberto faria o cliente ver 100% ao lado de uma
+  // fase que ninguém executou. Quem não vai acontecer deve ser cancelada.
+  if (novo === 'CONCLUIDO') {
+    const pendentes = pjEtapas.filter(et => !['CONCLUIDO','CANCELADO'].includes(et.status));
+    if (pendentes.length) {
+      e.target.value = antes;
+      return alert('Não dá para concluir o projeto: '
+        + pendentes.length + ' etapa(s) ainda em aberto.\n\n'
+        + pendentes.map(et => '· ' + et.nome).join('\n')
+        + '\n\nConclua cada uma, ou marque como cancelada a que não será executada.');
+    }
+    if (!pjEtapas.length && !confirm(
+      'Este projeto não tem etapas cadastradas. Concluir mesmo assim?')) {
+      e.target.value = antes;
+      return;
+    }
+  }
+
   const campos = { status: novo, atualizado_em: new Date().toISOString() };
   if (novo === 'ANDAMENTO' && !pjAberto.started_at) campos.started_at = new Date().toISOString();
   if (['CONCLUIDO','CANCELADO'].includes(novo)) campos.finished_at = new Date().toISOString();

@@ -199,7 +199,8 @@ const MODELO_EVOLUCAO = [
   e('DESENVOLVIMENTO', 'Desenvolvimento das melhorias', 4),
   e('TESTES',          'Testes', 2),
   e('TESTES',          'Homologação', 2),
-  e('ENTREGA',         'Atualização do sistema e registro da versão'),
+  e('ENTREGA',         'Atualização do sistema'),
+  e('ENTREGA',         'Registro da versão e entrega'),
 ];
 
 const MODELO_CONSULTORIA = [
