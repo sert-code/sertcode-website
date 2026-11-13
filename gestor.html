@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/portal.css?v=26">
+  <link rel="stylesheet" href="css/portal.css?v=27">
 <script>
   // Lido antes da tela aparecer, para não piscar o tema errado ao abrir.
   try { if (localStorage.getItem('sertcode_theme') === 'light') document.documentElement.setAttribute('data-theme', 'light'); } catch (e) {}
@@ -92,7 +92,6 @@
         identificar você na equipe, conforme a <a href="privacidade.html">política de privacidade</a>.
       </div>
 
-      <a href="cliente.html" class="login-back">← Área do Cliente</a>
     </div>
   </main>
 </div>
@@ -132,9 +131,19 @@
     hora < 12 ? 'Bom dia, equipe' :
     hora < 18 ? 'Boa tarde, equipe' : 'Boa noite, equipe';
 
-  el('acesso-capitulos').innerHTML = CAPITULOS.map((c, i) => `
+  // Os quatro valores entram como capítulos extras: clicar num cartão
+  // abre o valor aqui em cima, no mesmo lugar dos institucionais.
+  const TELAS = [
+    ...CAPITULOS,
+    ...VALORES.map(v => ({ rotulo: 'Nosso valor', titulo: v.nome, texto: v.texto, icone: v.icone })),
+  ];
+
+  el('acesso-capitulos').innerHTML = TELAS.map((c, i) => `
     <article class="acesso-capitulo${i ? '' : ' ativo'}">
-      <h1>${c.titulo}</h1>
+      ${c.icone ? `<span class="acesso-capitulo-marca">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.9"
+          viewBox="0 0 24 24" aria-hidden="true">${c.icone}</svg>${c.rotulo}</span>` : ''}
+      <h1>${c.icone ? `<b>${c.titulo}</b>` : c.titulo}</h1>
       <p>${c.texto}</p>
     </article>`).join('');
 
@@ -143,7 +152,8 @@
       style="--tempo:${TEMPO}ms" aria-label="${c.rotulo}"><i></i></button>`).join('');
 
   el('acesso-valores').innerHTML = VALORES.map((v, i) => `
-    <button class="acesso-valor${i ? '' : ' focado'}" type="button">
+    <button class="acesso-valor${i ? '' : ' focado'}" type="button"
+      aria-label="Ver o valor ${v.nome}">
       <span class="acesso-valor-icone">
         <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.9"
           viewBox="0 0 24 24" aria-hidden="true">${v.icone}</svg>
@@ -157,40 +167,62 @@
   const capitulos = [...document.querySelectorAll('.acesso-capitulo')];
   const passos    = [...document.querySelectorAll('.acesso-passo')];
   const valores   = [...document.querySelectorAll('.acesso-valor')];
-  let atual = 0, relogio = null, travado = false;
+  const INSTITUCIONAIS = CAPITULOS.length;
 
-  function mostrar(n) {
-    atual = (n + capitulos.length) % capitulos.length;
-    capitulos.forEach((c, i) => c.classList.toggle('ativo', i === atual));
+  let atual = 0, relogio = null, escolhido = null;
+
+  function pintar(n, destaque) {
+    capitulos.forEach((c, i) => c.classList.toggle('ativo', i === n));
     passos.forEach((p, i) => {
       p.classList.remove('ativo');
-      if (i === atual) {
-        // Reiniciar a animação exige tirar e repor a classe num quadro
-        // novo; sem isso a barra não volta ao começo.
-        void p.offsetWidth;
-        p.classList.add('ativo');
-      }
+      // Reiniciar a animação exige tirar e repor a classe num quadro
+      // novo; sem isso a barra não volta ao começo.
+      if (i === n) { void p.offsetWidth; p.classList.add('ativo'); }
     });
-    valores.forEach((v, i) => v.classList.toggle('focado', i === atual % valores.length));
+    valores.forEach((v, i) => {
+      v.classList.toggle('focado', i === destaque);
+      v.classList.toggle('selecionado', escolhido === i);
+      v.setAttribute('aria-pressed', escolhido === i ? 'true' : 'false');
+    });
+  }
+
+  // Rodízio dos institucionais; o valor em destaque acompanha.
+  function mostrar(n) {
+    escolhido = null;
+    atual = (n + INSTITUCIONAIS) % INSTITUCIONAIS;
+    pintar(atual, atual % valores.length);
+  }
+
+  // Clicar num cartão abre aquele valor em cima e para o rodízio: quem
+  // clicou quer ler, não ver a tela trocar embaixo do dedo.
+  function abrirValor(i) {
+    if (escolhido === i) { mostrar(atual); andar(); return; }
+    escolhido = i;
+    clearInterval(relogio);
+    pintar(INSTITUCIONAIS + i, i);
   }
 
   function andar() {
     if (calmo) return;
     clearInterval(relogio);
-    relogio = setInterval(() => { if (!travado) mostrar(atual + 1); }, TEMPO);
+    relogio = setInterval(() => { if (escolhido === null) mostrar(atual + 1); }, TEMPO);
   }
 
   passos.forEach((p, i) => p.addEventListener('click', () => { mostrar(i); andar(); }));
   valores.forEach((v, i) => {
-    const focar = () => {
-      travado = true;
-      valores.forEach((x, j) => x.classList.toggle('focado', i === j));
-    };
-    v.addEventListener('mouseenter', focar);
-    v.addEventListener('focus', focar);
-    v.addEventListener('click', focar);
-    v.addEventListener('mouseleave', () => { travado = false; mostrar(atual); });
-    v.addEventListener('blur', () => { travado = false; mostrar(atual); });
+    v.addEventListener('click', () => abrirValor(i));
+    // Passar o mouse só adianta o destaque; abrir é decisão de quem clica.
+    v.addEventListener('mouseenter', () => {
+      if (escolhido === null) valores.forEach((x, j) => x.classList.toggle('focado', i === j));
+    });
+    v.addEventListener('mouseleave', () => {
+      if (escolhido === null) pintar(atual, atual % valores.length);
+    });
+  });
+
+  // Sair da apresentação com Esc, para quem navega pelo teclado.
+  el('acesso-valores').addEventListener('keydown', e => {
+    if (e.key === 'Escape' && escolhido !== null) { mostrar(atual); andar(); }
   });
 
   // Parar enquanto a aba está escondida poupa a máquina de quem deixa o
