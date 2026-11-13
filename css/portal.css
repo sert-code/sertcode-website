@@ -845,6 +845,156 @@ button { font-family: var(--font); }
 .status-val   { font-size: 11.5px; color: var(--text-dim); font-weight: 700; }
 
 /* ══════════════════════════════════════
+   ACESSO DA EQUIPE — tela de duas colunas
+══════════════════════════════════════ */
+.acesso {
+  min-height: 100vh;
+  display: grid; grid-template-columns: 1.15fr 1fr;
+  background: var(--bg);
+}
+
+/* ── lado da marca ── */
+.acesso-palco {
+  position: relative; overflow: hidden;
+  display: flex; align-items: center;
+  padding: 56px clamp(32px, 5vw, 72px);
+  border-right: 1px solid var(--border);
+}
+.acesso-aurora {
+  position: absolute; inset: -30% -20% auto -20%; height: 150%;
+  pointer-events: none; opacity: .75;
+  background:
+    radial-gradient(42% 38% at 22% 28%, rgba(255,138,0,0.20), transparent 70%),
+    radial-gradient(38% 34% at 76% 62%, rgba(217,74,0,0.16), transparent 70%),
+    radial-gradient(30% 30% at 54% 88%, rgba(255,106,0,0.10), transparent 70%);
+  animation: acesso-respira 18s ease-in-out infinite alternate;
+}
+@keyframes acesso-respira {
+  from { transform: translate3d(-2%, -1%, 0) scale(1); }
+  to   { transform: translate3d(3%, 2%, 0) scale(1.08); }
+}
+[data-theme="light"] .acesso-aurora { opacity: .9; }
+
+.acesso-palco-conteudo {
+  position: relative; z-index: 1; width: 100%; max-width: 560px;
+}
+.acesso-marca { display: flex; align-items: center; gap: 11px; margin-bottom: 30px; }
+.acesso-marca img { width: 34px; }
+.acesso-marca span {
+  font-family: 'Orbitron', sans-serif; font-size: 17px;
+  font-weight: 600; color: var(--text);
+}
+.acesso-marca em {
+  font-style: normal; font-weight: 700;
+  background: linear-gradient(90deg, #FF8A00, #D94A00);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.acesso-saudacao {
+  font-size: 12px; font-weight: 700; letter-spacing: .09em;
+  text-transform: uppercase; color: var(--orange); margin-bottom: 14px;
+}
+
+/* Um capítulo por vez, no mesmo espaço: os três são empilhados e só o
+   ativo fica visível, para a altura não pular na troca. */
+.acesso-capitulos { display: grid; min-height: 190px; }
+.acesso-capitulo {
+  grid-area: 1 / 1;
+  opacity: 0; visibility: hidden; transform: translateY(10px);
+  transition: opacity .55s ease, transform .55s ease, visibility .55s;
+}
+.acesso-capitulo.ativo { opacity: 1; visibility: visible; transform: none; }
+.acesso-capitulo h1 {
+  font-size: clamp(26px, 3.4vw, 36px); font-weight: 800;
+  line-height: 1.18; color: var(--text); margin-bottom: 12px;
+}
+.acesso-capitulo h1 b {
+  font-weight: 800;
+  background: linear-gradient(90deg, #FF8A00, #D94A00);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.acesso-capitulo p {
+  font-size: 14.5px; line-height: 1.75; color: var(--text-mid); max-width: 48ch;
+}
+
+.acesso-passos { display: flex; gap: 8px; margin: 22px 0 34px; }
+.acesso-passo {
+  flex: 0 0 46px; height: 3px; padding: 0; border: 0; cursor: pointer;
+  border-radius: 99px; background: var(--fill-forte); overflow: hidden;
+  transition: flex-basis .4s ease;
+}
+.acesso-passo.ativo { flex-basis: 84px; }
+.acesso-passo i { display: block; height: 100%; width: 0; background: var(--orange); }
+.acesso-passo.ativo i { animation: acesso-avanca var(--tempo, 8s) linear forwards; }
+@keyframes acesso-avanca { to { width: 100%; } }
+.acesso-passo:focus-visible { outline: 2px solid var(--orange); outline-offset: 4px; }
+
+/* ── valores ── */
+.acesso-valores { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.acesso-valor {
+  display: flex; gap: 11px; text-align: left; cursor: pointer;
+  padding: 13px 14px; border-radius: 13px;
+  background: var(--fill); border: 1px solid var(--border);
+  transition: var(--tr); font: inherit; color: inherit;
+}
+.acesso-valor:hover,
+.acesso-valor:focus-visible { border-color: rgba(255,106,0,0.4); }
+.acesso-valor:focus-visible { outline: none; }
+/* O destaque passeia sozinho pelos quatro: a tela respira sem exigir
+   nada de quem está só esperando para entrar. */
+.acesso-valor.focado {
+  border-color: rgba(255,106,0,0.55);
+  background: rgba(255,106,0,0.07);
+  transform: translateY(-2px);
+}
+.acesso-valor-icone {
+  width: 30px; height: 30px; flex-shrink: 0; border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--fill-forte); color: var(--orange); transition: var(--tr);
+}
+.acesso-valor.focado .acesso-valor-icone {
+  background: linear-gradient(135deg, #FF8A00, #D94A00); color: #fff;
+}
+.acesso-valor > span:last-child { display: block; min-width: 0; }
+.acesso-valor-nome {
+  display: block; font-size: 13px; font-weight: 700; color: var(--text);
+}
+.acesso-valor-texto {
+  display: block; font-size: 11.5px; line-height: 1.55;
+  color: var(--text-dim); margin-top: 3px;
+}
+
+.acesso-rodape {
+  margin-top: 28px; padding-top: 18px; border-top: 1px solid var(--border);
+  font-size: 12.5px; line-height: 1.7; color: var(--text-dim);
+}
+.acesso-rodape strong { color: var(--text); font-weight: 600; }
+
+/* ── lado do formulário ── */
+.acesso-form {
+  display: flex; align-items: center; justify-content: center;
+  padding: 48px 24px; position: relative;
+}
+
+@media (max-width: 980px) {
+  .acesso { grid-template-columns: 1fr; }
+  /* No celular quem chega quer entrar: o formulário vem primeiro. */
+  .acesso-form   { order: 1; padding: 40px 20px 28px; }
+  .acesso-palco  { order: 2; border-right: 0; border-top: 1px solid var(--border);
+                   padding: 40px 24px 56px; }
+  .acesso-capitulos { min-height: 150px; }
+}
+@media (max-width: 560px) {
+  .acesso-valores { grid-template-columns: 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .acesso-aurora { animation: none; }
+  .acesso-passo.ativo i { animation: none; width: 100%; }
+  .acesso-capitulo { transition: none; }
+  .acesso-valor.focado { transform: none; }
+}
+
+/* ══════════════════════════════════════
    LOGIN PAGE
 ══════════════════════════════════════ */
 .login-page {

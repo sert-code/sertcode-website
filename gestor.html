@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/portal.css?v=23">
+  <link rel="stylesheet" href="css/portal.css?v=26">
 <script>
   // Lido antes da tela aparecer, para não piscar o tema errado ao abrir.
   try { if (localStorage.getItem('sertcode_theme') === 'light') document.documentElement.setAttribute('data-theme', 'light'); } catch (e) {}
@@ -27,25 +27,44 @@
 </head>
 <body>
 
-<div class="login-page">
-  <div class="login-glow"></div>
+<div class="acesso">
 
-  <div class="login-card" id="login-card">
+  <!-- ══ marca ══ -->
+  <aside class="acesso-palco">
+    <div class="acesso-aurora" aria-hidden="true"></div>
+    <div class="acesso-palco-conteudo">
+      <div class="acesso-marca">
+        <img src="assets/logo-symbol.png" alt="" width="34">
+        <span>Sert<em>Code</em></span>
+      </div>
 
-    <div style="display:flex;justify-content:flex-end;margin-bottom:-10px"><button class="tema-toggle" id="tema-toggle" aria-label="Alternar tema" title="Modo claro / escuro">
-          <svg class="icone-sol" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-          <svg class="icone-lua" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
-        </button></div>
+      <p class="acesso-saudacao" id="acesso-saudacao">Bem-vindo, equipe</p>
 
-    <div class="login-brand">
-      <img src="assets/logo-symbol.png" alt="SertCode" width="36">
-      <span class="login-brand-text">Sert<em>Code</em></span>
+      <div class="acesso-capitulos" id="acesso-capitulos"></div>
+      <div class="acesso-passos" id="acesso-passos"></div>
+      <div class="acesso-valores" id="acesso-valores"></div>
+
+      <p class="acesso-rodape">
+        <strong>Tecnologia feita para a realidade da sua empresa.</strong><br>
+        Não oferecemos soluções genéricas. Criamos tecnologia que trabalha
+        a favor de quem contrata a SertCode.
+      </p>
     </div>
+  </aside>
 
-    <div class="login-badge">🔒 Acesso restrito — Equipe SertCode</div>
+  <!-- ══ acesso ══ -->
+  <main class="acesso-form">
+    <div class="login-card" id="login-card">
+
+      <div style="display:flex;justify-content:flex-end;margin-bottom:-10px"><button class="tema-toggle" id="tema-toggle" aria-label="Alternar tema" title="Modo claro / escuro">
+            <svg class="icone-sol" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+            <svg class="icone-lua" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+          </button></div>
+
+      <div class="login-badge">🔒 Acesso restrito — Equipe SertCode</div>
 
       <div class="login-title">Painel da equipe</div>
-      <div class="login-sub">Gestão de clientes, assinaturas e chamados.</div>
+      <div class="login-sub">Gestão de clientes, projetos, chamados e pessoas.</div>
 
       <form class="login-form" id="login-form" novalidate>
         <div class="form-group">
@@ -63,15 +82,125 @@
         <div class="form-msg" id="login-msg" role="alert"></div>
       </form>
 
+      <div class="login-switch">
+        Esqueceu a senha?
+        <button type="button" id="login-esqueci">Receber um link por e-mail</button>
+      </div>
 
-    <div class="login-note">
-      Acesso criado por um gestor da SertCode. Seus dados são usados apenas para
-      identificar você na equipe, conforme a <a href="privacidade.html">política de privacidade</a>.
+      <div class="login-note">
+        Acesso criado por um gestor da SertCode. Seus dados são usados apenas para
+        identificar você na equipe, conforme a <a href="privacidade.html">política de privacidade</a>.
+      </div>
+
+      <a href="cliente.html" class="login-back">← Área do Cliente</a>
     </div>
-
-    <a href="cliente.html" class="login-back">← Área do Cliente</a>
-  </div>
+  </main>
 </div>
+
+<script>
+/* ── A VITRINE DA MARCA ──
+   Fora do módulo de propósito: se o Supabase demorar ou falhar, a tela
+   continua viva e quem chega não fica olhando um bloco vazio. */
+(() => {
+  const CAPITULOS = [
+    { rotulo: 'Nossa missão', titulo: 'Transformar empresas através de <b>sistemas inteligentes</b>.',
+      texto: 'Tecnologia personalizada, capaz de gerar crescimento, eficiência e inovação.' },
+    { rotulo: 'Nossa visão', titulo: 'Soluções digitais que impulsionam <b>empresas e pessoas</b>.',
+      texto: 'Conectando tecnologia, inovação e propósito, com excelência e autenticidade.' },
+    { rotulo: 'Nosso compromisso', titulo: 'Cada empresa tem <b>desafios próprios</b>.',
+      texto: 'Por isso a SertCode desenvolve soluções únicas, pensadas para gerar resultados reais, otimizar operações e impulsionar o crescimento de cada negócio.' },
+  ];
+
+  const VALORES = [
+    { nome: 'Inovação', texto: 'Evolução constante para criar soluções modernas e eficientes.',
+      icone: '<path d="M9 18h6"/><path d="M10 22h4"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0018 8 6 6 0 006 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 018.91 14"/>' },
+    { nome: 'Excelência', texto: 'Qualidade, desempenho e atenção aos detalhes em cada projeto.',
+      icone: '<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>' },
+    { nome: 'Compromisso', texto: 'Relações feitas de responsabilidade, transparência e confiança.',
+      icone: '<path d="M20 21v-2a4 4 0 00-3-3.87"/><path d="M4 21v-2a4 4 0 013-3.87"/><circle cx="12" cy="7" r="4"/><path d="M12 11v10"/>' },
+    { nome: 'Transformação', texto: 'A tecnologia como motor de crescimento e novas oportunidades.',
+      icone: '<polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/>' },
+  ];
+
+  const TEMPO = 8000;
+  const el = id => document.getElementById(id);
+  const calmo = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const hora = new Date().getHours();
+  el('acesso-saudacao').textContent =
+    hora < 5  ? 'Boa madrugada, equipe' :
+    hora < 12 ? 'Bom dia, equipe' :
+    hora < 18 ? 'Boa tarde, equipe' : 'Boa noite, equipe';
+
+  el('acesso-capitulos').innerHTML = CAPITULOS.map((c, i) => `
+    <article class="acesso-capitulo${i ? '' : ' ativo'}">
+      <h1>${c.titulo}</h1>
+      <p>${c.texto}</p>
+    </article>`).join('');
+
+  el('acesso-passos').innerHTML = CAPITULOS.map((c, i) => `
+    <button class="acesso-passo${i ? '' : ' ativo'}" type="button"
+      style="--tempo:${TEMPO}ms" aria-label="${c.rotulo}"><i></i></button>`).join('');
+
+  el('acesso-valores').innerHTML = VALORES.map((v, i) => `
+    <button class="acesso-valor${i ? '' : ' focado'}" type="button">
+      <span class="acesso-valor-icone">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.9"
+          viewBox="0 0 24 24" aria-hidden="true">${v.icone}</svg>
+      </span>
+      <span>
+        <span class="acesso-valor-nome">${v.nome}</span>
+        <span class="acesso-valor-texto">${v.texto}</span>
+      </span>
+    </button>`).join('');
+
+  const capitulos = [...document.querySelectorAll('.acesso-capitulo')];
+  const passos    = [...document.querySelectorAll('.acesso-passo')];
+  const valores   = [...document.querySelectorAll('.acesso-valor')];
+  let atual = 0, relogio = null, travado = false;
+
+  function mostrar(n) {
+    atual = (n + capitulos.length) % capitulos.length;
+    capitulos.forEach((c, i) => c.classList.toggle('ativo', i === atual));
+    passos.forEach((p, i) => {
+      p.classList.remove('ativo');
+      if (i === atual) {
+        // Reiniciar a animação exige tirar e repor a classe num quadro
+        // novo; sem isso a barra não volta ao começo.
+        void p.offsetWidth;
+        p.classList.add('ativo');
+      }
+    });
+    valores.forEach((v, i) => v.classList.toggle('focado', i === atual % valores.length));
+  }
+
+  function andar() {
+    if (calmo) return;
+    clearInterval(relogio);
+    relogio = setInterval(() => { if (!travado) mostrar(atual + 1); }, TEMPO);
+  }
+
+  passos.forEach((p, i) => p.addEventListener('click', () => { mostrar(i); andar(); }));
+  valores.forEach((v, i) => {
+    const focar = () => {
+      travado = true;
+      valores.forEach((x, j) => x.classList.toggle('focado', i === j));
+    };
+    v.addEventListener('mouseenter', focar);
+    v.addEventListener('focus', focar);
+    v.addEventListener('click', focar);
+    v.addEventListener('mouseleave', () => { travado = false; mostrar(atual); });
+    v.addEventListener('blur', () => { travado = false; mostrar(atual); });
+  });
+
+  // Parar enquanto a aba está escondida poupa a máquina de quem deixa o
+  // painel aberto o dia todo.
+  document.addEventListener('visibilitychange', () =>
+    document.hidden ? clearInterval(relogio) : andar());
+
+  andar();
+})();
+</script>
 
 <script type="module">
 import { supabase } from './js/supabase.js'
@@ -108,6 +237,21 @@ function setMsg(el, text, type = 'error') {
 }
 function clearMsg(el) { el.className = 'form-msg'; el.textContent = ''; }
 
+/* ── ESQUECI A SENHA ── */
+$('login-esqueci').addEventListener('click', async () => {
+  const msg = $('login-msg'), email = $('login-email').value.trim();
+  if (!email) {
+    $('login-email').focus();
+    return setMsg(msg, 'Escreva seu e-mail acima e clique de novo.');
+  }
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: new URL('gestor.html', location.href).href,
+  });
+  setMsg(msg, error
+    ? 'Não foi possível enviar: ' + error.message
+    : `Se este e-mail tiver acesso, o link chega em instantes.`, error ? 'error' : 'info');
+});
+
 /* ── ENTRAR ── */
 $('login-form').addEventListener('submit', async e => {
   e.preventDefault();
@@ -138,6 +282,7 @@ $('login-form').addEventListener('submit', async e => {
   done();
   if (!isTeam)                          return setMsg(msg, 'Acesso negado. Este acesso é exclusivo da equipe SertCode.');
   if (status === 'pendente')            return setMsg(msg, 'Sua solicitação ainda está em análise. Você será avisado quando o acesso for liberado.', 'info');
+  if (status === 'encerrada')           return setMsg(msg, 'Este acesso foi encerrado. Fale com um gestor da SertCode.');
   setMsg(msg, 'Seu acesso está desativado. Fale com um gestor da SertCode.');
 });
 
