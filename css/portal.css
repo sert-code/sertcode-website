@@ -1240,6 +1240,53 @@ button { font-family: var(--font); }
 }
 
 /* ══════════════════════════════════════
+   CLIENTES
+══════════════════════════════════════ */
+.cli-link {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 14px; flex-wrap: wrap;
+}
+.cli-link a {
+  color: var(--orange); font-size: 13px; word-break: break-all;
+}
+.cli-avatar {
+  width: 30px; height: 30px; flex-shrink: 0; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, #FF8A00, #D94A00);
+  font-size: 10px; font-weight: 800; color: #fff;
+}
+.cli-faixa { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+.cli-faixa-valor { font-size: 15px; font-weight: 700; margin-top: 4px; }
+@media (max-width: 760px) { .cli-faixa { grid-template-columns: 1fr 1fr; } }
+
+/* A senha temporária aparece uma vez só: o monoespaçado evita confundir
+   O com 0 e l com I na hora de repassar. */
+.senha-copiar {
+  display: flex; align-items: center; gap: 10px; margin: 10px 0;
+  flex-wrap: wrap;
+}
+.senha-copiar code {
+  flex: 1; min-width: 160px; padding: 9px 12px; border-radius: 8px;
+  background: var(--fill-forte); border: 1px solid var(--border);
+  font: 700 14px ui-monospace, Menlo, Consolas, monospace;
+  letter-spacing: .06em; color: var(--text); user-select: all;
+}
+
+.cli-timeline { display: flex; flex-direction: column; }
+.cli-evento {
+  position: relative; padding: 0 0 18px 20px;
+  border-left: 1px solid var(--border);
+}
+.cli-evento:last-child { border-left-color: transparent; padding-bottom: 0; }
+.cli-evento::before {
+  content: ''; position: absolute; left: -4.5px; top: 4px;
+  width: 8px; height: 8px; border-radius: 50%; background: var(--orange);
+}
+.cli-evento-data { font-size: 11px; color: var(--orange); margin-bottom: 3px; }
+.cli-evento-titulo { font-size: 12.5px; font-weight: 600; color: var(--text); }
+.cli-evento-nota { font-size: 11.5px; color: var(--text-dim); margin-top: 2px; line-height: 1.55; }
+
+/* ══════════════════════════════════════
    PROJETOS: ETAPAS
 ══════════════════════════════════════ */
 .pj-etapa {

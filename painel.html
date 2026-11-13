@@ -296,51 +296,204 @@
 
       <!-- ════════════ CLIENTES ════════════ -->
       <section class="tab-section" id="tab-clientes">
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:14px;margin-bottom:24px">
-          <div>
-            <div class="section-title">Clientes</div>
-            <div class="section-sub" style="margin-bottom:0">Gerenciamento de acesso, projetos e credenciais</div>
-          </div>
-          <button class="btn btn-primary" onclick="window._novoCliente()">
-            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            Novo cliente
-          </button>
-        </div>
-
-        <div class="card" style="margin-bottom:18px">
-          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px">
+        <!-- ══ lista ══ -->
+        <div id="cli-lista">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:14px;margin-bottom:18px">
             <div>
-              <div class="card-title">Clientes SertLink</div>
-              <div style="font-size:11.5px;color:var(--text-dim)">Empresas assinantes do sistema de agendamentos · sincronizado automaticamente</div>
+              <div class="section-title">Clientes</div>
+              <div class="section-sub" style="margin-bottom:0">Acesso, projetos e credenciais de quem contrata a SertCode.</div>
             </div>
-            <span class="origem-badge">via SertLink</span>
+            <button class="btn btn-primary" onclick="window._novoCliente()">
+              <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Novo cliente
+            </button>
           </div>
-          <div class="sertlink-resumo" id="sertlink-resumo"></div>
-          <div style="margin-top:14px;font-size:11.5px;color:var(--text-dim);line-height:1.7">
-            Chamados e demandas do SertLink são atendidos no painel de gestão do próprio SertLink.
+
+          <div class="card cli-link">
+            <div>
+              <div class="rh-bloco-titulo">Área do cliente</div>
+              <a href="https://sertcode.com.br/cliente.html" target="_blank" rel="noopener" id="cli-url">https://sertcode.com.br/cliente.html</a>
+            </div>
+            <div class="team-actions">
+              <button class="team-btn" onclick="window._copiarPortal()">Copiar</button>
+              <button class="team-btn" onclick="window._compartilharPortal()">Compartilhar</button>
+            </div>
+          </div>
+
+          <!-- ── projetos sob medida ── -->
+          <div class="card" style="margin:18px 0">
+            <div class="form-group" style="margin:0">
+              <label>Buscar</label>
+              <input type="text" id="cli-busca" placeholder="Nome, empresa, e-mail ou telefone">
+            </div>
+            <div class="rh-abas" id="cli-filtros" style="margin:14px 0 0">
+              <button class="rh-aba active" data-cli="">Todos</button>
+              <button class="rh-aba" data-cli="ativo">Ativo</button>
+              <button class="rh-aba" data-cli="inativo">Inativo</button>
+              <button class="rh-aba" data-cli="encerrada">Conta encerrada</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title" style="margin-bottom:4px">Projetos sob medida</div>
+            <div class="card-sub">Clientes cadastrados pela SertCode, com acesso à Área do Cliente</div>
+            <div class="table-scroll" style="margin-top:14px">
+              <table class="data-table">
+                <thead><tr><th>Cliente</th><th>Empresa</th><th>Projetos</th><th>Em aberto</th><th>Último acesso</th><th>Situação</th><th>Ações</th></tr></thead>
+                <tbody id="clientes-body"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- ── SertLink ── -->
+          <div class="card" style="margin-top:18px">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap">
+              <div>
+                <div class="card-title" style="margin-bottom:4px">Clientes SertLink</div>
+                <div class="card-sub">Empresas assinantes do sistema de agendamentos · sincronizado automaticamente</div>
+              </div>
+              <span class="origem-badge">via SertLink</span>
+            </div>
+
+            <div class="form-group" style="margin:14px 0 0">
+              <label>Buscar</label>
+              <input type="text" id="sl-busca" placeholder="Empresa, responsável, e-mail ou telefone">
+            </div>
+
+            <div class="sertlink-resumo" id="sertlink-resumo" style="margin:16px 0"></div>
+
+            <div class="table-scroll">
+              <table class="data-table">
+                <thead><tr><th>Empresa</th><th>Responsável</th><th>Plano</th><th>Assinatura</th><th>Cliente desde</th><th>Situação</th></tr></thead>
+                <tbody id="sertlink-body"></tbody>
+              </table>
+            </div>
+            <div class="rh-bloco-texto" style="margin-top:12px">
+              Chamados e demandas do SertLink são atendidos no painel de gestão do próprio SertLink.
+            </div>
           </div>
         </div>
 
-        <div class="card">
-          <div style="margin-bottom:14px">
-            <div class="card-title">Projetos sob medida</div>
-            <div style="font-size:11.5px;color:var(--text-dim)">Clientes cadastrados pela SertCode, com acesso à Área do Cliente</div>
+        <!-- ══ ficha do cliente ══ -->
+        <div id="cli-ficha" hidden>
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:18px">
+            <div>
+              <div class="section-title" style="margin:0" id="cf-nome">Cliente</div>
+              <div class="section-sub" style="margin:4px 0 0" id="cf-desde"></div>
+            </div>
+            <div class="team-actions">
+              <button class="team-btn" onclick="window._abrirPortalCliente()">Área do cliente</button>
+              <button class="btn btn-outline" onclick="window._voltarClientes()">← Voltar</button>
+            </div>
           </div>
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Cliente</th>
-                <th>Empresa</th>
-                <th>Projeto</th>
-                <th>Progresso</th>
-                <th>Último acesso</th>
-                <th>Status</th>
-                <th>Ações</th>
-              </tr>
-            </thead>
-            <tbody id="clientes-body">
-            </tbody>
-          </table>
+
+          <div class="card cli-faixa">
+            <div><div class="resumo-label">Situação</div><div id="cf-situacao"></div></div>
+            <div><div class="resumo-label">Projetos</div><div class="cli-faixa-valor" id="cf-projetos">—</div></div>
+            <div><div class="resumo-label">Em aberto</div><div class="cli-faixa-valor" id="cf-aberto">—</div></div>
+            <div><div class="resumo-label">Último acesso</div><div class="cli-faixa-valor" id="cf-acesso">—</div></div>
+          </div>
+
+          <nav class="rh-abas" id="cf-abas-cli" style="margin-top:18px">
+            <button class="rh-aba active" data-cfc="visao">Visão geral</button>
+            <button class="rh-aba" data-cfc="projetos">Projetos</button>
+            <button class="rh-aba" data-cfc="chamados">Chamados</button>
+            <button class="rh-aba" data-cfc="financeiro">Financeiro</button>
+            <button class="rh-aba" data-cfc="historico">Histórico</button>
+          </nav>
+
+          <div class="rh-painel active" id="cfc-visao">
+            <div class="grid-2" style="align-items:start">
+              <div class="card">
+                <div class="card-title" style="margin-bottom:12px">Cadastro</div>
+                <div class="form-group"><label>Nome do responsável</label><input type="text" id="cf-r-nome" maxlength="120"></div>
+                <div class="form-row-2">
+                  <div class="form-group"><label>Como gostaria de ser chamado</label><input type="text" id="cf-r-apelido" maxlength="40"></div>
+                  <div class="form-group"><label>Empresa</label><input type="text" id="cf-r-empresa" maxlength="120"></div>
+                </div>
+                <div class="form-row-2">
+                  <div class="form-group"><label>CNPJ</label><input type="text" id="cf-r-cnpj" maxlength="18"></div>
+                  <div class="form-group"><label>E-mail de acesso</label><input type="email" id="cf-r-email" disabled></div>
+                </div>
+                <div class="form-row-2">
+                  <div class="form-group"><label>Telefone</label><input type="tel" id="cf-r-telefone" maxlength="15"></div>
+                  <div class="form-group"><label>WhatsApp</label><input type="tel" id="cf-r-telefone2" maxlength="15"></div>
+                </div>
+                <div class="form-group"><label>Endereço</label><input type="text" id="cf-r-endereco" maxlength="160"></div>
+                <div class="form-group"><label>Descrição</label>
+                  <textarea id="cf-r-descricao" placeholder="O que esta empresa faz, para a equipe se situar."></textarea></div>
+                <button class="btn btn-primary" id="cf-r-btn" onclick="window._salvarFichaCliente()">Salvar alterações</button>
+                <div class="form-msg" id="cf-r-msg" role="alert"></div>
+              </div>
+
+              <div>
+                <div class="card" style="margin-bottom:18px">
+                  <div class="card-title" style="margin-bottom:10px">Resumo</div>
+                  <div id="cf-resumo"></div>
+                </div>
+
+                <div class="card" style="margin-bottom:18px">
+                  <div class="card-title" style="margin-bottom:6px">Acesso</div>
+                  <div class="rh-bloco-texto">Gera uma senha temporária para você entregar ao cliente, ou envia um link para ele mesmo criar a dele.</div>
+                  <div class="team-actions" style="margin-top:12px">
+                    <button class="team-btn" onclick="window._gerarSenhaCliente()">Gerar senha temporária</button>
+                    <button class="team-btn" onclick="window._linkSenhaCliente()">Enviar link por e-mail</button>
+                  </div>
+                  <div id="cf-senha-nova" hidden class="rh-bloco" style="margin-top:12px;border-color:rgba(255,106,0,0.4)">
+                    <div class="rh-bloco-titulo">Senha temporária</div>
+                    <div class="senha-copiar">
+                      <code id="cf-senha-valor"></code>
+                      <button class="team-btn" onclick="window._copiarSenha()">Copiar</button>
+                    </div>
+                    <div class="rh-bloco-texto">Entregue por um canal privado e peça que a pessoa troque no primeiro acesso. Esta senha não aparece de novo depois que você sair desta tela.</div>
+                  </div>
+                  <div class="form-msg" id="cf-senha-msg" role="alert"></div>
+                </div>
+
+                <div class="card" id="cf-encerrar-card">
+                  <div class="card-title" style="margin-bottom:6px">Encerrar conta</div>
+                  <div class="rh-bloco-texto" id="cf-encerrar-texto"></div>
+                  <div class="team-actions" style="margin-top:12px">
+                    <button class="team-btn" onclick="window._baixarDadosCliente()">Baixar todos os dados</button>
+                    <button class="team-btn danger" id="cf-encerrar-btn" onclick="window._encerrarCliente()">Encerrar conta</button>
+                  </div>
+                  <div class="form-msg" id="cf-encerrar-msg" role="alert"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="rh-painel" id="cfc-projetos"><div id="cf-lista-projetos"></div></div>
+
+          <div class="rh-painel" id="cfc-chamados">
+            <div class="card">
+              <div class="table-scroll">
+                <table class="data-table">
+                  <thead><tr><th>Chamado</th><th>Título</th><th>Tipo</th><th>Situação</th><th>Aberto em</th></tr></thead>
+                  <tbody id="cf-chamados"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div class="rh-painel" id="cfc-financeiro">
+            <div class="sup-contadores" id="cf-fin-numeros" style="grid-template-columns:repeat(4,1fr);margin-bottom:18px"></div>
+            <div class="card">
+              <div class="table-scroll">
+                <table class="data-table">
+                  <thead><tr><th>Cobrança</th><th>Descrição</th><th>Vencimento</th><th>Valor</th><th>Recebido</th><th>Situação</th></tr></thead>
+                  <tbody id="cf-fin-cobrancas"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div class="rh-painel" id="cfc-historico">
+            <div class="card">
+              <div class="card-title" style="margin-bottom:12px">Tudo o que aconteceu com esta empresa</div>
+              <div id="cf-historico" class="cli-timeline"></div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -2204,59 +2357,6 @@
   </div>
 </div>
 
-<!-- ══ MODAL: Editar Cliente ══ -->
-<div class="modal-overlay" id="modal-editar">
-  <div class="modal-box" style="max-width:480px">
-    <button class="modal-close" onclick="closeModal('modal-editar')">&times;</button>
-    <div class="modal-title">Editar cliente</div>
-    <div class="modal-sub" id="ed-sub">Dados de contato do cliente</div>
-
-    <div class="form-group">
-      <label>Nome do responsável</label>
-      <input type="text" id="ed-nome" maxlength="120">
-    </div>
-    <div class="form-row-2">
-      <div class="form-group">
-        <label>Como gostaria de ser chamado</label>
-        <input type="text" id="ed-apelido" maxlength="40">
-      </div>
-      <div class="form-group">
-        <label>Empresa</label>
-        <input type="text" id="ed-empresa" maxlength="120">
-      </div>
-    </div>
-    <div class="form-group">
-      <label>E-mail de acesso</label>
-      <input type="email" id="ed-email" disabled title="O e-mail de login não pode ser alterado por aqui">
-    </div>
-    <div class="form-row-2">
-      <div class="form-group">
-        <label>Telefone 01</label>
-        <input type="tel" id="ed-telefone" maxlength="15" inputmode="numeric">
-      </div>
-      <div class="form-group">
-        <label>Telefone 02</label>
-        <input type="tel" id="ed-telefone2" maxlength="15" inputmode="numeric">
-      </div>
-    </div>
-
-    <div style="display:flex;gap:10px;margin-bottom:12px">
-      <button class="btn btn-primary" style="flex:1;justify-content:center" id="ed-btn" onclick="window._salvarEdicao()">Salvar alterações</button>
-      <button class="btn btn-outline" onclick="closeModal('modal-editar')">Cancelar</button>
-    </div>
-
-    <div style="border-top:1px solid var(--border);padding-top:14px">
-      <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:4px">Senha de acesso</div>
-      <div style="font-size:11.5px;color:var(--text-dim);line-height:1.6;margin-bottom:10px">
-        Envia ao cliente um link para ele mesmo criar uma senha nova. A senha atual continua valendo até ele usar o link.
-      </div>
-      <button class="btn btn-outline" style="width:100%;justify-content:center" id="ed-reset" onclick="window._resetarSenha()">Enviar link de nova senha</button>
-    </div>
-
-    <div class="form-msg" id="ed-msg" role="alert"></div>
-  </div>
-</div>
-
 <!-- ══ MODAL: Fatura ══ -->
 <div class="modal-overlay" id="modal-fatura">
   <div class="modal-box" style="max-width:600px">
@@ -2453,19 +2553,6 @@
       <button class="btn btn-outline" onclick="closeModal('modal-doc-fin')">Cancelar</button>
     </div>
     <div class="form-msg" id="doc-msg" role="alert"></div>
-  </div>
-</div>
-
-<!-- ══ MODAL: Credenciais ══ -->
-<div class="modal-overlay" id="modal-cred">
-  <div class="modal-box" style="max-width:370px">
-    <button class="modal-close" onclick="closeModal('modal-cred')">&times;</button>
-    <div class="modal-title">Credenciais de acesso</div>
-    <div class="modal-sub">Dados de login do cliente no portal</div>
-    <div id="cred-info" style="background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px;padding:16px 18px;margin-bottom:14px"></div>
-    <div style="font-size:11.5px;color:var(--text-dim);padding:10px 14px;background:rgba(255,106,0,.05);border:1px solid rgba(255,106,0,.12);border-radius:8px">
-      🔒 Nunca compartilhe credenciais por canais públicos. Envie via WhatsApp ou e-mail diretamente ao cliente.
-    </div>
   </div>
 </div>
 
@@ -6994,134 +7081,461 @@ window._aviso = (texto, tipo = 'success') => {
   el('avisos').appendChild(caixa);
 };
 
-/* ── EDITAR CLIENTE SOB MEDIDA ── */
-let edClienteId = null;
-const edMsg = () => document.getElementById('ed-msg');
-const edSet = (t, tipo = 'error') => { const m = edMsg(); m.textContent = t; m.className = 'form-msg show ' + tipo; };
-
-window._editarCliente = (id) => {
-  const cl = clientMap[id];
-  if (!cl) return;
-  edClienteId = id;
-
-  document.getElementById('ed-sub').textContent = cl.company || cl.name || 'Cliente';
-  document.getElementById('ed-nome').value     = cl.name || '';
-  document.getElementById('ed-apelido').value  = cl.nickname || '';
-  document.getElementById('ed-telefone2').value = cl.phone2 || '';
-  document.getElementById('ed-empresa').value  = cl.company || '';
-  document.getElementById('ed-email').value    = cl.email || '';
-  document.getElementById('ed-telefone').value = cl.phone || '';
-  edMsg().className = 'form-msg';
-  openModal('modal-editar');
+/* ── CLIENTES ── */
+const PORTAL_URL = 'https://sertcode.com.br/cliente.html';
+const CLI_SITUACAO = {
+  ativo:     { label: 'Ativo',           cls: 'status-done' },
+  inativo:   { label: 'Inativo',         cls: 'status-pending' },
+  encerrada: { label: 'Conta encerrada', cls: 'status-cancelado' },
+  pendente:  { label: 'Aguardando',      cls: 'status-pending' },
+  recusado:  { label: 'Recusado',        cls: 'status-cancelado' },
+};
+const SL_SITUACAO = {
+  teste:     { label: 'Em teste',    cls: 'status-analysis' },
+  ativo:     { label: 'Ativo',       cls: 'status-done' },
+  expirado:  { label: 'Expirado',    cls: 'status-expirado' },
+  cancelado: { label: 'Cancelado',   cls: 'status-cancelado' },
+  excluindo: { label: 'Encerrando',  cls: 'status-cancelado' },
+  inadimplente: { label: 'Inadimplente', cls: 'status-expirado' },
 };
 
+let cliAberto = null, cliFiltro = '', cliSenhaGerada = '';
 
-window._salvarEdicao = async () => {
-  const btn = document.getElementById('ed-btn'), orig = btn.textContent;
-  const nome    = document.getElementById('ed-nome').value.trim();
-  const empresa = document.getElementById('ed-empresa').value.trim();
-  const apelido = document.getElementById('ed-apelido').value.trim();
-  const phone   = document.getElementById('ed-telefone').value.trim();
-  const phone2  = document.getElementById('ed-telefone2').value.trim();
+const cliSet = (id, t, tipo = 'error') => { const m = el(id); m.textContent = t; m.className = 'form-msg show ' + tipo; };
+const cliNome = c => c?.company || c?.name || '—';
 
-  if (!nome)    return edSet('Informe o nome do responsável.');
-  if (!empresa) return edSet('Informe a empresa.');
-
-  btn.textContent = 'Salvando...'; btn.disabled = true;
-  const fim = () => { btn.textContent = orig; btn.disabled = false; };
-
-  const { error } = await supabase.from('profiles')
-    .update({ name: nome, nickname: apelido || null, company: empresa, phone, phone2: phone2 || null }).eq('id', edClienteId);
-  if (error) { fim(); return edSet('Não foi possível salvar: ' + error.message); }
-
-
-  await loadAll();
-  fim();
-  edSet('Alterações salvas.', 'success');
+/* ── link do portal ── */
+window._copiarPortal = async () => {
+  await copiarTexto(PORTAL_URL);
+  window._aviso('Endereço da Área do Cliente copiado.');
 };
 
-window._resetarSenha = async () => {
-  const cl = clientMap[edClienteId];
-  if (!cl?.email) return edSet('Este cliente não tem e-mail cadastrado.');
-  if (!confirm(`Enviar link de nova senha para ${cl.email}?`)) return;
+window._compartilharPortal = async () => {
+  const texto = `Acesse a Área do Cliente da SertCode: ${PORTAL_URL}`;
+  if (navigator.share) {
+    try { await navigator.share({ title: 'Área do Cliente — SertCode', text: texto, url: PORTAL_URL }); return; }
+    catch { return; }   // a pessoa fechou a janela do sistema
+  }
+  await copiarTexto(texto);
+  window._aviso('Mensagem copiada. Cole onde quiser enviar.');
+};
 
-  const btn = document.getElementById('ed-reset'), orig = btn.textContent;
-  btn.textContent = 'Enviando...'; btn.disabled = true;
+// A API da área de transferência exige página segura; em http simples ela
+// não existe, e sem esta volta o botão não faria nada.
+async function copiarTexto(texto) {
+  try {
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(texto);
+      return true;
+    }
+  } catch { /* cai no plano B */ }
+  const campo = document.createElement('textarea');
+  campo.value = texto;
+  campo.style.cssText = 'position:fixed;opacity:0';
+  document.body.appendChild(campo);
+  campo.select();
+  const ok = document.execCommand('copy');
+  campo.remove();
+  return ok;
+}
 
-  const { error } = await supabase.auth.resetPasswordForEmail(cl.email, {
-    redirectTo: new URL('cliente.html', location.href).href,
+/* ── filtros e busca ── */
+document.querySelectorAll('#cli-filtros .rh-aba').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('#cli-filtros .rh-aba').forEach(x => x.classList.remove('active'));
+  b.classList.add('active');
+  cliFiltro = b.dataset.cli;
+  renderClientes();
+}));
+el('cli-busca').addEventListener('input', renderClientes);
+el('sl-busca').addEventListener('input', renderSertlinkClients);
+
+function renderClientes() {
+  const busca = val('cli-busca').toLowerCase();
+  const lista = allClients.filter(c => {
+    const situacao = c.status || 'ativo';
+    if (cliFiltro && situacao !== cliFiltro) return false;
+    if (!cliFiltro && situacao === 'encerrada') return false;   // encerradas só no filtro próprio
+    if (busca) {
+      const alvo = `${c.name || ''} ${c.company || ''} ${c.email || ''} ${c.phone || ''} ${c.phone2 || ''}`;
+      if (!alvo.toLowerCase().includes(busca)) return false;
+    }
+    return true;
   });
 
-  btn.textContent = orig; btn.disabled = false;
-  edSet(error ? 'Não foi possível enviar: ' + error.message
-              : `Link enviado para ${cl.email}.`, error ? 'error' : 'success');
-};
-
-/* ── CLIENTES SERTLINK ── */
-const slStatus = {
-  teste:        { label: 'Em teste',     cls: 'status-analysis' },
-  ativo:        { label: 'Ativo',        cls: 'status-done' },
-  cancelado:    { label: 'Cancelado',    cls: 'status-pending' },
-  inadimplente: { label: 'Inadimplente', cls: 'status-expirado' },
-  inativo:      { label: 'Inativo',      cls: 'status-cancelado' },
-  expirado:     { label: 'Expirado',     cls: 'status-expirado' },
-  excluindo:    { label: 'Excluindo',    cls: 'status-cancelado' },
-};
+  el('clientes-body').innerHTML = lista.length ? lista.map(c => {
+    const s = CLI_SITUACAO[c.status || 'ativo'] || { label: c.status, cls: '' };
+    const projetos = allProjects.filter(p => p.client_id === c.id);
+    const ativos = projetos.filter(p => !['CONCLUIDO','CANCELADO'].includes(p.status)).length;
+    const aberto = allInvoices.filter(i => i.client_id === c.id && VALEM.includes(i.status))
+      .reduce((t, i) => t + Math.max(0, valorAtual(i) - Number(i.recebido || 0)), 0);
+    return `<tr class="rh-linha" onclick="window._abrirCliente('${c.id}')">
+      <td><div style="display:flex;align-items:center;gap:10px">
+        <div class="cli-avatar">${esc(ini(c.name || c.company))}</div>
+        <div><div style="font-weight:600">${esc(c.name || '—')}</div>
+          <div class="rh-item-sub">${esc(c.email || '')}</div></div>
+      </div></td>
+      <td>${esc(c.company || '—')}</td>
+      <td style="color:var(--text-dim)">${projetos.length
+        ? `${projetos.length}${ativos ? ` · ${ativos} em andamento` : ''}` : 'nenhum'}</td>
+      <td style="color:${aberto ? 'var(--orange)' : 'var(--text-dim)'}">${aberto ? fmtMoney(aberto) : '—'}</td>
+      <td style="color:var(--text-dim);font-size:12px">${c.ultimo_acesso ? fmtDateTime(c.ultimo_acesso) : '—'}</td>
+      <td><span class="status ${s.cls}">${s.label}</span></td>
+      <td><div class="team-actions">
+        <button class="team-btn" onclick="event.stopPropagation();window._abrirCliente('${c.id}')">Abrir ficha</button>
+      </div></td>
+    </tr>`;
+  }).join('')
+  : `<tr><td colspan="7" class="team-empty">${allClients.length
+      ? 'Nenhum cliente no filtro escolhido.' : 'Nenhum cliente cadastrado.'}</td></tr>`;
+}
 
 function renderSertlinkClients() {
-  const box = document.getElementById('sertlink-resumo');
-  if (!box) return;
+  const conta = f => slClients.filter(f).length;
+  const inadimplente = c => c.status === 'ativo' && c.period_end && new Date(c.period_end) < new Date();
 
-  const conta = st => slClients.filter(c => c.status === st).length;
-  const cartoes = [
-    { label: 'Cadastrados',  valor: slClients.length,       cor: 'var(--text)' },
-    { label: 'Em teste',     valor: conta('teste'),         cor: 'var(--blue)' },
-    { label: 'Ativos',       valor: conta('ativo'),         cor: 'var(--green)' },
-    { label: 'Inadimplentes',valor: conta('inadimplente'),  cor: 'var(--red)' },
-    { label: 'Inativos',     valor: conta('inativo') + conta('cancelado'), cor: 'var(--text-dim)' },
-    { label: 'Expirados',    valor: conta('expirado'),      cor: 'var(--text-dim)' },
-  ];
-
-  box.innerHTML = cartoes.map(c => `
-    <div class="resumo-card">
+  el('sertlink-resumo').innerHTML = [
+    { label: 'Cadastrados',   valor: slClients.length, cor: 'var(--text)' },
+    { label: 'Em teste',      valor: conta(c => c.status === 'teste'), cor: 'var(--blue)' },
+    { label: 'Ativos',        valor: conta(c => c.status === 'ativo'), cor: 'var(--green)' },
+    { label: 'Inadimplentes', valor: conta(inadimplente), cor: 'var(--red)' },
+    { label: 'Inativos',      valor: conta(c => ['cancelado','excluindo'].includes(c.status)), cor: 'var(--text-dim)' },
+    { label: 'Expirados',     valor: conta(c => c.status === 'expirado'), cor: 'var(--text-dim)' },
+  ].map(c => `<div class="resumo-card">
       <div class="resumo-valor" style="color:${c.cor}">${c.valor}</div>
       <div class="resumo-label">${c.label}</div>
     </div>`).join('');
-}
 
-/* ── CLIENTES ── */
-function renderClientes() {
-  const tbody = document.getElementById('clientes-body');
-  if (!tbody) return;
-  tbody.innerHTML = allClients.map(cl => {
-    const proj = allProjects.find(p => p.client_id === cl.id);
+  const busca = val('sl-busca').toLowerCase();
+  const lista = slClients.filter(c => {
+    if (!busca) return true;
+    const alvo = `${c.name || ''} ${c.owner_name || ''} ${c.owner_nickname || ''} ${c.email || ''} ${c.phone || ''}`;
+    return alvo.toLowerCase().includes(busca);
+  });
+
+  el('sertlink-body').innerHTML = lista.length ? lista.map(c => {
+    const s = SL_SITUACAO[inadimplente(c) ? 'inadimplente' : c.status] || { label: c.status, cls: '' };
     return `<tr>
-      <td>
-        <div style="display:flex;align-items:center;gap:10px">
-          <div style="width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#FF8A00,#D94A00);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff;flex-shrink:0">${ini(cl.name)}</div>
-          <div><div style="font-weight:600">${cl.name||'—'}</div><div style="font-size:11px;color:var(--text-dim)">${esc(cl.email||'—')}</div></div>
-        </div>
-      </td>
-      <td style="color:var(--text-dim)">${cl.company||'—'}</td>
-      <td>${proj?.name||'—'}</td>
-      <td>
-        <div style="display:flex;align-items:center;gap:8px">
-          <div class="progress-bar-track" style="width:60px"><div class="progress-bar-fill" style="width:${proj?.progress||0}%"></div></div>
-          <span style="font-size:12px;font-weight:700;color:var(--orange)">${proj?.progress||0}%</span>
-        </div>
-      </td>
-      <td style="color:var(--text-dim);font-size:12px">—</td>
-      <td><span class="status ${proj?.status==='done'?'status-done':'status-dev'}">${proj?.status==='done'?'Entregue':'Ativo'}</span></td>
-      <td>
-        <div style="display:flex;gap:6px">
-          <button class="btn btn-outline" style="padding:5px 10px;font-size:11px" onclick="window._editarCliente('${cl.id}')">Editar</button>
-          <button class="btn btn-outline" style="padding:5px 10px;font-size:11px" onclick="window._showCred('${cl.name||''}','${cl.id}')">Credenciais</button>
-        </div>
-      </td>
+      <td><div style="font-weight:600">${esc(c.name)}</div>
+        <div class="rh-item-sub">${esc(c.email || '')}${c.phone ? ' · ' + esc(c.phone) : ''}</div></td>
+      <td>${esc(c.owner_name || c.owner_nickname || '—')}</td>
+      <td style="color:var(--text-dim)">${esc(c.plan_name || c.plan || '—')}</td>
+      <td style="color:var(--text-dim)">${c.cycle === 'ANUAL' ? 'Anual' : c.cycle === 'MENSAL' ? 'Mensal' : '—'}
+        ${c.plan_price ? `<div class="rh-item-sub">${fmtMoney(c.plan_price)}</div>` : ''}</td>
+      <td style="color:var(--text-dim);font-size:12px">${c.subscribed_at ? fmtDate(c.subscribed_at) : '—'}</td>
+      <td><span class="status ${s.cls}">${s.label}</span>
+        ${c.status === 'teste' && c.trial_days_left != null
+          ? `<div class="rh-item-sub">${c.trial_days_left} dia(s) restante(s)</div>` : ''}</td>
     </tr>`;
-  }).join('') || '<tr><td colspan="7" style="text-align:center;color:var(--text-dim)">Nenhum cliente cadastrado.</td></tr>';
+  }).join('')
+  : `<tr><td colspan="6" class="team-empty">${slClients.length
+      ? 'Nenhuma empresa encontrada.' : 'Nenhuma empresa sincronizada ainda.'}</td></tr>`;
 }
 
+/* ══ FICHA DO CLIENTE ══ */
+document.querySelectorAll('#cf-abas-cli .rh-aba').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('#cf-abas-cli .rh-aba').forEach(x => x.classList.remove('active'));
+  b.classList.add('active');
+  document.querySelectorAll('#cli-ficha > .rh-painel').forEach(p => p.classList.remove('active'));
+  el('cfc-' + b.dataset.cfc).classList.add('active');
+}));
+
+window._voltarClientes = () => {
+  cliAberto = null;
+  cliSenhaGerada = '';
+  el('cli-ficha').hidden = true;
+  el('cli-lista').hidden = false;
+};
+
+window._abrirPortalCliente = () => window.open(PORTAL_URL, '_blank', 'noopener');
+
+window._abrirCliente = async (id) => {
+  cliAberto = clientMap[id];
+  if (!cliAberto) return;
+  cliSenhaGerada = '';
+  el('cli-lista').hidden = true;
+  el('cli-ficha').hidden = false;
+  el('cf-senha-nova').hidden = true;
+  el('cf-senha-msg').className = 'form-msg';
+  el('cf-r-msg').className = 'form-msg';
+  el('cf-encerrar-msg').className = 'form-msg';
+
+  const c = cliAberto;
+  const s = CLI_SITUACAO[c.status || 'ativo'] || { label: c.status, cls: '' };
+  el('cf-nome').textContent = cliNome(c);
+  el('cf-desde').textContent = c.cliente_desde
+    ? 'Cliente desde ' + fmtDate(c.cliente_desde) : 'Cliente da SertCode';
+  el('cf-situacao').innerHTML = `<span class="status ${s.cls}">${s.label}</span>`
+    + (c.encerrada_em ? `<div class="rh-item-sub">em ${fmtDate(c.encerrada_em)}</div>` : '');
+
+  const projetos = allProjects.filter(p => p.client_id === id);
+  const cobrancas = allInvoices.filter(i => i.client_id === id);
+  const validas = cobrancas.filter(i => VALEM.includes(i.status));
+  const aberto = validas.reduce((t, i) => t + Math.max(0, valorAtual(i) - Number(i.recebido || 0)), 0);
+  const chamados = allTickets.filter(t => t.client_id === id);
+
+  el('cf-projetos').textContent = projetos.length;
+  el('cf-aberto').textContent = aberto ? fmtMoney(aberto) : 'nada';
+  el('cf-aberto').style.color = aberto ? 'var(--orange)' : '';
+  el('cf-acesso').textContent = c.ultimo_acesso ? fmtDateTime(c.ultimo_acesso) : 'nunca entrou';
+
+  // Cadastro
+  const v = (campo, valor) => { el(campo).value = valor || ''; };
+  v('cf-r-nome', c.name); v('cf-r-apelido', c.nickname); v('cf-r-empresa', c.company);
+  v('cf-r-cnpj', c.cnpj); v('cf-r-email', c.email); v('cf-r-telefone', c.phone);
+  v('cf-r-telefone2', c.phone2); v('cf-r-endereco', c.endereco); v('cf-r-descricao', c.descricao);
+
+  el('cf-resumo').innerHTML = [
+    ['Projetos', projetos.length],
+    ['Em andamento', projetos.filter(p => !['CONCLUIDO','CANCELADO'].includes(p.status)).length],
+    ['Chamados', chamados.length],
+    ['Chamados em aberto', chamados.filter(t => !['CONCLUIDO','CANCELADO'].includes(t.status)).length],
+    ['Total faturado', fmtMoney(validas.reduce((t, i) => t + valorAtual(i), 0))],
+    ['Total recebido', fmtMoney(validas.reduce((t, i) => t + Number(i.recebido || 0), 0))],
+  ].map(([r, val2]) => `<div class="meurh-linha"><span>${r}</span><strong>${val2}</strong></div>`).join('');
+
+  const encerrada = c.status === 'encerrada';
+  el('cf-encerrar-texto').textContent = encerrada
+    ? `Conta encerrada por ${c.encerrada_por || '—'}${c.encerrada_motivo ? ': ' + c.encerrada_motivo : '.'} O acesso está desligado; projetos, cobranças e chamados continuam guardados.`
+    : 'Desliga o acesso do cliente ao portal e marca a data. Projetos, cobranças e chamados continuam guardados — encerrar não apaga o histórico da SertCode.';
+  el('cf-encerrar-btn').textContent = encerrada ? 'Reabrir conta' : 'Encerrar conta';
+  el('cf-encerrar-btn').classList.toggle('danger', !encerrada);
+  el('cf-encerrar-btn').classList.toggle('approve', encerrada);
+
+  /* projetos */
+  el('cf-lista-projetos').innerHTML = projetos.length ? projetos.map(p => {
+    const st = PROJETO_STATUS[p.status] || { label: p.status, cls: '' };
+    return `<div class="card cp-card" style="margin-bottom:14px" onclick="window._abrirProjeto('${p.id}')">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap">
+        <div style="min-width:0">
+          <div style="font-size:14px;font-weight:700">${esc(p.name)}</div>
+          <div class="rh-item-sub">${esc(p.codigo || '')}${
+            p.servico ? ' · ' + esc(SERVICOS[p.servico]?.nome || p.servico) : ''}</div>
+        </div>
+        <span class="status ${st.cls}">${st.label}</span>
+      </div>
+      <div class="progress-bar" style="margin:12px 0 6px"><div class="progress-bar-fill" style="width:${p.progress || 0}%"></div></div>
+      <div class="rh-item-sub">${p.progress || 0}% · ${
+        p.previsao_entrega ? 'entrega prevista ' + fmtDate(p.previsao_entrega) : 'sem data de entrega'}</div>
+    </div>`;
+  }).join('') : '<div class="card"><div class="rh-item-sub">Nenhum projeto para este cliente.</div></div>';
+
+  /* chamados */
+  el('cf-chamados').innerHTML = chamados.length ? chamados.map(t => {
+    const st = SUP_STATUS[t.status] || { label: t.status, cls: '' };
+    return `<tr class="rh-linha" onclick="document.querySelector('.sidebar-nav a[data-tab=&quot;chamados&quot;]').click();window._abrirChamado('${t.id}')">
+      <td><span class="ticket-id">${numeroChamado(t)}</span></td>
+      <td style="font-weight:600">${esc(t.subject)}</td>
+      <td style="color:var(--text-dim)">${SUP_TIPO[t.type] || t.type}</td>
+      <td><span class="status ${st.cls}">${st.label}</span></td>
+      <td style="color:var(--text-dim);font-size:12px">${fmtDate(t.created_at)}</td>
+    </tr>`;
+  }).join('') : '<tr><td colspan="5" class="team-empty">Nenhum chamado deste cliente.</td></tr>';
+
+  /* financeiro */
+  el('cf-fin-numeros').innerHTML = [
+    { label: 'Total faturado', valor: fmtMoney(validas.reduce((t, i) => t + valorAtual(i), 0)) },
+    { label: 'Recebido', valor: fmtMoney(validas.reduce((t, i) => t + Number(i.recebido || 0), 0)), cor: 'var(--green)' },
+    { label: 'Em aberto', valor: fmtMoney(aberto), cor: aberto ? 'var(--orange)' : 'var(--text)' },
+    { label: 'Em atraso', valor: fmtMoney(validas.filter(i => i.status === 'ATRASADO')
+        .reduce((t, i) => t + Math.max(0, valorAtual(i) - Number(i.recebido || 0)), 0)), cor: 'var(--red)' },
+  ].map(x => `<div class="resumo-card" style="text-align:left">
+      <div class="resumo-label" style="margin:0 0 6px">${x.label}</div>
+      <div class="resumo-valor" style="color:${x.cor || 'var(--text)'};font-size:19px">${x.valor}</div>
+    </div>`).join('');
+
+  el('cf-fin-cobrancas').innerHTML = cobrancas.length ? cobrancas.map(i => {
+    const st = FIN_SITUACAO[i.status] || { label: i.status, cls: '' };
+    return `<tr class="rh-linha" onclick="window._editarFatura('${i.id}')">
+      <td><span class="ticket-id">${numeroCobranca(i)}</span></td>
+      <td>${esc(i.description || '—')}</td>
+      <td style="color:var(--text-dim);font-size:12px">${fmtDate(i.due_date)}</td>
+      <td style="font-weight:700">${fmtMoney(valorAtual(i))}</td>
+      <td style="color:var(--text-dim)">${fmtMoney(i.recebido)}</td>
+      <td><span class="status ${st.cls}">${st.label}</span></td>
+    </tr>`;
+  }).join('') : '<tr><td colspan="6" class="team-empty">Nenhuma cobrança.</td></tr>';
+
+  renderHistoricoCliente(id);
+};
+
+// A linha do tempo é montada com o que já existe em cada módulo, em vez
+// de uma tabela nova: assim ela não pode divergir do que as outras telas
+// mostram.
+async function renderHistoricoCliente(id) {
+  el('cf-historico').innerHTML = '<div class="rh-item-sub">Carregando...</div>';
+  const c = clientMap[id];
+
+  const [hist, atualizacoes] = await Promise.all([
+    supabase.from('fin_historico').select('*').eq('client_id', id).order('created_at', { ascending: false }).limit(60),
+    supabase.from('projeto_atualizacoes').select('*')
+      .in('project_id', allProjects.filter(p => p.client_id === id).map(p => p.id).concat(['00000000-0000-0000-0000-000000000000']))
+      .order('created_at', { ascending: false }).limit(40),
+  ]);
+
+  const eventos = [
+    { quando: c.cliente_desde || c.created_at, titulo: 'Cliente cadastrado na SertCode', nota: cliNome(c) },
+    ...allProjects.filter(p => p.client_id === id).flatMap(p => [
+      { quando: p.requested_at || p.created_at, titulo: 'Projeto solicitado', nota: p.name },
+      p.started_at ? { quando: p.started_at, titulo: 'Projeto iniciado', nota: p.name } : null,
+      p.finished_at ? { quando: p.finished_at,
+        titulo: p.status === 'CANCELADO' ? 'Projeto cancelado' : 'Projeto concluído', nota: p.name } : null,
+    ].filter(Boolean)),
+    ...allTickets.filter(t => t.client_id === id).flatMap(t => [
+      { quando: t.created_at, titulo: `Chamado ${numeroChamado(t)} aberto`, nota: t.subject },
+      t.concluido_em ? { quando: t.concluido_em, titulo: `Chamado ${numeroChamado(t)} concluído`, nota: t.subject } : null,
+    ].filter(Boolean)),
+    ...(hist.data || []).map(h => ({
+      quando: h.created_at, titulo: h.evento,
+      nota: [h.descricao, h.valor != null ? fmtMoney(h.valor) : null].filter(Boolean).join(' · '),
+    })),
+    ...(atualizacoes.data || []).map(a => ({
+      quando: a.created_at, titulo: 'Atualização: ' + a.titulo, nota: a.descricao,
+    })),
+    c.encerrada_em ? { quando: c.encerrada_em, titulo: 'Conta encerrada', nota: c.encerrada_motivo } : null,
+  ].filter(Boolean).sort((a, b) => new Date(b.quando) - new Date(a.quando));
+
+  el('cf-historico').innerHTML = eventos.map(e => `
+    <div class="cli-evento">
+      <div class="cli-evento-data">${fmtDateTime(e.quando)}</div>
+      <div class="cli-evento-titulo">${esc(e.titulo)}</div>
+      ${e.nota ? `<div class="cli-evento-nota">${esc(e.nota)}</div>` : ''}
+    </div>`).join('') || '<div class="rh-item-sub">Nada registrado ainda.</div>';
+}
+
+window._salvarFichaCliente = async () => {
+  const btn = el('cf-r-btn'), orig = btn.textContent;
+  if (!val('cf-r-nome')) return cliSet('cf-r-msg', 'Informe o nome do responsável.');
+
+  btn.textContent = 'Salvando...'; btn.disabled = true;
+  const campos = {
+    name: val('cf-r-nome'), nickname: val('cf-r-apelido') || null,
+    company: val('cf-r-empresa') || null, cnpj: val('cf-r-cnpj') || null,
+    phone: val('cf-r-telefone') || null, phone2: val('cf-r-telefone2') || null,
+    endereco: val('cf-r-endereco') || null, descricao: val('cf-r-descricao') || null,
+  };
+  const { error } = await supabase.from('profiles').update(campos).eq('id', cliAberto.id);
+  btn.textContent = orig; btn.disabled = false;
+  if (error) return cliSet('cf-r-msg', 'Não foi possível salvar: ' + error.message);
+
+  Object.assign(cliAberto, campos);
+  await loadAll();
+  el('cf-nome').textContent = cliNome(cliAberto);
+  cliSet('cf-r-msg', 'Cadastro atualizado.', 'success');
+};
+
+/* ── senha ── */
+window._gerarSenhaCliente = async () => {
+  const c = cliAberto;
+  if (!confirm(`Gerar uma senha nova para ${cliNome(c)}?\n\nA senha atual deixa de valer na hora, e as sessões abertas são encerradas.`)) return;
+
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789';
+  const senha = [...crypto.getRandomValues(new Uint32Array(12))].map(n => chars[n % chars.length]).join('');
+
+  const { error } = await supabase.rpc('gestor_redefine_senha', { p_user: c.id, p_senha: senha });
+  if (error) {
+    return cliSet('cf-senha-msg', 'Não foi possível redefinir: ' + error.message
+      + (/function|não existe|does not exist/i.test(error.message)
+        ? ' Rode supabase/clientes.sql no Supabase.' : ''));
+  }
+
+  cliSenhaGerada = senha;
+  el('cf-senha-valor').textContent = senha;
+  el('cf-senha-nova').hidden = false;
+  el('cf-senha-msg').className = 'form-msg';
+  await registrarAcesso('SENHA', `Senha temporária gerada para ${cliNome(c)}`);
+};
+
+window._copiarSenha = async () => {
+  if (!cliSenhaGerada) return;
+  const ok = await copiarTexto(cliSenhaGerada);
+  cliSet('cf-senha-msg', ok
+    ? 'Senha copiada. Entregue por um canal privado.'
+    : 'Não foi possível copiar sozinho — selecione e copie na mão.', ok ? 'success' : 'error');
+};
+
+window._linkSenhaCliente = async () => {
+  const c = cliAberto;
+  if (!c.email) return cliSet('cf-senha-msg', 'Este cliente não tem e-mail cadastrado.');
+  if (!confirm(`Enviar um link de nova senha para ${c.email}?\n\nA senha atual continua valendo até o link ser usado.`)) return;
+
+  const { error } = await supabase.auth.resetPasswordForEmail(c.email, {
+    redirectTo: new URL('cliente.html', location.href).href,
+  });
+  if (error) return cliSet('cf-senha-msg', 'Não foi possível enviar: ' + error.message);
+  await registrarAcesso('SENHA', `Link de nova senha enviado para ${c.email}`);
+  cliSet('cf-senha-msg', `Link enviado para ${c.email}.`, 'success');
+};
+
+/* ── encerrar ── */
+window._encerrarCliente = async () => {
+  const c = cliAberto;
+  const encerrada = c.status === 'encerrada';
+
+  if (encerrada) {
+    if (!confirm(`Reabrir a conta de ${cliNome(c)}? O acesso ao portal volta a funcionar.`)) return;
+    const { error } = await supabase.rpc('gestor_reabre_cliente', { p_user: c.id });
+    if (error) return cliSet('cf-encerrar-msg', 'Não foi possível reabrir: ' + error.message);
+    await registrarAcesso('ENCERRAMENTO', `Conta de ${cliNome(c)} reaberta`);
+  } else {
+    const motivo = prompt(
+      `Encerrar a conta de ${cliNome(c)}?\n\nO acesso ao portal é desligado e as sessões abertas caem. Projetos, cobranças e chamados continuam guardados.\n\nInforme o motivo:`);
+    if (!motivo) return;
+    const { error } = await supabase.rpc('gestor_encerra_cliente', { p_user: c.id, p_motivo: motivo });
+    if (error) {
+      return cliSet('cf-encerrar-msg', 'Não foi possível encerrar: ' + error.message
+        + (/function|does not exist/i.test(error.message) ? ' Rode supabase/clientes.sql no Supabase.' : ''));
+    }
+    await registrarAcesso('ENCERRAMENTO', `Conta de ${cliNome(c)} encerrada: ${motivo}`);
+  }
+
+  await loadAll();
+  await window._abrirCliente(c.id);
+  window._aviso(encerrada ? 'Conta reaberta.' : 'Conta encerrada. O acesso foi desligado.');
+};
+
+// Antes de encerrar, leva tudo embora numa planilha: depois o cliente
+// pode pedir, e reconstruir a mão é trabalhoso.
+window._baixarDadosCliente = () => {
+  const c = cliAberto;
+  const projetos = allProjects.filter(p => p.client_id === c.id);
+  const cobrancas = allInvoices.filter(i => i.client_id === c.id);
+  const chamados = allTickets.filter(t => t.client_id === c.id);
+
+  const blocos = [
+    ['CADASTRO'],
+    ['Nome', 'Empresa', 'CNPJ', 'E-mail', 'Telefone', 'Cliente desde', 'Situação'],
+    [c.name, c.company, c.cnpj, c.email, c.phone,
+     c.cliente_desde ? fmtDate(c.cliente_desde) : '', CLI_SITUACAO[c.status]?.label || c.status],
+    [],
+    ['PROJETOS'],
+    ['Código', 'Projeto', 'Serviço', 'Situação', 'Progresso', 'Entrega prevista', 'Valor'],
+    ...projetos.map(p => [p.codigo, p.name, SERVICOS[p.servico]?.nome || '',
+      PROJETO_STATUS[p.status]?.label || p.status, (p.progress || 0) + '%',
+      p.previsao_entrega ? fmtDate(p.previsao_entrega) : '', p.valor ?? '']),
+    [],
+    ['COBRANÇAS'],
+    ['Número', 'Descrição', 'Vencimento', 'Valor', 'Recebido', 'Situação'],
+    ...cobrancas.map(i => [numeroCobranca(i), i.description || '', fmtDate(i.due_date),
+      valorAtual(i).toFixed(2), Number(i.recebido || 0).toFixed(2),
+      FIN_SITUACAO[i.status]?.label || i.status]),
+    [],
+    ['CHAMADOS'],
+    ['Número', 'Título', 'Tipo', 'Situação', 'Aberto em'],
+    ...chamados.map(t => [numeroChamado(t), t.subject, SUP_TIPO[t.type] || t.type,
+      SUP_STATUS[t.status]?.label || t.status, fmtDate(t.created_at)]),
+  ];
+
+  const escapar = v => '"' + String(v ?? '').replace(/"/g, '""') + '"';
+  const texto = blocos.map(l => l.map(escapar).join(';')).join('\r\n');
+  const blob = new Blob(['﻿' + texto], { type: 'text/csv;charset=utf-8;' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `dados-${(c.company || c.name || 'cliente').toLowerCase().replace(/[^\w]+/g, '-')}.csv`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+
+  registrarAcesso('DADOS_CLIENTE', `Dados de ${cliNome(c)} baixados`);
+};
 
 /* ── SUPORTE ── */
 const SUP_TIPO = {
@@ -8850,13 +9264,6 @@ function renderFeedbacks() {
 /* ── GLOBAL HANDLERS (chamados pelo onclick no HTML renderizado) ── */
 let _currentProjId = '';
 
-window._showCred = async (name, clientId) => {
-  document.getElementById('cred-info').innerHTML =
-    rowBox('Cliente', name) + rowBox('ID Supabase', clientId) +
-    rowOrangeBox('Login', 'Via e-mail cadastrado no Supabase Auth');
-  document.getElementById('modal-cred').classList.add('open');
-};
-
 window._approveTesti = async (id, btn) => {
   btn.textContent = 'Aprovando...'; btn.disabled = true;
   await supabase.from('testimonials').update({ status:'approved' }).eq('id', id);
@@ -8957,16 +9364,6 @@ document.querySelector('.sidebar-logout').addEventListener('click', async e => {
   await supabase.auth.signOut();
   window.location.href = 'gestor.html';
 });
-
-/* ── CREDENTIAL HELPERS ── */
-function rowBox(label, val) {
-  return `<div style="margin-bottom:12px"><div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.07em;font-weight:700;margin-bottom:3px">${label}</div>
-    <div style="font-size:13px;font-family:monospace;background:rgba(255,255,255,.04);padding:7px 10px;border-radius:6px;color:var(--text)">${val}</div></div>`;
-}
-function rowOrangeBox(label, val) {
-  return `<div><div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.07em;font-weight:700;margin-bottom:3px">${label}</div>
-    <div style="font-size:13px;font-family:monospace;background:rgba(255,106,0,.06);border:1px solid rgba(255,106,0,.18);padding:7px 10px;border-radius:6px;color:var(--orange)">${val}</div></div>`;
-}
 
 /* ── INICIALIZAR ── */
 async function init() {
