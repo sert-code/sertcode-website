@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>SertCode — capas dos destaques</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root{--preto:#050505;--laranja:#FF6A00;--brilho:#FF8A00;--escuro:#D94A00}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#111;font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased}
+
+  /* 1080x1920 é o tamanho do story, que é o que o Instagram aceita como
+     capa. O recorte exibido é um círculo no centro, então tudo o que
+     precisa aparecer fica dentro da área segura central. */
+  .capa{position:relative;width:1080px;height:1920px;overflow:hidden;
+    background:var(--preto);display:flex;align-items:center;justify-content:center}
+  body:not(.todos) .capa{display:none}
+  body:not(.todos) .capa.ativo{display:flex}
+  body.todos{display:flex;flex-wrap:wrap;gap:20px;padding:20px;background:#1a1a1a}
+  body.todos .capa{width:270px;height:480px}
+
+  .brilho{position:absolute;inset:0;pointer-events:none;
+    background:radial-gradient(34% 19% at 50% 50%, rgba(255,138,0,.30), rgba(255,106,0,.07) 55%, transparent 75%)}
+
+  /* O guia marca o círculo que o Instagram mostra; some na exportação,
+     serve só para conferir o enquadramento com ?guia=1. */
+  .guia{position:absolute;top:50%;left:50%;width:1080px;height:1080px;
+    transform:translate(-50%,-50%);border-radius:50%;
+    border:2px dashed rgba(255,255,255,.22);display:none}
+  body.guia .guia{display:block}
+
+  /* Centrado no eixo exato da imagem: o recorte do Instagram sai do
+     meio, então qualquer composição "centrada como grupo" joga o ícone
+     para fora do círculo visível. */
+  .miolo{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+    z-index:2;display:flex;align-items:center;justify-content:center}
+
+  /* 620px de diâmetro: cabe folgado no recorte mesmo nos aparelhos que
+     apertam um pouco mais o corte. */
+  .aro{width:620px;height:620px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    border:6px solid rgba(255,106,0,.34);
+    background:radial-gradient(circle at 50% 38%, rgba(255,106,0,.14), rgba(255,106,0,.03) 70%);
+    box-shadow:0 0 120px rgba(255,106,0,.24), inset 0 0 80px rgba(255,106,0,.08)}
+  /* Traço grosso porque a capa é exibida com cerca de 160px: linha fina
+     some nesse tamanho. */
+  .aro svg{width:330px;height:330px;stroke:url(#deg);fill:none;
+    stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;
+    filter:drop-shadow(0 0 30px rgba(255,106,0,.55))}
+
+  /* O nome do destaque o Instagram já mostra embaixo do círculo;
+     repeti-lo dentro só rouba espaço e arrisca ser cortado. */
+</style>
+</head>
+<body>
+
+<!-- Degradê compartilhado pelos traços dos ícones. -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs><linearGradient id="deg" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0%" stop-color="#FF8A00"/><stop offset="100%" stop-color="#D94A00"/>
+  </linearGradient></defs>
+</svg>
+
+<div id="palco"></div>
+
+<script>
+  const DESTAQUES = [
+    // Duas pessoas em vez de um prédio: "quem somos" é a equipe, e a
+    // silhueta humana se reconhece melhor em 160px que uma fachada.
+    { id:'quem-somos', nome:'Quem somos',
+      icone:'<path d="M16 20.5v-1.7a4.2 4.2 0 00-4.2-4.2H6.2A4.2 4.2 0 002 18.8v1.7"/><circle cx="9" cy="7.2" r="3.7"/><path d="M22 20.5v-1.7a4.2 4.2 0 00-3.2-4.07"/><path d="M16.2 3.7a4.2 4.2 0 010 8.13"/>' },
+    { id:'servicos', nome:'Serviços',
+      icone:'<polygon points="12 2 3 7.5 12 13 21 7.5 12 2"/><polyline points="3 12.5 12 18 21 12.5"/><polyline points="3 17 12 22.5 21 17"/>' },
+    { id:'sistemas', nome:'Sistemas',
+      icone:'<rect x="2.5" y="4" width="19" height="13" rx="2"/><path d="M8 21h8M12 17v4"/><path d="M7 9.5l2 2-2 2M11.5 13.5h5"/>' },
+    { id:'processo', nome:'Processo',
+      icone:'<circle cx="6" cy="5.5" r="2.6"/><circle cx="6" cy="18.5" r="2.6"/><circle cx="18" cy="12" r="2.6"/><path d="M8.6 5.5h3.9a2.5 2.5 0 012.5 2.5v1.4"/><path d="M8.6 18.5h3.9a2.5 2.5 0 002.5-2.5v-1.4"/>' },
+    { id:'projetos', nome:'Projetos',
+      icone:'<rect x="2.5" y="7" width="19" height="13.5" rx="2"/><path d="M8.5 7V5a2 2 0 012-2h3a2 2 0 012 2v2"/><path d="M2.5 12.5h19"/><path d="M10.5 12.5v2h3v-2"/>' },
+    { id:'duvidas', nome:'Dúvidas',
+      icone:'<circle cx="12" cy="12" r="9.5"/><path d="M9.3 9.3a2.8 2.8 0 015.4.9c0 1.9-2.7 2.8-2.7 2.8"/><circle cx="12" cy="17" r="0.9" fill="url(#deg)" stroke="none"/>' },
+    { id:'bastidores', nome:'Bastidores',
+      icone:'<polyline points="8.5 7.5 3.5 12 8.5 16.5"/><polyline points="15.5 7.5 20.5 12 15.5 16.5"/><line x1="13.4" y1="4.5" x2="10.6" y2="19.5"/>' },
+    { id:'contato', nome:'Contato',
+      icone:'<path d="M21 15.2a2 2 0 01-2 2H7.5L3 21.2V5a2 2 0 012-2h14a2 2 0 012 2z"/><path d="M8 8.5h8M8 12h5"/>' },
+  ];
+
+  document.getElementById('palco').innerHTML = DESTAQUES.map(d => `
+    <section class="capa" data-id="${d.id}">
+      <div class="brilho"></div><div class="guia"></div>
+      <div class="miolo">
+        <div class="aro">
+          <svg viewBox="0 0 24 24" role="img" aria-label="${d.nome}">${d.icone}</svg>
+        </div>
+      </div>
+    </section>`).join('');
+
+  const p = new URLSearchParams(location.search);
+  if (p.get('guia')) document.body.classList.add('guia');
+  const alvo = p.get('d');
+  if (alvo === 'todos') document.body.classList.add('todos');
+  else document.querySelector('.capa[data-id="' + (alvo || DESTAQUES[0].id) + '"]')?.classList.add('ativo');
+</script>
+</body>
+</html>
