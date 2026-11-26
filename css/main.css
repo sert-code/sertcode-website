@@ -281,12 +281,6 @@ section:nth-child(even) { background: var(--surface); }
   transform: rotate(45deg); background: var(--orange); opacity: .55;
 }
 
-.founder-fala {
-  margin: 0 0 20px; padding: 2px 0 2px 18px;
-  border-left: 2px solid var(--orange);
-  font-size: 1.02rem; line-height: 1.7; font-style: italic;
-  color: var(--text);
-}
 .founder-texto > p { font-size: 0.97rem; line-height: 1.8; margin-bottom: 22px; }
 
 .founder-pontos { list-style: none; display: grid; gap: 14px; margin: 0; padding: 0; }
