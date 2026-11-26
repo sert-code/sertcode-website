@@ -213,6 +213,110 @@ section:nth-child(even) { background: var(--surface); }
 }
 .about-tag:hover { border-color: var(--orange); color: var(--orange); }
 
+/* ── Quem lidera ── */
+.founder {
+  display: grid; grid-template-columns: minmax(0, 360px) minmax(0, 1fr);
+  gap: clamp(32px, 5vw, 64px); align-items: center;
+  max-width: 980px; margin: clamp(64px, 8vw, 96px) auto 0;
+}
+
+.founder-retrato { position: relative; margin: 0; }
+/* O brilho fica atrás e maior que a foto: é o que tira o ar de recorte
+   colado e integra o retrato ao resto da página. */
+.founder-aura {
+  position: absolute; inset: -14%; border-radius: 50%;
+  background: radial-gradient(circle at 50% 42%,
+    rgba(255,138,0,0.28) 0%, rgba(255,106,0,0.10) 45%, transparent 72%);
+  filter: blur(6px); pointer-events: none;
+}
+.founder-retrato img {
+  /* `height: auto` é obrigatório: sem ele o atributo height do HTML vale
+     como altura fixa, as duas medidas ficam definidas e o aspect-ratio
+     é ignorado — a foto saía com 1402px de altura. */
+  position: relative; display: block; width: 100%; height: auto;
+  aspect-ratio: 1 / 1;
+  object-fit: cover; object-position: 50% 14%;
+  border-radius: 50%;
+  /* A máscara apaga os últimos por cento da borda, então o fundo cinza do
+     estúdio se dissolve em vez de terminar num corte seco. Sem moldura:
+     a forma vem do desvanecimento, não de um anel desenhado por cima. */
+  -webkit-mask-image: radial-gradient(circle at 50% 50%, #000 67%, transparent 99%);
+          mask-image: radial-gradient(circle at 50% 50%, #000 67%, transparent 99%);
+  /* drop-shadow segue o alfa da máscara; box-shadow desenharia a sombra
+     do quadrado original e devolveria a borda que acabamos de dissolver. */
+  filter: drop-shadow(0 18px 40px rgba(0,0,0,0.38));
+}
+[data-theme="light"] .founder-retrato img { filter: drop-shadow(0 18px 40px rgba(0,0,0,0.14)); }
+
+.founder-selo {
+  position: absolute; left: 50%; bottom: -10px; transform: translateX(-50%);
+  z-index: 2;
+  display: inline-flex; align-items: center; gap: 7px; white-space: nowrap;
+  padding: 8px 16px; border-radius: 100px;
+  background: var(--gradient-h); color: #fff;
+  font-size: 0.76rem; font-weight: 700; letter-spacing: .04em;
+  box-shadow: 0 8px 22px rgba(217,74,0,0.35);
+}
+
+.founder-texto { text-align: left; }
+.founder-texto .badge { margin-bottom: 14px; }
+.founder-nome {
+  font-family: var(--font-head);
+  font-size: clamp(1.5rem, 2.6vw, 2rem); font-weight: 700;
+  color: var(--text); margin-bottom: 8px;
+}
+/* Os dois títulos separados por um losango: lidos como duas competências
+   de igual peso, e não como um cargo comprido. */
+.founder-cargo {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 10px;
+  margin-bottom: 22px; font-size: 0.9rem; font-weight: 600;
+}
+.founder-cargo span {
+  background: var(--gradient-h);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.founder-cargo i {
+  width: 5px; height: 5px; flex-shrink: 0;
+  transform: rotate(45deg); background: var(--orange); opacity: .55;
+}
+
+.founder-fala {
+  margin: 0 0 20px; padding: 2px 0 2px 18px;
+  border-left: 2px solid var(--orange);
+  font-size: 1.02rem; line-height: 1.7; font-style: italic;
+  color: var(--text);
+}
+.founder-texto > p { font-size: 0.97rem; line-height: 1.8; margin-bottom: 22px; }
+
+.founder-pontos { list-style: none; display: grid; gap: 14px; margin: 0; padding: 0; }
+.founder-pontos li {
+  position: relative; padding-left: 26px;
+  font-size: 0.9rem; line-height: 1.65; color: var(--text-muted);
+}
+.founder-pontos li::before {
+  content: ''; position: absolute; left: 0; top: 7px;
+  width: 11px; height: 11px; border-radius: 50%;
+  border: 2px solid var(--orange);
+}
+.founder-pontos strong {
+  display: block; color: var(--text); font-weight: 600;
+  font-size: 0.95rem; margin-bottom: 2px;
+}
+
+@media (max-width: 860px) {
+  .founder { grid-template-columns: 1fr; justify-items: center; text-align: center; }
+  .founder-retrato { width: min(280px, 72vw); }
+  .founder-texto { text-align: left; margin-top: 18px; }
+  .founder-cargo { justify-content: flex-start; }
+}
+/* Em tela estreita os dois títulos não cabem lado a lado e o losango
+   sobrava sozinho no fim da linha; empilhados, cada um fica inteiro. */
+@media (max-width: 560px) {
+  .founder-cargo { flex-direction: column; align-items: flex-start; gap: 3px; }
+  .founder-cargo i { display: none; }
+}
+
 /* ══════════════════════════════════════
    SERVIÇOS
 ══════════════════════════════════════ */
