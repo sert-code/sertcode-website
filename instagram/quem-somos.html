@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>SertCode — carrossel Quem somos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --preto:#050505; --laranja:#FF6A00; --brilho:#FF8A00; --escuro:#D94A00;
+    --texto:#F2F2F2; --suave:#9A9A9A;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#111;font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased}
+
+  /* 1080x1350 é o 4:5 do Instagram: ocupa mais tela no feed que o quadrado. */
+  .slide{
+    position:relative; width:1080px; height:1350px; overflow:hidden;
+    background:var(--preto); color:var(--texto);
+    padding:96px 88px; display:flex; flex-direction:column;
+  }
+  /* Cada slide sozinho na página; o parâmetro ?s= escolhe qual. */
+  body:not(.todos) .slide{display:none}
+  body:not(.todos) .slide.ativo{display:flex}
+  body.todos{display:flex;flex-direction:column;gap:24px;align-items:center;padding:24px}
+
+  /* O brilho vem de duas manchas suaves, não de um degradê reto: dá
+     profundidade sem roubar leitura do texto. */
+  .aurora{position:absolute;inset:0;pointer-events:none;
+    background:
+      radial-gradient(44% 34% at 84% 8%, rgba(255,138,0,.22), transparent 70%),
+      radial-gradient(38% 30% at 8% 94%, rgba(217,74,0,.16), transparent 70%);}
+  .grade{position:absolute;inset:0;pointer-events:none;opacity:.5;
+    background-image:linear-gradient(rgba(255,106,0,.05) 1px,transparent 1px),
+                     linear-gradient(90deg,rgba(255,106,0,.05) 1px,transparent 1px);
+    background-size:90px 90px;
+    -webkit-mask-image:radial-gradient(70% 60% at 50% 45%,#000,transparent 78%);
+            mask-image:radial-gradient(70% 60% at 50% 45%,#000,transparent 78%);}
+  .conteudo{position:relative;z-index:2;display:flex;flex-direction:column;height:100%}
+
+  .marca{display:flex;align-items:center;gap:16px;margin-bottom:auto}
+  .marca img{width:56px;height:56px}
+  .marca span{font-family:'Space Grotesk',sans-serif;font-size:27px;font-weight:600;letter-spacing:.01em}
+  .marca b{font-weight:700;background:linear-gradient(90deg,var(--brilho),var(--escuro));
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent}
+
+  .etiqueta{display:inline-flex;align-items:center;gap:11px;align-self:flex-start;
+    padding:11px 22px;border-radius:999px;border:1px solid rgba(255,106,0,.3);
+    background:rgba(255,106,0,.08);color:var(--laranja);
+    font-size:18px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;margin-bottom:34px}
+  .etiqueta i{width:9px;height:9px;border-radius:50%;background:var(--laranja);display:block}
+
+  h1{font-family:'Space Grotesk',sans-serif;font-size:94px;font-weight:700;
+     line-height:1.03;letter-spacing:-.025em;margin-bottom:34px}
+  h2{font-family:'Space Grotesk',sans-serif;font-size:64px;font-weight:700;
+     line-height:1.1;letter-spacing:-.02em;margin-bottom:30px}
+  .destaque{background:linear-gradient(90deg,var(--brilho),var(--escuro));
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent}
+  p{font-size:31px;line-height:1.62;color:var(--suave);max-width:40ch}
+  p + p{margin-top:26px}
+  p strong{color:var(--texto);font-weight:600}
+
+  .lista{list-style:none;display:flex;flex-direction:column;gap:25px;margin-top:8px}
+  .lista li{display:flex;gap:20px;align-items:flex-start;font-size:31px;line-height:1.45}
+  .lista i{width:13px;height:13px;flex-shrink:0;margin-top:13px;transform:rotate(45deg);
+    background:linear-gradient(135deg,var(--brilho),var(--escuro))}
+
+  .passos{list-style:none;display:flex;flex-direction:column;gap:19px;margin-top:6px}
+  .passos li{display:flex;gap:24px;align-items:center;font-size:29px}
+  .passos b{width:60px;height:60px;flex-shrink:0;border-radius:17px;
+    display:flex;align-items:center;justify-content:center;
+    background:rgba(255,106,0,.1);border:1px solid rgba(255,106,0,.28);
+    color:var(--laranja);font-family:'Space Grotesk',sans-serif;font-size:27px;font-weight:700}
+  .passos span{color:var(--suave)}
+  .passos em{font-style:normal;color:var(--texto);font-weight:600}
+
+  .rodape{margin-top:auto;padding-top:46px;display:flex;align-items:flex-end;
+    justify-content:space-between;gap:24px}
+  .passa{display:flex;align-items:center;gap:13px;font-size:24px;font-weight:600;color:var(--laranja)}
+  .numero{font-family:'Space Grotesk',sans-serif;font-size:24px;font-weight:600;color:#3A3A3A}
+  .site{font-size:25px;color:var(--suave)}
+
+  /* ── capa ── */
+  .capa{align-items:center;text-align:center;justify-content:center}
+  .capa .conteudo{align-items:center;justify-content:center;text-align:center}
+  .capa .simbolo{width:200px;margin-bottom:62px;
+    filter:drop-shadow(0 0 70px rgba(255,106,0,.45))}
+  .capa h1{font-size:92px;margin-bottom:34px}
+  .capa .sub{font-size:34px;color:var(--suave)}
+  .capa .rodape{justify-content:center}
+
+  /* ── retrato ── */
+  .retrato-area{display:flex;align-items:center;gap:60px}
+  .retrato{position:relative;flex-shrink:0;width:390px}
+  .retrato .halo{position:absolute;inset:-16%;border-radius:50%;
+    background:radial-gradient(circle at 50% 42%,rgba(255,138,0,.38),rgba(255,106,0,.12) 46%,transparent 72%)}
+  .retrato img{position:relative;display:block;width:100%;height:auto;aspect-ratio:1/1;
+    object-fit:cover;object-position:50% 14%;border-radius:50%;
+    -webkit-mask-image:radial-gradient(circle,#000 67%,transparent 99%);
+            mask-image:radial-gradient(circle,#000 67%,transparent 99%);}
+  .cargo{display:inline-flex;align-items:center;gap:12px;align-self:flex-start;
+    padding:13px 26px;border-radius:999px;margin-top:22px;
+    background:linear-gradient(90deg,var(--brilho),var(--escuro));color:#fff;
+    font-size:22px;font-weight:700;letter-spacing:.03em}
+  .cargo em{font-style:normal;opacity:.5;font-weight:400}
+  .nome{font-family:'Space Grotesk',sans-serif;font-size:62px;font-weight:700;
+    line-height:1.08;letter-spacing:-.02em;margin-bottom:14px}
+  .formacao{font-size:27px;font-weight:600;margin-bottom:30px;
+    background:linear-gradient(90deg,var(--brilho),var(--escuro));
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent}
+  .retrato-area p{font-size:29px}
+
+  /* ── chamada final ── */
+  .final{text-align:center;align-items:center}
+  .final .conteudo{align-items:center;text-align:center;justify-content:center}
+  .final h2{font-size:72px;max-width:17ch}
+  .final p{max-width:30ch}
+  .contatos{display:flex;flex-direction:column;gap:19px;margin-top:52px;width:100%;max-width:560px}
+  .contato{display:flex;align-items:center;justify-content:center;gap:16px;
+    padding:25px 30px;border-radius:19px;font-size:29px;font-weight:600}
+  .contato.cheio{background:linear-gradient(90deg,var(--brilho),var(--escuro));color:#fff}
+  .contato.vazio{border:1px solid rgba(255,106,0,.32);color:var(--texto);background:rgba(255,106,0,.05)}
+</style>
+</head>
+<body>
+
+<!-- 1 ── capa ── -->
+<section class="slide capa" data-s="1">
+  <div class="aurora"></div><div class="grade"></div>
+  <div class="conteudo">
+    <img class="simbolo" src="../assets/logo-symbol.png" alt="">
+    <h1>Nascemos<br>no sertão.<br><span class="destaque">Programamos<br>para o mundo.</span></h1>
+    <p class="sub">Prazer, somos a SertCode.</p>
+    <div class="rodape">
+      <span class="passa">arraste
+        <svg width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.6" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </span>
+    </div>
+  </div>
+</section>
+
+<!-- 2 ── o que é ── -->
+<section class="slide" data-s="2">
+  <div class="aurora"></div>
+  <div class="conteudo">
+    <div class="marca"><img src="../assets/logo-symbol.png" alt=""><span>Sert<b>Code</b></span></div>
+    <div class="etiqueta"><i></i>Quem somos</div>
+    <h2>Sistemas que cabem no seu negócio <span class="destaque">— não o contrário.</span></h2>
+    <p>Desenvolvemos tecnologia sob medida para empresas que já cansaram de adaptar a própria operação a um sistema pronto.</p>
+    <p><strong>Nada de solução genérica.</strong> Entendemos o processo, achamos o gargalo e construímos a partir dele.</p>
+    <div class="rodape"><span class="site">sertcode.com.br</span><span class="numero">02</span></div>
+  </div>
+</section>
+
+<!-- 3 ── quem lidera ── -->
+<section class="slide" data-s="3">
+  <div class="aurora"></div>
+  <div class="conteudo">
+    <div class="marca"><img src="../assets/logo-symbol.png" alt=""><span>Sert<b>Code</b></span></div>
+    <div class="etiqueta"><i></i>Quem lidera</div>
+    <div class="retrato-area">
+      <figure class="retrato">
+        <span class="halo"></span>
+        <img src="../assets/roseanne-souza.webp" alt="Roseanne N. Souza">
+      </figure>
+      <div>
+        <div class="nome">Roseanne<br>N. Souza</div>
+        <div class="cargo">CEO <em>|</em> Cofundadora</div>
+        <div class="formacao" style="margin-top:26px">Administradora e Desenvolvedora de Sistemas</div>
+        <p>A mesma pessoa que entende o seu negócio é quem escreve o código.</p>
+      </div>
+    </div>
+    <div class="rodape"><span class="site">sertcode.com.br</span><span class="numero">03</span></div>
+  </div>
+</section>
+
+<!-- 4 ── diferencial ── -->
+<section class="slide" data-s="4">
+  <div class="aurora"></div>
+  <div class="conteudo">
+    <div class="marca"><img src="../assets/logo-symbol.png" alt=""><span>Sert<b>Code</b></span></div>
+    <div class="etiqueta"><i></i>Nosso diferencial</div>
+    <h2>Você fala com quem <span class="destaque">decide e constrói.</span></h2>
+    <p>Cada projeto é conduzido pessoalmente pela nossa CEO, do primeiro diagnóstico à entrega.</p>
+    <p><strong>Sem intermediários.</strong> Sem ruído entre o que foi pedido e o que é entregue.</p>
+    <div class="rodape"><span class="site">sertcode.com.br</span><span class="numero">04</span></div>
+  </div>
+</section>
+
+<!-- 5 ── sob medida ── -->
+<section class="slide" data-s="5">
+  <div class="aurora"></div>
+  <div class="conteudo">
+    <div class="marca"><img src="../assets/logo-symbol.png" alt=""><span>Sert<b>Code</b></span></div>
+    <div class="etiqueta"><i></i>Sistemas sob medida</div>
+    <h2>Construídos <span class="destaque">do zero</span>, para a sua realidade</h2>
+    <ul class="lista">
+      <li><i></i>CRM e ERP personalizados</li>
+      <li><i></i>Portais e plataformas</li>
+      <li><i></i>Painéis administrativos</li>
+      <li><i></i>Dashboards com indicadores em tempo real</li>
+      <li><i></i>Automação de processos e fluxos</li>
+      <li><i></i>Integrações entre sistemas e APIs</li>
+    </ul>
+    <div class="rodape"><span class="site">sertcode.com.br</span><span class="numero">05</span></div>
+  </div>
+</section>
+
+<!-- 6 ── sistemas próprios ── -->
+<section class="slide" data-s="6">
+  <div class="aurora"></div>
+  <div class="conteudo">
+    <div class="marca"><img src="../assets/logo-symbol.png" alt=""><span>Sert<b>Code</b></span></div>
+    <div class="etiqueta"><i></i>Sistemas próprios</div>
+    <h2>Soluções <span class="destaque">prontas para implantar</span></h2>
+    <p>Mantemos sistemas desenvolvidos pela SertCode, construídos em torno de demandas que o mercado repete.</p>
+    <p><strong>Implantação rápida</strong>, com a personalização que a sua empresa precisa.</p>
+    <div class="rodape"><span class="site">sertcode.com.br</span><span class="numero">06</span></div>
+  </div>
+</section>
+
+<!-- 7 ── processo ── -->
+<section class="slide" data-s="7">
+  <div class="aurora"></div>
+  <div class="conteudo">
+    <div class="marca"><img src="../assets/logo-symbol.png" alt=""><span>Sert<b>Code</b></span></div>
+    <div class="etiqueta"><i></i>Como trabalhamos</div>
+    <h2>Do diagnóstico <span class="destaque">à entrega</span></h2>
+    <ol class="passos">
+      <li><b>1</b><span><em>Diagnóstico</em> — entendemos a operação</span></li>
+      <li><b>2</b><span><em>Planejamento</em> — escopo e cronograma</span></li>
+      <li><b>3</b><span><em>Design</em> — telas aprovadas por você</span></li>
+      <li><b>4</b><span><em>Desenvolvimento</em> — construção</span></li>
+      <li><b>5</b><span><em>Testes</em> — validação</span></li>
+      <li><b>6</b><span><em>Entrega</em> — implantação e treinamento</span></li>
+      <li><b>7</b><span><em>Suporte</em> — acompanhamento contínuo</span></li>
+    </ol>
+    <div class="rodape"><span class="site">sertcode.com.br</span><span class="numero">07</span></div>
+  </div>
+</section>
+
+<!-- 8 ── chamada ── -->
+<section class="slide final" data-s="8">
+  <div class="aurora"></div><div class="grade"></div>
+  <div class="conteudo">
+    <img class="simbolo" src="../assets/logo-symbol.png" alt="" style="width:120px;margin-bottom:46px;filter:drop-shadow(0 0 60px rgba(255,106,0,.4))">
+    <h2>A sua empresa cresceu.<br><span class="destaque">O sistema acompanhou?</span></h2>
+    <p>Vamos conversar sobre o que a sua operação precisa.</p>
+    <div class="contatos">
+      <div class="contato cheio">
+        <svg width="27" height="27" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        Chame no direct
+      </div>
+      <div class="contato vazio">
+        <svg width="27" height="27" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 010 20 15 15 0 010-20"/></svg>
+        sertcode.com.br
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  // ?s=N mostra um slide; ?s=todos mostra a folha de contato inteira.
+  const alvo = new URLSearchParams(location.search).get('s');
+  if (alvo === 'todos') document.body.classList.add('todos');
+  else document.querySelector('.slide[data-s="' + (alvo || 1) + '"]')?.classList.add('ativo');
+</script>
+</body>
+</html>
