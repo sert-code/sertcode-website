@@ -257,6 +257,10 @@ section:nth-child(even) { background: var(--surface); }
   font-size: 0.76rem; font-weight: 700; letter-spacing: .04em;
   box-shadow: 0 8px 22px rgba(217,74,0,0.35);
 }
+/* A barra é o caractere mesmo, só esmaecido: desenhada com um elemento
+   vazio ela sumiria ao copiar o texto e para quem usa leitor de tela,
+   que ouviria "CEOCofundadora". */
+.founder-selo-barra { opacity: .45; font-weight: 400; }
 
 .founder-texto { text-align: left; }
 .founder-texto .badge { margin-bottom: 14px; }
