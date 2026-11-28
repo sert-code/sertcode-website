@@ -1,0 +1,204 @@
+/* ════════════════════════════════════════════════════════════════
+   Aviso e preferências de cookies
+   Usa as variáveis do tema, então acompanha o modo claro e o escuro.
+   ════════════════════════════════════════════════════════════════ */
+
+.ck-banner {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%);
+  z-index: 9998;
+  width: calc(100% - 48px);
+  max-width: 880px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+  padding: 20px 24px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 10px 44px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.03);
+  font-family: var(--font-body);
+  animation: ckSobe 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.ck-banner.ck-oculto { display: none; }
+
+@keyframes ckSobe {
+  from { opacity: 0; transform: translateX(-50%) translateY(18px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+.ck-banner-texto { display: flex; align-items: flex-start; gap: 14px; flex: 1 1 320px; min-width: 0; }
+.ck-icone { flex-shrink: 0; margin-top: 2px; color: var(--orange); }
+.ck-titulo { font-size: 0.92rem; font-weight: 700; color: var(--text); }
+.ck-desc { margin-top: 4px; font-size: 0.82rem; line-height: 1.65; color: var(--text-muted); }
+.ck-desc a { color: var(--orange); text-decoration: underline; text-underline-offset: 3px; }
+
+/* Os três botões com o mesmo tamanho: recusar precisa ser tão fácil
+   quanto aceitar, que é o que a LGPD exige. */
+.ck-acoes { display: flex; gap: 10px; flex-shrink: 0; flex-wrap: wrap; }
+.ck-btn {
+  flex: 1 1 auto;
+  min-width: 112px;
+  padding: 10px 18px;
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: var(--transition);
+}
+.ck-btn:hover { border-color: var(--border-hover); color: var(--text); }
+.ck-btn:focus-visible { outline: 2px solid var(--orange); outline-offset: 2px; }
+.ck-btn-forte {
+  background: var(--gradient-h);
+  border-color: transparent;
+  color: #fff;
+  font-weight: 700;
+  box-shadow: 0 2px 14px rgba(255, 106, 0, 0.3);
+}
+.ck-btn-forte:hover { color: #fff; opacity: 0.9; }
+
+/* ── painel de preferências ─────────────────────────────────────── */
+.ck-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(3px);
+}
+.ck-overlay.ck-aberto { display: flex; }
+body.ck-travado { overflow: hidden; }
+
+.ck-painel {
+  width: 100%;
+  max-width: 620px;
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  padding: 28px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  font-family: var(--font-body);
+  animation: ckEntra 0.28s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@keyframes ckEntra {
+  from { opacity: 0; transform: translateY(14px) scale(0.985); }
+  to   { opacity: 1; transform: none; }
+}
+
+.ck-painel-topo { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.ck-painel-topo h2 {
+  font-family: var(--font-head);
+  font-size: 1.22rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.ck-fechar {
+  display: grid;
+  place-items: center;
+  width: 32px; height: 32px;
+  flex-shrink: 0;
+  color: var(--text-muted);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.ck-fechar:hover { border-color: var(--border-hover); color: var(--text); }
+
+.ck-painel-intro { margin-top: 10px; font-size: 0.88rem; line-height: 1.7; color: var(--text-muted); }
+
+.ck-lista {
+  margin-top: 20px;
+  list-style: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.ck-item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 16px 18px;
+}
+.ck-item + .ck-item { border-top: 1px solid var(--border); }
+.ck-item-texto { min-width: 0; }
+.ck-item-titulo { font-size: 0.88rem; font-weight: 600; color: var(--text); }
+.ck-item-desc { margin-top: 3px; font-size: 0.82rem; line-height: 1.6; color: var(--text-muted); }
+.ck-item-nota { margin-top: 6px; font-size: 0.76rem; line-height: 1.55; color: var(--text-dim); }
+
+.ck-sempre {
+  flex-shrink: 0;
+  padding: 5px 11px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--orange);
+  background: rgba(255, 106, 0, 0.1);
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.ck-switch { flex-shrink: 0; position: relative; display: inline-block; width: 44px; height: 24px; cursor: pointer; }
+.ck-switch input { position: absolute; opacity: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
+.ck-switch-trilho {
+  position: absolute;
+  inset: 0;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  transition: var(--transition);
+  pointer-events: none;
+}
+.ck-switch-trilho::after {
+  content: '';
+  position: absolute;
+  top: 3px; left: 3px;
+  width: 16px; height: 16px;
+  background: var(--text-dim);
+  border-radius: 50%;
+  transition: var(--transition);
+}
+.ck-switch input:checked + .ck-switch-trilho {
+  background: var(--gradient-h);
+  border-color: transparent;
+}
+.ck-switch input:checked + .ck-switch-trilho::after { left: 23px; background: #fff; }
+.ck-switch input:focus-visible + .ck-switch-trilho { outline: 2px solid var(--orange); outline-offset: 2px; }
+
+.ck-painel-rodape { margin-top: 14px; font-size: 0.78rem; line-height: 1.6; color: var(--text-dim); }
+.ck-acoes-painel { margin-top: 20px; justify-content: flex-end; }
+
+@media (max-width: 720px) {
+  .ck-banner {
+    left: 0; right: 0; bottom: 0;
+    transform: none;
+    width: 100%;
+    max-width: 100%;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    padding: 18px 20px;
+    gap: 16px;
+  }
+  @keyframes ckSobe {
+    from { opacity: 0; transform: translateY(100%); }
+    to   { opacity: 1; transform: none; }
+  }
+  .ck-acoes { width: 100%; }
+  .ck-btn { flex: 1 1 0; min-width: 0; padding: 11px 10px; }
+  .ck-painel { padding: 22px 18px; }
+  .ck-acoes-painel { flex-direction: column-reverse; }
+  .ck-acoes-painel .ck-btn { width: 100%; }
+}

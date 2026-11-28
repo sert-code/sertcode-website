@@ -574,8 +574,9 @@ footer {
   background: var(--bg); border-top: 1px solid var(--border);
   padding: 64px 0 32px;
 }
+/* Marca + quatro colunas: Serviços e os três grupos do rodapé legal. */
 .footer-top {
-  display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr; gap: 48px;
+  display: grid; grid-template-columns: 1.5fr repeat(4, minmax(0, 1fr)); gap: 40px 32px;
   padding-bottom: 48px; border-bottom: 1px solid var(--border);
   margin-bottom: 32px;
 }
@@ -638,7 +639,9 @@ footer {
   .hero-stats { justify-content: center; }
   .hero-visual { display: none; }
   .contact-grid { grid-template-columns: 1fr; }
+  /* A marca ocupa a linha inteira; as quatro colunas descem em dupla. */
   .footer-top { grid-template-columns: 1fr 1fr; gap: 32px; }
+  .footer-brand { grid-column: 1 / -1; }
 }
 @media (max-width: 768px) {
   :root { --section-gap: 72px; }
@@ -783,12 +786,129 @@ a.sertlink-header:hover { opacity: 0.82; }
 .legal li::marker { color: var(--orange); }
 .legal strong { color: var(--text); font-weight: 600; }
 .legal p a, .legal li a { color: var(--orange); text-decoration: underline; text-underline-offset: 3px; }
-.legal-footer {
-  border-top: 1px solid var(--border); padding: 28px 0;
-  font-size: 0.82rem; color: var(--text-dim); text-align: center;
+.legal-footer { border-top: 1px solid var(--border); padding: 44px 0 28px; }
+.legal-footer-cols {
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 32px; padding-bottom: 32px; border-bottom: 1px solid var(--border);
+}
+.legal-footer-col h4 {
+  font-size: 0.78rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.1em; color: var(--text-muted); margin-bottom: 16px;
+}
+.legal-footer-col a {
+  display: block; font-size: 0.86rem; color: var(--text-dim);
+  margin-bottom: 10px; transition: color var(--transition);
+  background: none; border: none; padding: 0; cursor: pointer;
+  font-family: inherit; text-align: left;
+}
+.legal-footer-col a:hover { color: var(--orange); }
+.legal-footer-base {
+  padding-top: 24px; font-size: 0.82rem; color: var(--text-dim); text-align: center;
+}
+
+/* Atalhos para os documentos irmãos, no topo de cada página legal. */
+.legal-irmas { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 18px; }
+.legal-irmas a {
+  font-size: 0.8rem; color: var(--text-dim); text-decoration: underline;
+  text-underline-offset: 3px; transition: color var(--transition);
+}
+.legal-irmas a:hover { color: var(--orange); }
+
+.legal-destaque {
+  margin-top: 28px; padding: 22px 24px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-left: 3px solid var(--orange); border-radius: var(--radius);
+}
+.legal-destaque p { margin-bottom: 0; }
+.legal-destaque .btn, .legal-destaque p + .btn { margin-top: 16px; }
+
+/* A tabela rola sozinha no celular em vez de espremer as colunas. */
+.legal-tabela-rolagem { margin-top: 16px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.legal-tabela {
+  width: 100%; min-width: 480px; border-collapse: collapse;
+  border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden;
+}
+.legal-tabela th, .legal-tabela td {
+  padding: 12px 14px; text-align: left; vertical-align: top;
+  font-size: 0.87rem; line-height: 1.65; border-bottom: 1px solid var(--border);
+}
+.legal-tabela thead th {
+  font-size: 0.76rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.08em; color: var(--text-muted); background: var(--surface);
+}
+.legal-tabela tbody th { color: var(--text); font-weight: 600; white-space: nowrap; }
+.legal-tabela td { color: var(--text-muted); }
+.legal-tabela tr:last-child th, .legal-tabela tr:last-child td { border-bottom: none; }
+.legal-tabela code {
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  font-size: 0.82em; color: var(--orange);
+  background: rgba(255,106,0,0.08); padding: 2px 6px; border-radius: 4px;
+}
+
+.legal-passos { margin: 14px 0 0; padding-left: 22px; list-style: decimal; }
+.legal-passos li { margin-bottom: 10px; font-size: 0.95rem; line-height: 1.8; color: var(--text-muted); }
+.legal-passos li::marker { color: var(--orange); font-weight: 700; }
+
+/* ── Formulário de privacidade ─────────────────────────────────── */
+.pv-form { margin-top: 32px; display: flex; flex-direction: column; gap: 20px; }
+.pv-grupo-titulo {
+  font-family: var(--font-head); font-size: 1.05rem; font-weight: 700;
+  color: var(--text); margin-top: 8px;
+}
+.pv-fieldset { border: none; padding: 0; margin: 0; }
+.pv-legend { font-size: 0.86rem; color: var(--text-muted); margin-bottom: 12px; padding: 0; }
+.pv-obrig { color: var(--orange); }
+.pv-opcoes {
+  display: flex; flex-direction: column;
+  border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden;
+}
+.pv-opcao {
+  display: flex; align-items: center; gap: 12px; padding: 13px 16px;
+  font-size: 0.9rem; color: var(--text-muted); cursor: pointer;
+  transition: background var(--transition), color var(--transition);
+}
+.pv-opcao + .pv-opcao { border-top: 1px solid var(--border); }
+.pv-opcao:hover { background: var(--surface); color: var(--text); }
+.pv-opcao input { accent-color: var(--orange); width: 17px; height: 17px; flex-shrink: 0; cursor: pointer; }
+.pv-opcao:has(input:checked) { background: rgba(255,106,0,0.07); color: var(--text); }
+.pv-opcao:has(input:focus-visible) { outline: 2px solid var(--orange); outline-offset: -2px; }
+
+.pv-contador { font-size: 0.76rem; color: var(--text-dim); text-align: right; }
+.pv-aviso {
+  padding: 14px 16px; font-size: 0.82rem; line-height: 1.65; color: var(--text-muted);
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm);
+}
+
+/* Fora da tela, mas ainda preenchível por robô — que é o ponto. */
+.pv-armadilha { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+
+.pv-protocolo {
+  margin-top: 32px; padding: 32px 28px; text-align: center;
+  background: var(--surface); border: 1px solid rgba(34,197,94,0.3); border-radius: var(--radius-lg);
+}
+.pv-protocolo-icone {
+  width: 52px; height: 52px; margin: 0 auto 18px; display: grid; place-items: center;
+  color: #4ade80; background: rgba(34,197,94,0.1); border-radius: 50%;
+}
+.pv-protocolo h3 { font-family: var(--font-head); font-size: 1.3rem; font-weight: 700; color: var(--text); }
+.pv-protocolo p { margin-top: 10px; }
+.pv-protocolo-numero {
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  font-size: 1.5rem; font-weight: 700; letter-spacing: 0.06em; color: var(--orange);
+  margin: 14px 0 !important;
+}
+.pv-protocolo-nota { font-size: 0.85rem !important; color: var(--text-dim) !important; max-width: 520px; margin: 0 auto !important; }
+.pv-protocolo .btn { margin-top: 22px; }
+
+@media (max-width: 760px) {
+  .legal-footer-cols { grid-template-columns: 1fr 1fr; gap: 26px; }
 }
 @media (max-width: 600px) {
   .legal { padding: 110px 0 56px; }
   .legal-back { padding: 8px 12px; }
   .legal-back svg { display: none; }
+  .legal-footer-cols { grid-template-columns: 1fr; }
+  .legal-destaque { padding: 18px; }
+  .pv-protocolo { padding: 26px 18px; }
+  .pv-protocolo-numero { font-size: 1.22rem; }
 }

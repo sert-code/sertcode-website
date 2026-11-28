@@ -1633,3 +1633,27 @@ button { font-family: var(--font); }
   .sup-etapa { display: grid; grid-template-columns: 70px 1fr; align-items: center; gap: 10px; }
   .sup-etapa .sup-rotulo { margin: 0; order: -1; }
 }
+
+/* ══ PRIVACIDADE (LGPD) — ficha da solicitação ══ */
+.pv-dados {
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2px 18px; margin-top: 12px;
+}
+.pv-dado {
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: 14px; padding: 9px 0; border-bottom: 1px solid var(--border);
+}
+.pv-dado span { font-size: 12px; color: var(--text-dim); flex-shrink: 0; }
+.pv-dado strong {
+  font-size: 13px; font-weight: 600; color: var(--text);
+  text-align: right; word-break: break-word;
+}
+/* pre-wrap porque o titular escreve em parágrafos e perder as quebras
+   dificulta a leitura justamente do texto que precisa ser atendido. */
+.pv-descricao {
+  font-size: 13.5px; line-height: 1.75; color: var(--text-mid);
+  white-space: pre-wrap; word-break: break-word;
+}
+@media (max-width: 720px) {
+  .pv-dados { grid-template-columns: 1fr; }
+}

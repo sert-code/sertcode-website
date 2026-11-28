@@ -8,7 +8,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/portal.css?v=23">
+  <link rel="stylesheet" href="css/portal.css?v=24">
+  <link rel="stylesheet" href="css/cookies.css?v=1">
 <script>
   // Lido antes da tela aparecer, para não piscar o tema errado ao abrir.
   try { if (localStorage.getItem('sertcode_theme') === 'light') document.documentElement.setAttribute('data-theme', 'light'); } catch (e) {}
@@ -1714,6 +1715,8 @@ document.getElementById('modal-cobranca-cliente').addEventListener('click', e =>
   if (e.target.id === 'modal-cobranca-cliente') e.target.classList.remove('open');
 });
 </script>
+
+<script src="js/cookies.js?v=1" defer></script>
 
 </body>
 </html>

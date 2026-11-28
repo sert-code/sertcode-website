@@ -35,10 +35,11 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Orbitron:wght@600;700&family=Space+Grotesk:wght@500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- CSS -->
-  <link rel="stylesheet" href="css/variables.css?v=3">
-  <link rel="stylesheet" href="css/reset.css?v=3">
-  <link rel="stylesheet" href="css/components.css?v=3">
-  <link rel="stylesheet" href="css/main.css?v=12">
+  <link rel="stylesheet" href="css/variables.css?v=4">
+  <link rel="stylesheet" href="css/reset.css?v=4">
+  <link rel="stylesheet" href="css/components.css?v=4">
+  <link rel="stylesheet" href="css/main.css?v=13">
+  <link rel="stylesheet" href="css/cookies.css?v=1">
 
   <!-- Schema -->
   <script type="application/ld+json">
@@ -720,19 +721,29 @@
       </div>
 
       <div class="footer-col">
-        <h4>Empresa</h4>
-        <a href="#sobre">Sobre a SertCode</a>
+        <h4>Institucional</h4>
+        <a href="#sobre">Sobre a empresa</a>
         <a href="#diferenciais">Diferenciais</a>
         <a href="#processo">Processo</a>
-        <a href="privacidade.html">Termos de uso e privacidade</a>
+        <a href="#contato">Solicitar orçamento</a>
+        <a href="mailto:contatosertcode@gmail.com">contatosertcode@gmail.com</a>
+        <a href="https://wa.me/5588994355394" target="_blank" rel="noopener">WhatsApp</a>
       </div>
 
       <div class="footer-col">
-        <h4>Contato</h4>
-        <a href="#contato">Solicitar orçamento</a>
+        <h4>Privacidade e Legal</h4>
+        <a href="termos.html">Termos de Uso</a>
+        <a href="privacidade.html">Política de Privacidade</a>
+        <a href="cookies.html">Política de Cookies</a>
+        <a href="aviso-legal.html">Aviso Legal</a>
+      </div>
+
+      <div class="footer-col">
+        <h4>Preferências e Suporte</h4>
+        <a href="#" data-cookies="preferencias">Preferências de cookies</a>
+        <a href="contato-privacidade.html">Solicitações de privacidade</a>
+        <a href="cliente.html">Central de atendimento</a>
         <a href="#faq">Dúvidas frequentes</a>
-        <a href="mailto:contatosertcode@gmail.com">contatosertcode@gmail.com</a>
-        <a href="https://wa.me/5588994355394" target="_blank" rel="noopener">WhatsApp</a>
       </div>
 
     </div>
@@ -748,99 +759,9 @@
 <script src="js/faq.js?v=3" defer></script>
 <script src="js/main.js?v=3" defer></script>
 
-<!-- ══ LGPD BANNER ══ -->
-<div id="lgpd-banner" role="dialog" aria-live="polite" aria-label="Aviso de privacidade">
-  <div style="display:flex;align-items:flex-start;gap:12px;flex:1;min-width:240px">
-    <span style="font-size:22px;flex-shrink:0;margin-top:1px">🍪</span>
-    <div>
-      <div style="font-size:13.5px;font-weight:700;color:#fff;margin-bottom:4px">
-        Privacidade &amp; Cookies — LGPD
-      </div>
-      <div style="font-size:12.5px;color:rgba(255,255,255,0.5);line-height:1.6">
-        Utilizamos cookies essenciais para o funcionamento do site. Ao aceitar, você também permite cookies analíticos que nos ajudam a melhorar sua experiência, em conformidade com a
-        <a href="https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm"
-           target="_blank" rel="noopener"
-           style="color:rgba(255,106,0,0.85);text-decoration:underline;text-underline-offset:3px">Lei nº 13.709/2018 (LGPD)</a>.
-        Saiba mais na nossa
-        <a href="privacidade.html"
-           style="color:rgba(255,106,0,0.85);text-decoration:underline;text-underline-offset:3px">política de privacidade</a>.
-      </div>
-    </div>
-  </div>
-  <div style="display:flex;gap:10px;flex-shrink:0;align-items:center;flex-wrap:wrap">
-    <button id="lgpd-reject" style="
-      background:transparent; border:1px solid rgba(255,255,255,0.12);
-      color:rgba(255,255,255,0.5); font-family:'Inter',sans-serif;
-      font-size:12.5px; font-weight:600; padding:9px 18px;
-      border-radius:8px; cursor:pointer; transition:all .2s;
-      white-space:nowrap;
-    " onmouseover="this.style.borderColor='rgba(255,255,255,0.25)';this.style.color='rgba(255,255,255,0.75)'"
-       onmouseout="this.style.borderColor='rgba(255,255,255,0.12)';this.style.color='rgba(255,255,255,0.5)'">
-      Rejeitar opcionais
-    </button>
-    <button id="lgpd-accept" style="
-      background:linear-gradient(135deg,#FF8A00,#FF6A00);
-      border:none; color:#fff; font-family:'Inter',sans-serif;
-      font-size:12.5px; font-weight:700; padding:9px 20px;
-      border-radius:8px; cursor:pointer; transition:opacity .2s;
-      white-space:nowrap; box-shadow:0 2px 12px rgba(255,106,0,0.35);
-    " onmouseover="this.style.opacity='.88'" onmouseout="this.style.opacity='1'">
-      Aceitar todos
-    </button>
-  </div>
-</div>
-
-<style>
-#lgpd-banner {
-  display:none;
-  position:fixed; bottom:24px; left:50%; transform:translateX(-50%);
-  width:calc(100% - 48px); max-width:780px; z-index:9999;
-  background:#0e0e0e; border:1px solid rgba(255,106,0,0.22);
-  border-radius:16px; padding:20px 24px;
-  box-shadow:0 8px 40px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04);
-  align-items:center; gap:20px; flex-wrap:wrap;
-  font-family:'Inter',sans-serif;
-  animation: lgpdSlideUp .4s cubic-bezier(.16,1,.3,1) both;
-  box-sizing:border-box;
-}
-@keyframes lgpdSlideUp {
-  from { opacity:0; transform:translateX(-50%) translateY(20px); }
-  to   { opacity:1; transform:translateX(-50%) translateY(0); }
-}
-@media (max-width:600px) {
-  #lgpd-banner {
-    bottom:0; left:0; transform:none; width:100%;
-    border-radius:16px 16px 0 0; max-width:100%; padding:18px 20px;
-  }
-  #lgpd-banner > div:last-child { width:100%; }
-  #lgpd-banner > div:last-child button { flex:1; }
-  @keyframes lgpdSlideUp {
-    from { opacity:0; transform:translateY(100%); }
-    to   { opacity:1; transform:translateY(0); }
-  }
-}
-</style>
-
-<script>
-(function () {
-  var KEY = 'sertcode_lgpd_v1';
-  var choice = localStorage.getItem(KEY);
-  if (choice) return; // já decidiu antes
-
-  var banner = document.getElementById('lgpd-banner');
-  banner.style.display = 'flex';
-
-  function dismiss(accepted) {
-    localStorage.setItem(KEY, accepted ? 'accepted' : 'rejected');
-    banner.style.transition = 'opacity .35s ease';
-    banner.style.opacity = '0';
-    setTimeout(function () { banner.style.display = 'none'; }, 380);
-  }
-
-  document.getElementById('lgpd-accept').addEventListener('click', function () { dismiss(true); });
-  document.getElementById('lgpd-reject').addEventListener('click', function () { dismiss(false); });
-})();
-</script>
+<!-- Aviso de cookies: markup e comportamento vivem em js/cookies.js,
+     para serem os mesmos no site, nas páginas legais e nos painéis. -->
+<script src="js/cookies.js?v=1" defer></script>
 
 </body>
 </html>

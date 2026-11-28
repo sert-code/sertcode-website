@@ -8,7 +8,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/portal.css?v=23">
+  <link rel="stylesheet" href="css/portal.css?v=24">
+  <link rel="stylesheet" href="css/cookies.css?v=1">
   <style>
     .admin-badge {
       font-size: 9px; font-weight: 800;
@@ -173,6 +174,14 @@
         <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
         Equipe
         <span class="sidebar-badge" id="equipe-badge" style="display:none"></span>
+      </a>
+      <!-- Sem data-only: quem entra é decidido pela permissão
+           'privacidade.ver', que o banco também confere. O item nasce
+           escondido e só aparece se pode_privacidade() disser que sim. -->
+      <a href="#" data-tab="privacidade" id="nav-privacidade" style="display:none">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+        Privacidade
+        <span class="sidebar-badge" id="priv-badge" style="display:none"></span>
       </a>
     </nav>
 
@@ -1579,6 +1588,120 @@
             </div>
           </div>
           <div class="rh-bloco-texto" style="margin-top:12px">Últimos 200 registros.</div>
+        </div>
+      </section>
+
+      <!-- ════════════ PRIVACIDADE (LGPD) ════════════ -->
+      <section class="tab-section" id="tab-privacidade">
+        <!-- lista -->
+        <div id="pv-lista">
+          <div class="section-title">Solicitações de privacidade</div>
+          <div class="section-sub">Pedidos recebidos pelo canal Contato sobre Privacidade do site</div>
+
+          <!-- sup-cartoes e não sup-contadores: a grade de contadores tem
+               seis colunas fixas e estes são quatro, que ficariam espremidos
+               à esquerda com dois vãos sobrando. -->
+          <div class="sup-cartoes" id="pv-contadores" style="margin-top:18px"></div>
+
+          <div class="card" style="margin:18px 0">
+            <div class="sup-filtros">
+              <div class="form-group" style="margin:0"><label>De</label><input type="date" id="pv-de"></div>
+              <div class="form-group" style="margin:0"><label>Até</label><input type="date" id="pv-ate"></div>
+              <div class="form-group" style="margin:0"><label>Assunto</label>
+                <select id="pv-f-tipo"><option value="">Todos</option></select></div>
+              <div class="form-group" style="margin:0"><label>Situação</label>
+                <select id="pv-f-situacao"><option value="">Todas</option></select></div>
+              <div class="form-group" style="margin:0"><label>Prazo</label>
+                <select id="pv-f-prazo">
+                  <option value="">Todos</option>
+                  <option value="atrasado">Atrasados</option>
+                  <option value="proximo">Vencem em até 3 dias</option>
+                  <option value="aberto">Em aberto</option>
+                </select></div>
+            </div>
+            <div class="form-group" style="margin:12px 0 0"><label>Pesquisar</label>
+              <input type="text" id="pv-busca" placeholder="Protocolo, nome, e-mail ou empresa"></div>
+          </div>
+
+          <div class="card">
+            <div class="table-scroll">
+              <table class="data-table">
+                <thead><tr><th>Protocolo</th><th>Solicitante</th><th>Assunto</th><th>Empresa</th><th>Situação</th><th>Responsável</th><th>Recebida</th><th>Prazo</th></tr></thead>
+                <tbody id="pv-body"></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="rh-bloco-texto" style="margin-top:12px">
+            O prazo de referência é de 15 dias corridos a contar do recebimento (LGPD, art. 19, II).
+            Linhas destacadas estão no prazo final ou já passaram dele.
+          </div>
+        </div>
+
+        <!-- ficha da solicitação -->
+        <div id="pv-ficha" hidden>
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap">
+            <div>
+              <div class="section-title" style="margin:0" id="pvf-protocolo">Solicitação</div>
+              <div class="section-sub" style="margin:4px 0 0" id="pvf-sub"></div>
+            </div>
+            <div class="team-actions">
+              <button class="team-btn" onclick="window._pvResponderEmail()">Responder por e-mail</button>
+              <button class="team-btn" onclick="window._pvVoltar()">← Voltar</button>
+            </div>
+          </div>
+
+          <div class="sup-cartoes" style="margin:18px 0">
+            <div class="card">
+              <div class="resumo-label">Situação</div>
+              <div class="resumo-valor" style="font-size:19px;text-align:left" id="pvf-situacao">—</div>
+            </div>
+            <div class="card">
+              <div class="resumo-label">Prazo de resposta</div>
+              <div class="resumo-valor" style="font-size:19px;text-align:left" id="pvf-prazo">—</div>
+            </div>
+            <div class="card">
+              <div class="resumo-label">Responsável</div>
+              <div class="resumo-valor" style="font-size:19px;text-align:left" id="pvf-responsavel">—</div>
+            </div>
+          </div>
+
+          <div class="card" style="margin-bottom:18px">
+            <div class="rh-bloco-titulo">Informações do chamado</div>
+            <div class="pv-dados" id="pvf-dados"></div>
+            <div class="rh-bloco" style="margin-top:14px">
+              <div class="rh-bloco-titulo" style="margin:0 0 8px">Descrição da solicitação</div>
+              <div class="pv-descricao" id="pvf-descricao">—</div>
+            </div>
+          </div>
+
+          <div class="card" style="margin-bottom:18px">
+            <div class="rh-bloco-titulo">Atendimento</div>
+            <div class="form-row-2" style="margin-top:12px">
+              <div class="form-group" style="margin:0"><label>Situação</label>
+                <select id="pvf-nova-situacao"></select></div>
+              <div class="form-group" style="margin:0"><label>Responsável pelo atendimento</label>
+                <select id="pvf-novo-responsavel"><option value="">Sem responsável</option></select></div>
+            </div>
+            <div class="form-group" style="margin-top:12px"><label>Observação (entra no histórico)</label>
+              <input type="text" id="pvf-nota-situacao" maxlength="400" placeholder="Ex.: identidade confirmada por e-mail"></div>
+            <button class="btn btn-primary" style="margin-top:12px" onclick="window._pvSalvarAtendimento()">Salvar atendimento</button>
+            <div class="form-msg" id="pvf-msg" role="alert"></div>
+          </div>
+
+          <div class="card" style="margin-bottom:18px">
+            <div class="rh-bloco-titulo">Registrar nota interna</div>
+            <div class="rh-bloco-texto" style="margin:6px 0 12px">
+              A nota fica só no painel: o solicitante não a vê. Use para registrar o que foi apurado e o que foi respondido.
+            </div>
+            <div class="form-group" style="margin:0"><label>Nota</label>
+              <textarea id="pvf-nota" maxlength="4000" placeholder="O que foi verificado, com quem, e qual foi a conclusão."></textarea></div>
+            <button class="btn btn-outline" style="margin-top:12px" onclick="window._pvAddNota()">Adicionar ao histórico</button>
+          </div>
+
+          <div class="card">
+            <div class="rh-bloco-titulo">Histórico de atendimento</div>
+            <div id="pvf-historico" class="hist-lista" style="margin-top:12px"></div>
+          </div>
         </div>
       </section>
 
@@ -3781,7 +3904,6 @@ function abrirImpressao(conteudo, titulo) {
   if (!janela) return alert('Libere as janelas pop-up para gerar o PDF.');
   janela.document.write(`<!DOCTYPE html><html lang="pt-BR"><head><meta charset="utf-8">
 <title>${titulo}</title><style>${ESTILO_HOLERITE}</style></head><body>${conteudo}<div id="avisos" class="avisos" aria-live="polite"></div>
-
 </body></html>`);
   janela.document.close();
   janela.focus();
@@ -5399,6 +5521,11 @@ const RECURSOS = [
     { chave: 'pessoas.montar',    label: 'Montar a folha',          perfis: ['RH'] },
     { chave: 'pessoas.aprovar',   label: 'Aprovar a folha',         perfis: [] },
     { chave: 'pessoas.pagamentos',label: 'Pagamentos e encargos',   perfis: ['FINANCEIRO'] },
+  ]},
+  // A área de privacidade guarda pedidos de titulares com nome, e-mail e
+  // o teor da solicitação: por padrão ninguém além da administração entra.
+  { grupo: 'Privacidade (LGPD)', itens: [
+    { chave: 'privacidade.ver',     label: 'Ver e atender solicitações', perfis: ['GESTOR'] },
   ]},
   { grupo: 'Configurações', itens: [
     { chave: 'config.ver',       label: 'Visualizar',          perfis: ['GESTOR','FINANCEIRO','RH'] },
@@ -7066,6 +7193,7 @@ const notif = await ligarNotificacoes({
     link.click();
     if (aba === 'chamados' && referencia) window._abrirChamado(referencia);
     if (aba === 'financeiro' && referencia) window._editarFatura(referencia);
+    if (aba === 'privacidade' && referencia) window._pvAbrir(referencia);
   },
 });
 
@@ -9297,7 +9425,311 @@ document.querySelector('.sidebar-nav a[data-tab="pessoas"]')?.addEventListener('
   registrarRh('VISUALIZOU', 'Gestão de Pessoas', 'Abriu a Gestão de Pessoas com salários');
 });
 
-const tabTitles = {dashboard:'Dashboard',clientes:'Clientes',projetos:'Projetos',chamados:'Chamados',arquivos:'Arquivos',financeiro:'Financeiro',depoimentos:'Depoimentos',feedbacks:'Feedbacks',"meu-rh":'Meu RH',pessoas:'Gestão de Pessoas',equipe:'Equipe'};
+/* ══════════════════════════════════════════════════════════════
+   PRIVACIDADE (LGPD) — Solicitações dos titulares
+
+   A área é restrita: quem decide é a função pode_privacidade() no
+   banco, não o JavaScript. Esconder o item do menu é conveniência;
+   a RLS é que impede de fato um colaborador sem permissão de ler
+   um pedido, mesmo chamando a API na mão.
+   ══════════════════════════════════════════════════════════════ */
+const PV_TIPOS = {
+  CONFIRMAR:        'Confirmar se tratamos seus dados',
+  ACESSO:           'Acesso aos dados',
+  CORRIGIR:         'Correção de dados pessoais',
+  EXCLUIR:          'Exclusão de dados',
+  REVOGAR:          'Revogação de consentimento',
+  COMPARTILHAMENTO: 'Com quem os dados são compartilhados',
+  OUTRA:            'Outra solicitação sobre privacidade',
+};
+const PV_SITUACOES = {
+  RECEBIDA:   'Recebida',
+  EM_ANALISE: 'Em análise',
+  IDENTIDADE: 'Identidade a confirmar',
+  RESPONDIDA: 'Respondida',
+  ENCERRADA:  'Encerrada',
+};
+const PV_EVENTOS = {
+  ABERTURA: 'Abertura', NOTA: 'Nota interna', STATUS: 'Situação',
+  RESPOSTA: 'Resposta', RESPONSAVEL: 'Responsável',
+};
+/* Prazo de referência da LGPD, art. 19, II. */
+const PV_DIAS_PRAZO = 15;
+
+let pvTodas = [], pvAtual = null, pvEquipe = [], pvPodeVer = false;
+
+const pvDia = 24 * 60 * 60 * 1000;
+const pvPrazo = criado => new Date(new Date(criado).getTime() + PV_DIAS_PRAZO * pvDia);
+const pvDiasRestantes = criado =>
+  Math.ceil((pvPrazo(criado).getTime() - Date.now()) / pvDia);
+const pvEmAberto = s => s !== 'RESPONDIDA' && s !== 'ENCERRADA';
+const pvData = d => d ? new Date(d).toLocaleDateString('pt-BR') : '—';
+const pvDataHora = d => d
+  ? new Date(d).toLocaleString('pt-BR', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' })
+  : '—';
+
+function pvSelo(s) {
+  const cls = { RECEBIDA:'status-analysis', EM_ANALISE:'status-dev',
+                IDENTIDADE:'status-purple', RESPONDIDA:'status-done', ENCERRADA:'' }[s] || '';
+  const extra = s === 'ENCERRADA' ? ' style="background:rgba(255,255,255,.05);color:var(--text-dim)"' : '';
+  return `<span class="status ${cls}"${extra}>${PV_SITUACOES[s] || s}</span>`;
+}
+
+function pvSeloPrazo(p) {
+  if (!pvEmAberto(p.status)) return '<span style="color:var(--text-dim)">—</span>';
+  const dias = pvDiasRestantes(p.created_at);
+  if (dias < 0)  return `<span style="color:var(--red);font-weight:700">${Math.abs(dias)} d em atraso</span>`;
+  if (dias <= 3) return `<span style="color:var(--orange);font-weight:700">${dias} d</span>`;
+  return `<span style="color:var(--text-muted)">${dias} d</span>`;
+}
+
+async function loadPrivacidade() {
+  /* A pergunta vai ao banco porque um SELECT barrado pela RLS volta
+     vazio, não com erro: sem isso não dá para distinguir "não pode ver"
+     de "ainda não chegou nenhum pedido". */
+  const { data: pode } = await supabase.rpc('pode_privacidade');
+  pvPodeVer = pode === true;
+  const link = el('nav-privacidade');
+  if (!pvPodeVer) { if (link) link.style.display = 'none'; return; }
+  if (link) link.style.display = '';
+
+  const { data, error } = await supabase
+    .from('privacy_requests').select('*').order('created_at', { ascending: false });
+  if (error) { console.warn('privacidade:', error.message); return; }
+  pvTodas = data || [];
+
+  /* Lista para o campo de responsável. Pode falhar se a política de
+     profiles não liberar a leitura da equipe para este perfil; nesse
+     caso o campo oferece ao menos a própria pessoa. */
+  const { data: eq } = await supabase.from('profiles')
+    .select('id,name,nickname').in('role', ['gestor','colaborador']).eq('status','ativo');
+  pvEquipe = eq?.length ? eq : [{ id: session.user.id, name: myName, nickname: null }];
+
+  pvMontaFiltros();
+  pvRender();
+}
+
+function pvMontaFiltros() {
+  const tipo = el('pv-f-tipo'), sit = el('pv-f-situacao');
+  if (tipo.options.length <= 1) {
+    for (const [v, r] of Object.entries(PV_TIPOS)) tipo.add(new Option(r, v));
+  }
+  if (sit.options.length <= 1) {
+    for (const [v, r] of Object.entries(PV_SITUACOES)) sit.add(new Option(r, v));
+  }
+  ['pv-de','pv-ate','pv-f-tipo','pv-f-situacao','pv-f-prazo','pv-busca']
+    .forEach(id => el(id).oninput = pvRender);
+}
+
+function pvFiltradas() {
+  const de = el('pv-de').value, ate = el('pv-ate').value;
+  const tipo = el('pv-f-tipo').value, sit = el('pv-f-situacao').value;
+  const prazo = el('pv-f-prazo').value;
+  const busca = el('pv-busca').value.trim().toLowerCase();
+
+  return pvTodas.filter(p => {
+    const dia = (p.created_at || '').slice(0, 10);
+    if (de && dia < de) return false;
+    if (ate && dia > ate) return false;
+    if (tipo && p.type !== tipo) return false;
+    if (sit && p.status !== sit) return false;
+    if (prazo) {
+      if (!pvEmAberto(p.status)) return false;
+      const d = pvDiasRestantes(p.created_at);
+      if (prazo === 'atrasado' && d >= 0) return false;
+      if (prazo === 'proximo' && (d < 0 || d > 3)) return false;
+    }
+    if (busca) {
+      const alvo = [p.protocol, p.name, p.email, p.related_to, p.account_ref]
+        .filter(Boolean).join(' ').toLowerCase();
+      if (!alvo.includes(busca)) return false;
+    }
+    return true;
+  });
+}
+
+function pvRender() {
+  const lista = pvFiltradas();
+  const abertas = pvTodas.filter(p => pvEmAberto(p.status));
+  const atrasadas = abertas.filter(p => pvDiasRestantes(p.created_at) < 0);
+
+  el('pv-contadores').innerHTML = [
+    ['Em aberto', abertas.length, 'var(--orange)'],
+    ['Fora do prazo', atrasadas.length, atrasadas.length ? 'var(--red)' : 'var(--text-muted)'],
+    ['Respondidas', pvTodas.filter(p => p.status === 'RESPONDIDA').length, 'var(--green)'],
+    ['Total recebido', pvTodas.length, 'var(--text)'],
+  ].map(([r, n, cor]) => `
+    <div class="card">
+      <div class="resumo-label">${r}</div>
+      <div class="resumo-valor" style="font-size:22px;text-align:left;color:${cor}">${n}</div>
+    </div>`).join('');
+
+  const badge = el('priv-badge');
+  if (badge) {
+    badge.textContent = abertas.length;
+    badge.style.display = abertas.length ? '' : 'none';
+    badge.style.background = atrasadas.length ? 'var(--red)' : '';
+  }
+
+  el('pv-body').innerHTML = lista.length ? lista.map(p => {
+    const vencido = pvEmAberto(p.status) && pvDiasRestantes(p.created_at) < 0;
+    const resp = pvEquipe.find(e => e.id === p.assigned_to);
+    return `<tr style="cursor:pointer${vencido ? ';background:rgba(239,68,68,.05)' : ''}"
+                onclick="window._pvAbrir('${p.id}')">
+      <td style="font-family:ui-monospace,monospace;font-weight:600;color:var(--orange)">${esc(p.protocol)}</td>
+      <td><div style="font-weight:600">${esc(p.name)}</div>
+          <div style="font-size:11.5px;color:var(--text-dim)">${esc(p.email)}</div></td>
+      <td>${esc(PV_TIPOS[p.type] || p.type)}</td>
+      <td>${esc(p.related_to || '—')}</td>
+      <td>${pvSelo(p.status)}</td>
+      <td>${esc(resp ? (resp.nickname || resp.name) : '—')}</td>
+      <td>${pvData(p.created_at)}</td>
+      <td>${pvSeloPrazo(p)}</td>
+    </tr>`;
+  }).join('') : '<tr><td colspan="8" style="text-align:center;color:var(--text-dim);padding:28px">Nenhuma solicitação com esses filtros.</td></tr>';
+}
+
+window._pvAbrir = async (id) => {
+  const p = pvTodas.find(x => x.id === id);
+  if (!p) return;
+  pvAtual = p;
+
+  el('pv-lista').hidden = true;
+  el('pv-ficha').hidden = false;
+  el('header-title').textContent = 'Privacidade';
+
+  el('pvf-protocolo').textContent = p.protocol;
+  el('pvf-sub').textContent = `${PV_TIPOS[p.type] || p.type} · recebida em ${pvDataHora(p.created_at)}`;
+  el('pvf-situacao').innerHTML = pvSelo(p.status);
+
+  const dias = pvDiasRestantes(p.created_at);
+  el('pvf-prazo').innerHTML = pvEmAberto(p.status)
+    ? `${pvData(pvPrazo(p.created_at))} <span style="font-size:13px;color:${dias < 0 ? 'var(--red)' : dias <= 3 ? 'var(--orange)' : 'var(--text-dim)'}">(${dias < 0 ? Math.abs(dias) + ' d em atraso' : dias + ' d'})</span>`
+    : '<span style="color:var(--text-dim)">Encerrado</span>';
+
+  const resp = pvEquipe.find(e => e.id === p.assigned_to);
+  el('pvf-responsavel').textContent = resp ? (resp.nickname || resp.name) : 'Sem responsável';
+
+  // Tudo que vem do formulário público é escapado. O e-mail é o único
+  // campo que vira link, e é montado à parte justamente para o escape
+  // valer para ele também.
+  const emailLink = `<a href="mailto:${esc(p.email)}" style="color:var(--orange)">${esc(p.email)}</a>`;
+  el('pvf-dados').innerHTML = [
+    ['Protocolo', esc(p.protocol)],
+    ['Data de recebimento', pvDataHora(p.created_at)],
+    ['Nome do solicitante', esc(p.name)],
+    ['E-mail', emailLink],
+    ['Empresa ou sistema', esc(p.related_to || '—')],
+    ['Identificação do cadastro', esc(p.account_ref || '—')],
+    ['Tipo de solicitação', esc(PV_TIPOS[p.type] || p.type)],
+    ['Última atualização', pvDataHora(p.updated_at)],
+  ].map(([rotulo, valor]) =>
+    `<div class="pv-dado"><span>${rotulo}</span><strong>${valor}</strong></div>`).join('');
+
+  el('pvf-descricao').textContent = p.description;
+
+  const sel = el('pvf-nova-situacao');
+  sel.innerHTML = Object.entries(PV_SITUACOES)
+    .map(([v, r]) => `<option value="${v}"${v === p.status ? ' selected' : ''}>${r}</option>`).join('');
+
+  const selResp = el('pvf-novo-responsavel');
+  selResp.innerHTML = '<option value="">Sem responsável</option>' + pvEquipe
+    .map(e => `<option value="${e.id}"${e.id === p.assigned_to ? ' selected' : ''}>${esc(e.nickname || e.name)}</option>`).join('');
+
+  el('pvf-nota-situacao').value = '';
+  el('pvf-nota').value = '';
+  el('pvf-msg').textContent = '';
+
+  await pvCarregaHistorico(p.id);
+};
+
+async function pvCarregaHistorico(id) {
+  const { data } = await supabase.from('privacy_request_events')
+    .select('*').eq('request_id', id).order('created_at');
+  el('pvf-historico').innerHTML = data?.length ? data.map(e => `
+    <div class="hist-item${e.kind === 'NOTA' ? ' sup-nota' : ''}">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
+        <strong style="font-size:12px;color:var(--orange)">${esc(PV_EVENTOS[e.kind] || e.kind)}</strong>
+        <span style="font-size:11.5px;color:var(--text-dim)">${esc(e.author || '—')} · ${pvDataHora(e.created_at)}</span>
+      </div>
+      <div style="margin-top:6px;white-space:pre-wrap">${esc(e.text)}</div>
+    </div>`).join('') : '<div style="color:var(--text-dim)">Nenhum registro.</div>';
+}
+
+window._pvVoltar = () => {
+  el('pv-ficha').hidden = true;
+  el('pv-lista').hidden = false;
+  pvAtual = null;
+};
+
+window._pvSalvarAtendimento = async () => {
+  if (!pvAtual) return;
+  const msg = el('pvf-msg');
+  const novoStatus = el('pvf-nova-situacao').value;
+  const novoResp = el('pvf-novo-responsavel').value || null;
+  const nota = el('pvf-nota-situacao').value.trim();
+
+  msg.textContent = 'Salvando…';
+
+  if (novoResp !== (pvAtual.assigned_to || null)) {
+    const { error } = await supabase.from('privacy_requests')
+      .update({ assigned_to: novoResp, updated_at: new Date().toISOString() })
+      .eq('id', pvAtual.id);
+    if (error) { msg.textContent = 'Não foi possível alterar o responsável: ' + error.message; return; }
+    const quem = pvEquipe.find(e => e.id === novoResp);
+    await supabase.from('privacy_request_events').insert({
+      request_id: pvAtual.id, kind: 'RESPONSAVEL', author_id: session.user.id, author: myName,
+      text: quem ? `Atendimento atribuído a ${quem.nickname || quem.name}.` : 'Responsável removido.',
+    });
+  }
+
+  if (novoStatus !== pvAtual.status || nota) {
+    const { error } = await supabase.rpc('privacidade_muda_situacao', {
+      p_id: pvAtual.id, p_status: novoStatus, p_nota: nota || null,
+    });
+    if (error) { msg.textContent = 'Não foi possível salvar: ' + error.message; return; }
+  }
+
+  msg.textContent = '';
+  window._aviso('Atendimento atualizado.');
+  await loadPrivacidade();
+  await window._pvAbrir(pvAtual.id);
+};
+
+window._pvAddNota = async () => {
+  if (!pvAtual) return;
+  const campo = el('pvf-nota');
+  const texto = campo.value.trim();
+  if (texto.length < 3) { window._aviso('Escreva a nota antes de adicionar.', 'error'); return; }
+  const { error } = await supabase.from('privacy_request_events').insert({
+    request_id: pvAtual.id, kind: 'NOTA', text: texto,
+    author_id: session.user.id, author: myName,
+  });
+  if (error) { window._aviso('Não foi possível gravar a nota: ' + error.message, 'error'); return; }
+  campo.value = '';
+  await pvCarregaHistorico(pvAtual.id);
+  window._aviso('Nota registrada no histórico.');
+};
+
+/* Abre o cliente de e-mail já com protocolo e assunto. A resposta formal
+   sai do e-mail da empresa; aqui fica só o registro de que foi enviada. */
+window._pvResponderEmail = () => {
+  if (!pvAtual) return;
+  const assunto = `Resposta à sua solicitação de privacidade — protocolo ${pvAtual.protocol}`;
+  const corpo = [
+    `Olá, ${pvAtual.name}.`, '',
+    `Sobre a sua solicitação registrada em ${pvData(pvAtual.created_at)} sob o protocolo ${pvAtual.protocol} (${PV_TIPOS[pvAtual.type] || pvAtual.type}):`,
+    '', '', '',
+    'Se precisar complementar, responda este e-mail informando o protocolo.', '',
+    'SertCode',
+  ].join('\n');
+  window.location.href = `mailto:${encodeURIComponent(pvAtual.email)}`
+    + `?subject=${encodeURIComponent(assunto)}&body=${encodeURIComponent(corpo)}`;
+};
+
+await loadPrivacidade();
+
+const tabTitles = {dashboard:'Dashboard',clientes:'Clientes',projetos:'Projetos',chamados:'Chamados',arquivos:'Arquivos',financeiro:'Financeiro',depoimentos:'Depoimentos',feedbacks:'Feedbacks',"meu-rh":'Meu RH',pessoas:'Gestão de Pessoas',equipe:'Equipe',privacidade:'Privacidade'};
 document.querySelectorAll('.sidebar-nav a[data-tab]').forEach(link => {
   link.addEventListener('click', e => {
     e.preventDefault();
@@ -9381,6 +9813,8 @@ async function init() {
 
 init();
 </script>
+
+<script src="js/cookies.js?v=1" defer></script>
 
 </body>
 </html>
