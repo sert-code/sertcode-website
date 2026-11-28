@@ -1,0 +1,13 @@
+# Arquivos que ficam no repositório mas não vão para o site publicado.
+
+# Os scripts de banco. Sem isto a Vercel serve sertcode.com.br/supabase/*.sql
+# para qualquer um: o esquema inteiro, as políticas de RLS e o corpo das
+# funções SECURITY DEFINER ficam legíveis. A RLS continua sendo a defesa
+# de verdade — ela é aplicada no servidor —, mas não há motivo para
+# publicar o mapa.
+supabase/
+
+# Fontes das artes do Instagram: HTML de montagem, scripts de exportação
+# e os PNGs já gerados. Servem para produzir as imagens, não para serem
+# acessados pelo site.
+instagram/
